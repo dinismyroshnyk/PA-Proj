@@ -10,20 +10,18 @@ public class Main {
 
     private static void doUsersExist(Scanner scanner) {
         if (User.getAllUsers().isEmpty()) {
-            System.out.println("No users found. Please create a manager.");
+            System.out.println("No users found. Please register a manager.");
             boolean valid = false;
             while (!valid) {
-                System.out.print("(New manager) Enter login: ");
+                System.out.print("Login: ");
                 String login = scanner.nextLine();
-                System.out.print("(New manager) Enter password: ");
+                System.out.print("Password: ");
                 String password = scanner.nextLine();
-                System.out.print("(New manager) Enter name: ");
+                System.out.print("Name: ");
                 String name = scanner.nextLine();
-                System.out.print("(New manager) Enter email: ");
+                System.out.print("Email: ");
                 String email = scanner.nextLine();
-                System.out.print("(New manager) Enter status: ");
-                String status = scanner.nextLine();
-                Manager.register(login, password, name, email, status);
+                Manager.register(login, password, name, email);
                 if (!User.getAllUsers().isEmpty()) {
                     System.out.println("Manager created successfully.");
                     valid = true;
