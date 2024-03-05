@@ -1,9 +1,9 @@
 public class Author extends User{
-    private static String nif;
-    private static String phone;
-    private static String address;
-    private static String literaryStyle;
-    private static String startDate;
+    private String nif;
+    private String phone;
+    private String address;
+    private String literaryStyle;
+    private String startDate;
 
     // constructor
     public Author(String login, String password, String name, String email, String nif, String phone, String address, String literaryStyle, String startDate) {

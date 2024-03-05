@@ -1,9 +1,9 @@
 public class Reviewer extends User{
-    private static String nif;
-    private static String phone;
-    private static String address;
-    private static String specialization;
-    private static String academicBackground;
+    private String nif;
+    private String phone;
+    private String address;
+    private String specialization;
+    private String academicBackground;
 
     // constructor
     public Reviewer(String login, String password, String name, String email, String nif, String phone, String address, String specialization, String academicBackground) {
