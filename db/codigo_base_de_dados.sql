@@ -22,7 +22,7 @@ drop table if exists UTILIZADORES;
 /*==============================================================*/
 create table ANOTACAO
 (
-   ID_ANOTACAO          int not null,
+   ID_ANOTACAO          int not null AUTO_INCREMENT,
    ID_REVISAO           int,
    DESCRICAO            text not null,
    PAGINA               int not null,
@@ -36,7 +36,7 @@ create table ANOTACAO
 /*==============================================================*/
 create table LICENCA
 (
-   ID_LICENCA           int not null,
+   ID_LICENCA           int not null AUTO_INCREMENT,
    NUMERO               text not null,
    DATA_INICIO          date not null,
    DATA_FIM             date not null,
@@ -49,7 +49,7 @@ create table LICENCA
 /*==============================================================*/
 create table OBRAS
 (
-   ID_OBRA              int not null,
+   ID_OBRA              int not null AUTO_INCREMENT,
    ID_UTILIZADORES      int not null,
    ID_LICENCA           int not null,
    TITULO               varchar(50) not null,
@@ -70,7 +70,7 @@ create table OBRAS
 /*==============================================================*/
 create table REVISAO
 (
-   ID_REVISAO           int not null,
+   ID_REVISAO           int not null AUTO_INCREMENT,
    ID_OBRA              int not null,
    ID_UTILIZADORES      int not null,
    N_SERIE              text not null,
@@ -86,7 +86,7 @@ create table REVISAO
 /*==============================================================*/
 create table UTILIZADORES
 (
-   ID_UTILIZADORES      int not null,
+   ID_UTILIZADORES      int not null AUTO_INCREMENT,
    NOME                 varchar(100) not null,
    USERNAME             varchar(20) not null,
    PASSWORD             varchar(30) not null,
