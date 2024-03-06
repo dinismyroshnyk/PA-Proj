@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     29/02/2024 12:15:03                          */
+/* Created on:     06/03/2024 17:45:02                          */
 /*==============================================================*/
 
 drop database if exists projeto;
@@ -90,7 +90,7 @@ create table UTILIZADORES
    NOME                 varchar(100) not null,
    USERNAME             varchar(20) not null,
    PASSWORD             varchar(30) not null,
-   ESTADO               bool not null,
+   ESTADO               varchar(15) not null,
    EMAIL                text not null,
    TIPO                 varchar(7) not null,
    CONTRIBUINTE         int not null,
