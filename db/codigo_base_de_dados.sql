@@ -97,7 +97,7 @@ create table UTILIZADORES
    TELEFONE             varchar(9),
    MORADA               text,
    ESTILO_LITERARIO     varchar(30),
-   DATA_INICIO          date,
+   DATA_INICIO          varchar(10),
    AREA_ESPECIALIZACAO  text,
    FORMACAO_ACADEMICA   varchar(50),
    primary key (ID_UTILIZADORES)
