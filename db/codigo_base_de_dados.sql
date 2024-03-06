@@ -93,13 +93,13 @@ create table UTILIZADORES
    ESTADO               varchar(15) not null,
    EMAIL                text not null,
    TIPO                 varchar(7) not null,
-   CONTRIBUINTE         int not null,
-   TELEFONE             int not null,
-   MORADA               text not null,
-   ESTILO_LITERARIO     varchar(30) not null,
-   DATA_INICIO          date not null,
-   AREA_ESPECIALIZACAO  text not null,
-   FORMACAO_ACADEMICA   varchar(50) not null,
+   CONTRIBUINTE         varchar(9),
+   TELEFONE             varchar(9),
+   MORADA               text,
+   ESTILO_LITERARIO     varchar(30),
+   DATA_INICIO          date,
+   AREA_ESPECIALIZACAO  text,
+   FORMACAO_ACADEMICA   varchar(50),
    primary key (ID_UTILIZADORES)
 );
 
