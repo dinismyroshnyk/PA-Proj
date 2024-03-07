@@ -98,7 +98,7 @@ public class Main {
         // Check if there are any users in the database
         rs = null;
         sqlQuery = new StringBuffer();
-        sqlQuery.append(" SELECT username FROM utilizadores ");
+        sqlQuery.append(" SELECT username FROM UTILIZADORES ");
         try {
             rs = st.executeQuery(sqlQuery.toString());
         } catch (SQLException e) {
@@ -122,7 +122,7 @@ public class Main {
                 List<Object> values = getUserValues(manager);
                 // Insert the manager into the database
                 sqlQuery = new StringBuffer();
-                sqlQuery.append(" INSERT INTO utilizadores (username, password, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)");
+                sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)");
                 PreparedStatement ps = null;
                 try {
                     ps = conn.prepareStatement(sqlQuery.toString());
