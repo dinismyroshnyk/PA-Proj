@@ -1,5 +1,8 @@
 import java.util.ArrayList;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Scanner;
 import java.sql.Connection;
@@ -65,7 +68,7 @@ public class Main {
         String parameters  = "?useTimezone=true&serverTimezone=UTC&verifyServerCertificate=false&useSSL=true";
         String url = "jdbc:mysql://" + ip + ":" + port + "/" + database + parameters;
         String user = "root";
-        String password = "toor";
+        String password = "14022004";
         // Load the JDBC driver
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -114,6 +117,22 @@ public class Main {
                 String login = scanner.nextLine();
                 System.out.print("Password: ");
                 String password = scanner.nextLine();
+                try 
+                {
+                    MessageDigest algorithm = MessageDigest.getInstance("MD5");
+                    byte senha[] = algorithm.digest(password.getBytes("UTF-8"));
+                    StringBuilder pass = new StringBuilder();
+                    for (byte b : senha) 
+                    {
+                        pass.append(String.format("%02X", 0xFF & b));
+                    }
+                    password = pass.toString();
+                } 
+                catch (UnsupportedEncodingException | NoSuchAlgorithmException e) 
+                {
+                    e.printStackTrace();
+                }
+                
                 System.out.print("Name: ");
                 String name = scanner.nextLine();
                 System.out.print("Email: ");

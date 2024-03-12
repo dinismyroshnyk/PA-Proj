@@ -89,7 +89,7 @@ create table UTILIZADORES
    ID_UTILIZADORES      int not null AUTO_INCREMENT,
    NOME                 varchar(100) not null,
    USERNAME             varchar(20) not null,
-   PASSWORD             varchar(30) not null,
+   PASSWORD             varchar(60) not null,
    ESTADO               varchar(15) not null,
    EMAIL                text not null,
    TIPO                 varchar(7) not null,
