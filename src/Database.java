@@ -132,8 +132,9 @@ public class Database {
             }
         }
     }
-    //verificar se o email existe
-    public static boolean Exists(String st, String type) {
+
+    // Check if a string type exists in the database
+    public static boolean existsInDatabase(String st, String type) {
         try {
             sqlQuery = new StringBuffer();
             if (type.equals("email")) {
@@ -144,13 +145,12 @@ public class Database {
             PreparedStatement ps = conn.prepareStatement(sqlQuery.toString());
             ps.setString(1, st);
             ResultSet rs = ps.executeQuery();
-            // Se houver algum resultado, o email/username/login já existe
+            // If the result set is not empty, the string exists in the database
             if (rs.next()) {
                 return true;
             }
         } catch (SQLException e) {
-            // Tratar a exceção
-            System.out.println("Ocorreu um erro ao interagir com o banco de dados");
+            System.out.println("Failed to execute query.");
             e.printStackTrace();
         }
         return false;

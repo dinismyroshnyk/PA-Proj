@@ -40,10 +40,10 @@ public abstract class User {
         }
     }
     public static String getLogin(Scanner scanner, String login) {
-        while (Database.Exists(login, "login")) {
+        while (Database.existsInDatabase(login, "login")) {
             System.out.print("Login: ");
             login = scanner.nextLine();
-            Database.Exists(login, "login");
+            Database.existsInDatabase(login, "login");
         }
         return login;
     }
@@ -59,6 +59,9 @@ public abstract class User {
             email = scanner.nextLine();
             if (!isEmailValid(email)) {
                 System.out.println("Invalid email. Please try again.");
+            }
+            if (Database.existsInDatabase(email, "email")) {
+                System.out.println("Email already in use. Please try again.");
             }
         } while (!isEmailValid(email));
         return email;
