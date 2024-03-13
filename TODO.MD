@@ -2,14 +2,14 @@
 ### Gestão de acesso e utilizadores
 - [ ] [R1] Permitir aos utilizadores registarem-se e autenticarem-se na aplicação.
 - [ ] [R2] Permitir o acesso à aplicação por 3 tipos de utilizadores: gestores da plataforma (ou administradores), autores e revisores.
-- [ ] [R3] Os utilizadores são caracterizados pelos atributos nome, login, password, estado (ativo/inativo), email e tipo (gestor, autor ou revisor).
+- [x] [R3] Os utilizadores são caracterizados pelos atributos nome, login, password, estado (ativo/inativo), email e tipo (gestor, autor ou revisor).
 - [ ] [R4] Tanto o atributo login como o email devem ser únicos.
 - [ ] [R5] O email deve apresentar um formato válido.
 > [!NOTE]
 > [designação] @ [entidade] . [domínio]
 - [ ] [R6] Cada utilizador apenas pode alterar a sua própria informação, não podendo alterar ou visualizar dados de outros utilizadores, ou criar utilizadores.
 - [ ] [R7] A exceção ao requisito anterior são os gestores, que podem visualizar e alterar dados de todos os utilizadores e criar utilizadores, nomeadamente outros gestores.
-- [ ] [R8] Tanto os autores como os revisores têm adicionalmente os parâmetros número de contribuinte, contacto telefónico e morada. Os autores possuem ainda estilo literário (e.g. drama, ficção, thriller) e data de início de atividade. Os revisores possuem, adicionalmente, área de especialização e formação académica.
+- [x] [R8] Tanto os autores como os revisores têm adicionalmente os parâmetros número de contribuinte, contacto telefónico e morada. Os autores possuem ainda estilo literário (e.g. drama, ficção, thriller) e data de início de atividade. Os revisores possuem, adicionalmente, área de especialização e formação académica.
 > [!NOTE]
 > (e.g. ciências, literatura, artes)
 - [ ] [R9] O atributo número de contribuinte deve ser único e possuir 9 dígitos.
@@ -21,8 +21,8 @@
 - [ ] [R15] Em qualquer momento um gestor pode inativar ou ativar uma conta de um utilizador.
 - [ ] [R16] Um utilizador pode solicitar que a sua conta seja removida do sistema. Neste caso deve surgir uma notificação aos gestores que podem aceitar ou recusar o pedido. Se o pedido for aceite, a informação pessoal do utilizador deve ser omitida do sistema, embora os registos associados ao utilizador devem ser mantidos.
 - [ ] [R17] Caso não existiam utilizadores criados na primeira execução, a aplicação deve solicitar credenciais para criar uma conta gestor.
-- [ ] [R18] Após a autenticação, a aplicação deve apresentar a mensagem `Bem-vindo [nome utilizador]`.
-- [ ] [R19] Quando a aplicação estiver a encerrar, deve apresentar a mensagem `Adeus [nome utilizador]`.
+- [x] [R18] Após a autenticação, a aplicação deve apresentar a mensagem `Bem-vindo [nome utilizador]`.
+- [x] [R19] Quando a aplicação estiver a encerrar, deve apresentar a mensagem `Adeus [nome utilizador]`.
 
 ### Ações → Intervenientes e responsabilidades
 - [ ] [R20] Os revisores gerem (aprovam e finalizam) o processo de revisão.
