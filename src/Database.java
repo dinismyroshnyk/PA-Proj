@@ -140,6 +140,8 @@ public class Database {
                 sqlQuery.append("SELECT * FROM UTILIZADORES WHERE email = ?");
             } else if (type.equals("login")) {
                 sqlQuery.append("SELECT * FROM UTILIZADORES WHERE username = ?");
+            }else if (type.equals("NIF")) {
+                sqlQuery.append("SELECT * FROM UTILIZADORES WHERE contribuinte = ?");
             }
             PreparedStatement ps = conn.prepareStatement(sqlQuery.toString());
             ps.setString(1, st);

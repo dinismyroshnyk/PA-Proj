@@ -3,8 +3,8 @@
 - [x] [R1] Permitir aos utilizadores registarem-se e autenticarem-se na aplicação.
 - [x] [R2] Permitir o acesso à aplicação por 3 tipos de utilizadores: gestores da plataforma (ou administradores), autores e revisores.
 - [x] [R3] Os utilizadores são caracterizados pelos atributos nome, login, password, estado (ativo/inativo), email e tipo (gestor, autor ou revisor).
-- [ ] [R4] Tanto o atributo login como o email devem ser únicos.
-- [ ] [R5] O email deve apresentar um formato válido.
+- [x] [R4] Tanto o atributo login como o email devem ser únicos.
+- [x] [R5] O email deve apresentar um formato válido.
 > [!NOTE]
 > [designação] @ [entidade] . [domínio]
 - [ ] [R6] Cada utilizador apenas pode alterar a sua própria informação, não podendo alterar ou visualizar dados de outros utilizadores, ou criar utilizadores.

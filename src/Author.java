@@ -29,8 +29,21 @@ public class Author extends User{
         }
         System.out.print("NIF: ");
         String nif = scanner.nextLine();
+        if (Database.Exists(nif, "NIF") ) {
+            System.out.println("NIF already in use . Please try again.");
+            nif=User.validateNIF(scanner);   
+        }
+        if (!User.isValidNIF(nif)) {
+            System.out.println("Invalid NIF. Please try again.");
+            nif=User.validateNIF(scanner);
+        } 
         System.out.print("Phone: ");
         String phone = scanner.nextLine();
+        if (!User.isValidPhoneNumber(phone)) {
+            System.out.println("Invalid phone number. Please try again.");
+            phone=User.validatePhone(scanner);
+            
+        }
         System.out.print("Address: ");
         String address = scanner.nextLine();
         System.out.print("Literary Style: ");

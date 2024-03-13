@@ -52,6 +52,7 @@ public abstract class User {
         return email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
     }
 
+    
     public static String validateEmail(Scanner scanner) {
         String email;
         do {
@@ -62,5 +63,38 @@ public abstract class User {
             }
         } while (!isEmailValid(email));
         return email;
+    }
+    
+    public static boolean isValidNIF(String nif) {
+        // A expressão regular verifica se a string contém exatamente 9 dígitos
+        return nif.matches("^[0-9]{9}$");
+    }
+
+    public static String validateNIF(Scanner scanner) {
+        String nif;
+        do {
+            System.out.print("NIF: ");
+            nif = scanner.nextLine();
+            if (!isValidNIF(nif)) {
+                System.out.println("Invalid NIF. Please try again.");
+            }
+        } while (!isValidNIF(nif));
+        return nif;
+    }
+
+    public static boolean isValidPhoneNumber(String phoneNumber) {
+        return phoneNumber.matches("^(9|2|3)\\d{8}$");
+    }
+
+    public static String validatePhone(Scanner scanner) {
+        String phone;
+        do {
+            System.out.print("Phone: ");
+            phone = scanner.nextLine();
+            if (!isValidPhoneNumber(phone)) {
+                System.out.println("Invalid phone number. Please try again.");
+            }
+        } while (!isValidPhoneNumber(phone));
+        return phone;
     }
 }
