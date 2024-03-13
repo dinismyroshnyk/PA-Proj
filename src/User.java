@@ -79,7 +79,7 @@ public abstract class User {
         do {
             System.out.print("NIF: ");
             nif = scanner.nextLine();
-            if (!isValidNIF(nif)) {
+            if (!isValidNIF(nif) || Database.existsInDatabase(nif, "NIF")) {
                 System.out.println("Invalid NIF. Please try again.");
             }
         } while (!isValidNIF(nif));
