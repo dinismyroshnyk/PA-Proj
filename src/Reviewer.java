@@ -7,7 +7,7 @@ public class Reviewer extends User{
 
     // constructor
     public Reviewer(String login, String password, String name, String email, String nif, String phone, String address, String specialization, String academicBackground) {
-        super(login, password, name, email, "reviewer", "active");
+        super(login, password, name, email, "reviewer", "inactive");
         this.nif = nif;
         this.phone = phone;
         this.address = address;

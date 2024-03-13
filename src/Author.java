@@ -7,7 +7,7 @@ public class Author extends User{
 
     // constructor
     public Author(String login, String password, String name, String email, String nif, String phone, String address, String literaryStyle, String startDate) {
-        super(login, password, name, email, "author", "active");
+        super(login, password, name, email, "author", "inactive");
         this.nif = nif;
         this.phone = phone;
         this.address = address;
