@@ -62,6 +62,8 @@ public class Main {
         // If no users are found, create a manager
         try {
             if (!Database.rs.next()) {
+                System.out.println("No users found. Creating a manager...");
+                pressAnyKey(scanner);
                 User manager = User.createUser("manager", scanner);
                 List<Object> values = getUserValues(manager);
                 Database.insertUserIntoDatabase(values, scanner);
