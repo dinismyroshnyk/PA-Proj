@@ -1,8 +1,11 @@
 import java.util.ArrayList;
-import java.io.UnsupportedEncodingException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Scanner;
 import java.sql.Connection;
@@ -20,13 +23,14 @@ public class Main {
     static StringBuffer sqlQuery = null;
 
     public static void main(String[] args) throws Exception {
-        // Connect to the database
-        connectToDatabase();
         // Open scanner for user input
         Scanner scanner = new Scanner(System.in);
+        // Connect to the database
+        setUpDatabase(scanner);
         // Application and SQL handling
         try {
             doUsersExist(scanner);
+            System.out.println("Application running...");
             //mainLoop(scanner);
         } catch (Exception e) {
             System.out.println("Exception: " + e);
@@ -59,23 +63,61 @@ public class Main {
         System.exit(0);
     }
 
-    // Prepare JDBC driver and connect to the database
-    private static void connectToDatabase() {
-        // JDBC related variables
+    // Set up the database connection
+    private static void setUpDatabase(Scanner scanner) {
+        // Path to the credentials file
+        String credentialsPath = ".credentials";
+        File credentialsFile = new File(credentialsPath);
+        // Check if the credentials file exists
+        if (credentialsFile.exists()) {
+            // Read the credentials from the file
+            try (BufferedReader reader = new BufferedReader(new FileReader(credentialsFile))) {
+                String user = reader.readLine();
+                String password = reader.readLine();
+                password = Security.encryptDecryptString(password, "-d");
+                connectToDatabase(user, password);
+            } catch (IOException e) {
+                System.out.println("Error reading credentials file: " + e.getMessage());
+                System.exit(1);
+            }
+        } else {
+            // Prompt the user for credentials
+            System.out.print("Database User: ");
+            String user = scanner.nextLine();
+            System.out.print("Database Password: ");
+            String password = scanner.nextLine();
+            // Attempt to connect with the provided credentials
+            if (connectToDatabase(user, password)) {
+                // If successful, encrypt and save the credentials
+                password = Security.encryptDecryptString(password, "-e");
+                try (PrintWriter writer = new PrintWriter(new FileWriter(credentialsPath))) {
+                    writer.println(user);
+                    writer.println(password);
+                } catch (IOException e) {
+                    System.out.println("Error saving credentials: " + e.getMessage());
+                    System.exit(1);
+                }
+            } else {
+                System.out.println("Invalid credentials. Please try again.");
+                setUpDatabase(scanner);
+            }
+        }
+    }
+
+    // Connect to the database
+    private static boolean connectToDatabase(String user, String password) {
         String ip = "localhost";
         String port = "3306";
         String database = "projeto";
-        String parameters  = "?useTimezone=true&serverTimezone=UTC&verifyServerCertificate=false&useSSL=true";
+        String parameters = "?useTimezone=true&serverTimezone=UTC&verifyServerCertificate=false&useSSL=true";
         String url = "jdbc:mysql://" + ip + ":" + port + "/" + database + parameters;
-        String user = "root";
-        String password = "14022004";
         // Load the JDBC driver
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             System.out.println("MySQL JDBC Driver not found.");
             System.out.println("Exception: " + e);
-            System.exit(1);
+            return false;
         }
         // Connect to the database
         try {
@@ -84,7 +126,7 @@ public class Main {
         } catch (SQLException e) {
             System.out.println("Connection failed.");
             System.out.println("Exception: " + e);
-            System.exit(1);
+            return false;
         }
         // Transaction control
         try {
@@ -92,8 +134,9 @@ public class Main {
         } catch (SQLException e) {
             System.out.println("Failed to turn off auto-commit.");
             System.out.println("Exception: " + e);
-            System.exit(1);
+            return false;
         }
+        return true;
     }
 
     // Create a manager if no users exist
@@ -117,22 +160,7 @@ public class Main {
                 String login = scanner.nextLine();
                 System.out.print("Password: ");
                 String password = scanner.nextLine();
-                try 
-                {
-                    MessageDigest algorithm = MessageDigest.getInstance("MD5");
-                    byte senha[] = algorithm.digest(password.getBytes("UTF-8"));
-                    StringBuilder pass = new StringBuilder();
-                    for (byte b : senha) 
-                    {
-                        pass.append(String.format("%02X", 0xFF & b));
-                    }
-                    password = pass.toString();
-                } 
-                catch (UnsupportedEncodingException | NoSuchAlgorithmException e) 
-                {
-                    e.printStackTrace();
-                }
-                
+                password = Security.hashPassword(password);
                 System.out.print("Name: ");
                 String name = scanner.nextLine();
                 System.out.print("Email: ");
