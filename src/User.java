@@ -39,11 +39,13 @@ public abstract class User {
                 throw new IllegalArgumentException("Invalid user type: " + type);
         }
     }
-    public static String getLogin(scanner scanner) {
-        System.out.print("Login: ");
-        String login = scanner.nextLine();
-
-        return user.login;
+    public static String getLogin(Scanner scanner, String login) {
+        while (Database.Exists(login, "login")) {
+            System.out.print("Login: ");
+            login = scanner.nextLine();
+            Database.Exists(login, "login");
+        }
+        return login;
     }
 
     public static boolean isEmailValid(String email) {
