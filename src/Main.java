@@ -115,11 +115,8 @@ public class Main {
                 case "2":
                     List<Object> values = registerUser(scanner);
                     if (values != null) {
-                        System.out.println("User created successfully.");
-                        System.out.println("Values: " + values);
                         Database.insertUserIntoDatabase(values, scanner);
                     }
-                    pressAnyKey(scanner);
                     break;
                 case "0":
                     clearConsole();
