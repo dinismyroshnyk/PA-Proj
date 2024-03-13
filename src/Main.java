@@ -117,7 +117,7 @@ public class Main {
                     if (values != null) {
                         System.out.println("User created successfully.");
                         System.out.println("Values: " + values);
-                        //insertUserIntoDatabase(values);
+                        Database.insertUserIntoDatabase(values, scanner);
                     }
                     pressAnyKey(scanner);
                     break;

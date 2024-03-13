@@ -96,11 +96,16 @@ public class Database {
         return true;
     }
 
-    // Insert into the database
+    // Insert a user into the database
     public static void insertUserIntoDatabase(List<Object> values, Scanner scanner) {
-        // Insert the manager into the database
         sqlQuery = new StringBuffer();
-        sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)");
+        if (values.contains("manager")) {
+            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)");
+        } else if (values.contains("author")) {
+            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado, contribuinte, telefone, morada, estilo_literario, data_inicio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        } else if (values.contains("reviewer")) {
+            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado, contribuinte, telefone, morada, area_especializacao, formacao_academica) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        }
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -110,10 +115,10 @@ public class Database {
             ps.executeUpdate();
             conn.commit();
             Main.clearConsole();
-            System.out.println("Manager created successfully.");
+            System.out.println("User created successfully.");
             Main.pressAnyKey(scanner);
         } catch (SQLException e) {
-            System.out.println("Failed to insert manager into database. Rolling back transaction.");
+            System.out.println("Failed to insert user into database. Rolling back transaction.");
             System.out.println("Exception: " + e);
             System.exit(1);
         } finally {
