@@ -143,7 +143,7 @@ public class Main {
             switch (option) {
                 case "1":
                     clearConsole();
-                    System.out.println("Login menu...");
+                    loginUser(scanner);
                     pressAnyKey(scanner);
                     break;
                 case "2":
@@ -164,6 +164,42 @@ public class Main {
         }
     }
 
+    // Attempt to login a user
+    private static void loginUser(Scanner scanner) {
+        System.out.print("Login: ");
+        String login = scanner.nextLine();
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+        // Check if the user exists
+        Database.rs = null;
+        Database.sqlQuery = new StringBuffer();
+        Database.sqlQuery.append(" SELECT * FROM UTILIZADORES WHERE username = ? AND password = ?");
+        PreparedStatement ps = null;
+        try {
+            ps = Database.conn.prepareStatement(Database.sqlQuery.toString());
+            ps.setString(1, login);
+            ps.setString(2, Security.hashPassword(password));
+            Database.rs = ps.executeQuery();
+            if (Database.rs.next()) {
+                System.out.println("Login successful.");
+                System.out.println("Welcome, " + Database.rs.getString("nome") + "!");
+            } else {
+                System.out.println("Login failed.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to execute query.");
+            System.out.println("Exception: " + e);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                }
+            }
+        }
+    }
     // Clear the console
     private static void clearConsole() {
         System.out.print("\033[H\033[2J");
