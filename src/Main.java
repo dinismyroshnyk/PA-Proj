@@ -142,9 +142,9 @@ public class Main {
             String option = scanner.nextLine();
             switch (option) {
                 case "1":
-                    clearConsole();
-                    loginUser(scanner);
-                    pressAnyKey(scanner);
+                    String user = loginUser(scanner);
+                    if (user != null)
+                        loggedUserLoop(scanner, user);
                     break;
                 case "2":
                     clearConsole();
@@ -164,8 +164,46 @@ public class Main {
         }
     }
 
+    // Logged user loop
+    private static void loggedUserLoop(Scanner scanner, String user) {
+        boolean running = true;
+        while (running) {
+            clearConsole();
+            System.out.println("Logged as " + user);
+            System.out.println("1. Option 1");
+            System.out.println("2. Option 2");
+            System.out.println("0. Logout");
+            System.out.print("\nOption: ");
+            String option = scanner.nextLine();
+            switch (option) {
+                case "1":
+                    clearConsole();
+                    System.out.println("Option 1...");
+                    pressAnyKey(scanner);
+                    break;
+                case "2":
+                    clearConsole();
+                    System.out.println("Option 2...");
+                    pressAnyKey(scanner);
+                    break;
+                case "0":
+                    clearConsole();
+                    System.out.println("Goodbye, " + user + "!");
+                    pressAnyKey(scanner);
+                    running = false;
+                    break;
+                default:
+                    clearConsole();
+                    System.out.println("Invalid option. Please try again.");
+                    pressAnyKey(scanner);
+                    break;
+            }
+        }
+    }
+
     // Attempt to login a user
-    private static void loginUser(Scanner scanner) {
+    private static String loginUser(Scanner scanner) {
+        clearConsole();
         System.out.print("Login: ");
         String login = scanner.nextLine();
         System.out.print("Password: ");
@@ -181,14 +219,20 @@ public class Main {
             ps.setString(2, Security.hashPassword(password));
             Database.rs = ps.executeQuery();
             if (Database.rs.next()) {
+                String user = Database.rs.getString("nome");
                 System.out.println("Login successful.");
-                System.out.println("Welcome, " + Database.rs.getString("nome") + "!");
+                System.out.println("Welcome, " + user + "!");
+                pressAnyKey(scanner);
+                return user;
             } else {
                 System.out.println("Login failed.");
+                pressAnyKey(scanner);
+                return null;
             }
         } catch (SQLException e) {
             System.out.println("Failed to execute query.");
             System.out.println("Exception: " + e);
+            return null;
         } finally {
             if (ps != null) {
                 try {
