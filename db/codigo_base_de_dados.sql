@@ -92,7 +92,7 @@ create table UTILIZADORES
    PASSWORD             varchar(60) not null,
    ESTADO               varchar(15) not null,
    EMAIL                text not null,
-   TIPO                 varchar(7) not null,
+   TIPO                 varchar(8) not null,
    CONTRIBUINTE         varchar(9),
    TELEFONE             varchar(9),
    MORADA               text,
