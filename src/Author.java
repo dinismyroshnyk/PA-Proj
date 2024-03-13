@@ -23,6 +23,9 @@ public class Author extends User{
         String name = scanner.nextLine();
         System.out.print("Email: ");
         String email = scanner.nextLine();
+        if (Database.Exists(email, "email")) {
+            System.out.println("Email already in use. Please try again.");
+        }
         System.out.print("NIF: ");
         String nif = scanner.nextLine();
         System.out.print("Phone: ");
@@ -35,6 +38,10 @@ public class Author extends User{
         String startDate = scanner.nextLine();
         System.out.print("Login: ");
         String login = scanner.nextLine();
+        if (Database.Exists(login, "login")) {
+            System.out.println("Email already in use. Please try again.");
+            
+        }
         System.out.print("Password: ");
         String password = scanner.nextLine();
         password = Security.hashPassword(password);

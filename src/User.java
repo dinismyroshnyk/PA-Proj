@@ -39,4 +39,10 @@ public abstract class User {
                 throw new IllegalArgumentException("Invalid user type: " + type);
         }
     }
+    public static String getLogin(scanner scanner) {
+        System.out.print("Login: ");
+        String login = scanner.nextLine();
+
+        return user.login;
+    }
 }

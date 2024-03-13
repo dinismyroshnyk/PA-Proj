@@ -132,4 +132,27 @@ public class Database {
             }
         }
     }
+    //verificar se o email existe
+    public static boolean Exists(String st, String type) {
+        try {
+            sqlQuery = new StringBuffer();
+            if (type.equals("email")) {
+                sqlQuery.append("SELECT * FROM UTILIZADORES WHERE email = ?");
+            } else if (type.equals("login")) {
+                sqlQuery.append("SELECT * FROM UTILIZADORES WHERE username = ?");
+            }
+            PreparedStatement ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, st);
+            ResultSet rs = ps.executeQuery();
+            // Se houver algum resultado, o email/username/login já existe
+            if (rs.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            // Tratar a exceção
+            System.out.println("Ocorreu um erro ao interagir com o banco de dados");
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
