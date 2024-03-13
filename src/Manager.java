@@ -13,9 +13,7 @@ public class Manager extends User {
         System.out.print("Name: ");
         String name = scanner.nextLine();
         String email = User.validateEmail(scanner);
-        System.out.print("Login: ");
-        String login = scanner.nextLine();
-        System.out.print("Password: ");
+        String login = validateLogin(scanner);
         String password = scanner.nextLine();
         password = Security.hashPassword(password);
         return new Manager(login, password, name, email);

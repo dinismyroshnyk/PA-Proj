@@ -21,12 +21,7 @@ public class Author extends User{
     public static Author register (Scanner scanner) {
         System.out.print("Name: ");
         String name = scanner.nextLine();
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-        if (Database.Exists(email, "email") || !User.isEmailValid(email)) {
-            System.out.println("Email already in use. Please try again.");
-            email=User.validateEmail(scanner);
-        }
+        String email = validateEmail(scanner);
         System.out.print("NIF: ");
         String nif = scanner.nextLine();
         if (Database.Exists(nif, "NIF") ) {
@@ -50,12 +45,7 @@ public class Author extends User{
         String style = scanner.nextLine();
         System.out.print("Start Date: ");
         String startDate = scanner.nextLine();
-        System.out.print("Login: ");
-        String login = scanner.nextLine();
-        if (Database.Exists(login, "login")) {
-            System.out.println("Email already in use. Please try again.");
-            login=User.getLogin(scanner, login);   
-        }
+        String login = validateLogin(scanner);
         System.out.print("Password: ");
         String password = scanner.nextLine();
         password = Security.hashPassword(password);
