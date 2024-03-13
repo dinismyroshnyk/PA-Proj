@@ -101,4 +101,16 @@ public abstract class User {
         } while (!isValidPhoneNumber(phone));
         return phone;
     }
+
+    public static String validateLogin(Scanner scanner) {
+        String login;
+        do {
+            System.out.print("Login: ");
+            login = scanner.nextLine();
+            if (Database.existsInDatabase(login, "login")) {
+                System.out.println("Login already in use. Please try again.");
+            }
+        } while (Database.existsInDatabase(login, "login"));
+        return login;
+    }
 }
