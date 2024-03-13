@@ -62,7 +62,6 @@ public class Main {
         // If no users are found, create a manager
         try {
             if (!Database.rs.next()) {
-                System.out.println("No users found. Creating a manager...");
                 User manager = User.createUser("manager", scanner);
                 List<Object> values = getUserValues(manager);
                 Database.insertUserIntoDatabase(values, scanner);
@@ -115,11 +114,8 @@ public class Main {
                 case "2":
                     List<Object> values = registerUser(scanner);
                     if (values != null) {
-                        System.out.println("User created successfully.");
-                        System.out.println("Values: " + values);
                         Database.insertUserIntoDatabase(values, scanner);
                     }
-                    pressAnyKey(scanner);
                     break;
                 case "0":
                     clearConsole();
@@ -182,11 +178,9 @@ public class Main {
         String option = scanner.nextLine();
         switch (option) {
             case "1":
-                clearConsole();
                 User author = User.createUser("author", scanner);
                 return getUserValues(author);
             case "2":
-                clearConsole();
                 User reviewer = User.createUser("reviewer", scanner);
                 return getUserValues(reviewer);
             case "0":
