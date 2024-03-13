@@ -40,38 +40,31 @@ public abstract class User {
         }
     }
 
-    //public static String getLogin(Scanner scanner, String login) {
-    //    while (Database.existsInDatabase(login, "login")) {
-    //        System.out.print("Login: ");
-    //        login = scanner.nextLine();
-    //        Database.existsInDatabase(login, "login");
-    //    }
-    //    return login;
-    //}
-
-    public static boolean isEmailValid(String email) {
+    private static boolean isValidEmail(String email) {
         return email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
     }
 
-    
+    private static boolean isValidNIF(String nif) {
+        return nif.matches("^[0-9]{9}$");
+    }
+
+    public static boolean isValidPhoneNumber(String phoneNumber) {
+        return phoneNumber.matches("^(9|2|3)\\d{8}$");
+    }
+
     public static String validateEmail(Scanner scanner) {
         String email;
         do {
             System.out.print("Email: ");
             email = scanner.nextLine();
-            if (!isEmailValid(email)) {
+            if (!isValidEmail(email)) {
                 System.out.println("Invalid email. Please try again.");
             }
             if (Database.existsInDatabase(email, "email")) {
                 System.out.println("Email already in use. Please try again.");
             }
-        } while (!isEmailValid(email));
+        } while (!isValidEmail(email));
         return email;
-    }
-
-    public static boolean isValidNIF(String nif) {
-        // A expressão regular verifica se a string contém exatamente 9 dígitos
-        return nif.matches("^[0-9]{9}$");
     }
 
     public static String validateNIF(Scanner scanner) {
@@ -79,15 +72,14 @@ public abstract class User {
         do {
             System.out.print("NIF: ");
             nif = scanner.nextLine();
-            if (!isValidNIF(nif) || Database.existsInDatabase(nif, "NIF")) {
+            if (!isValidNIF(nif)) {
                 System.out.println("Invalid NIF. Please try again.");
+            }
+            if (Database.existsInDatabase(nif, "NIF")) {
+                System.out.println("NIF already in use. Please try again.");
             }
         } while (!isValidNIF(nif));
         return nif;
-    }
-
-    public static boolean isValidPhoneNumber(String phoneNumber) {
-        return phoneNumber.matches("^(9|2|3)\\d{8}$");
     }
 
     public static String validatePhone(Scanner scanner) {

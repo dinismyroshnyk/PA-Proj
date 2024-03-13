@@ -19,26 +19,12 @@ public class Author extends User{
 
     // getters, setters, and other author-specific methods
     public static Author register (Scanner scanner) {
+        Main.clearConsole();
         System.out.print("Name: ");
         String name = scanner.nextLine();
         String email = validateEmail(scanner);
-        System.out.print("NIF: ");
-        String nif = scanner.nextLine();
-        if (Database.existsInDatabase(nif, "NIF") ) {
-            System.out.println("NIF already in use . Please try again.");
-            nif=User.validateNIF(scanner);   
-        }
-        if (!User.isValidNIF(nif)) {
-            System.out.println("Invalid NIF. Please try again.");
-            nif=User.validateNIF(scanner);
-        } 
-        System.out.print("Phone: ");
-        String phone = scanner.nextLine();
-        if (!User.isValidPhoneNumber(phone)) {
-            System.out.println("Invalid phone number. Please try again.");
-            phone=User.validatePhone(scanner);
-            
-        }
+        String nif = validateNIF(scanner);
+        String phone = validatePhone(scanner);
         System.out.print("Address: ");
         String address = scanner.nextLine();
         System.out.print("Literary Style: ");

@@ -19,13 +19,12 @@ public class Reviewer extends User{
 
     // getters, setters, and other reviewer-specific methods
     public static Reviewer register (Scanner scanner) {
+        Main.clearConsole();
         System.out.print("Name: ");
         String name = scanner.nextLine();
         String email = validateEmail(scanner);
-        System.out.print("NIF: ");
-        String nif = scanner.nextLine();
-        System.out.print("Phone: ");
-        String phone = scanner.nextLine();
+        String nif = validateNIF(scanner);
+        String phone = validatePhone(scanner);
         System.out.print("Address: ");
         String address = scanner.nextLine();
         System.out.print("Specialization: ");
