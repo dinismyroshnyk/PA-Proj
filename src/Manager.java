@@ -8,10 +8,11 @@ public class Manager extends User {
 
     // getters, setters, and other manager-specific methods
     public static Manager register (Scanner scanner) {
+        Main.clearConsole();
+        System.out.println("No users found. Creating a manager...");
         System.out.print("Name: ");
         String name = scanner.nextLine();
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
+        String email = User.validateEmail(scanner);
         System.out.print("Login: ");
         String login = scanner.nextLine();
         System.out.print("Password: ");

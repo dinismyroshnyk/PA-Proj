@@ -39,4 +39,20 @@ public abstract class User {
                 throw new IllegalArgumentException("Invalid user type: " + type);
         }
     }
+
+    public static boolean isEmailValid(String email) {
+        return email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
+    }
+
+    public static String validateEmail(Scanner scanner) {
+        String email;
+        do {
+            System.out.print("Email: ");
+            email = scanner.nextLine();
+            if (!isEmailValid(email)) {
+                System.out.println("Invalid email. Please try again.");
+            }
+        } while (!isEmailValid(email));
+        return email;
+    }
 }
