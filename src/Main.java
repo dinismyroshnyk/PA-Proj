@@ -14,8 +14,7 @@ public class Main {
         // Application and SQL handling
         try {
             doUsersExist(scanner);
-            System.out.println("Application running...");
-            //mainLoop(scanner);
+            mainLoop(scanner);
         } catch (Exception e) {
             System.out.println("Exception: " + e);
             try {
@@ -131,34 +130,49 @@ public class Main {
     }
 
     // Main loop of the application
-    //private static void mainLoop(Scanner scanner) {
-    //    boolean running = true;
-    //    while (running) {
-    //        System.out.print("Enter login: ");
-    //        String login = scanner.nextLine();
-    //        System.out.print("Enter password: ");
-    //        String password = scanner.nextLine();
-    //        User user = User.login(login, password);
-    //        if (user != null) {
-    //            User.welcomeUser(user);
-//
-    //            // Rest of the application...
-//
-    //            User.goodbyeUser(user);
-    //        } else System.out.println("Invalid login or password.");
-    //        running = exitApplication(scanner);
-    //    }
-    //}
-//
-    //// Ask the user if they want to exit the application
-    //private static boolean exitApplication(Scanner scanner) {
-    //    System.out.print("Do you want to exit the application? (y/n): ");
-    //    String exit = scanner.nextLine().toLowerCase();
-    //    if (exit.equals("y") || exit.equals("yes")) return false;
-    //    else if (exit.equals("n") || exit.equals("no")) return true;
-    //    else {
-    //        System.out.println("Invalid input. Please try again.");
-    //        return exitApplication(scanner);
-    //    }
-    //}
+    private static void mainLoop(Scanner scanner) {
+        boolean running = true;
+        while (running) {
+            clearConsole();
+            System.out.println("Menu:");
+            System.out.println("1. Login");
+            System.out.println("2. Register");
+            System.out.println("0. Exit");
+            System.out.print("\nOption: ");
+            String option = scanner.nextLine();
+            switch (option) {
+                case "1":
+                    clearConsole();
+                    System.out.println("Login menu...");
+                    pressAnyKey(scanner);
+                    break;
+                case "2":
+                    clearConsole();
+                    System.out.println("Register menu...");
+                    pressAnyKey(scanner);
+                    break;
+                case "0":
+                    clearConsole();
+                    running = false;
+                    break;
+                default:
+                    clearConsole();
+                    System.out.println("Invalid option. Please try again.");
+                    pressAnyKey(scanner);
+                    break;
+            }
+        }
+    }
+
+    // Clear the console
+    private static void clearConsole() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    // Press any key to continue
+    private static void pressAnyKey(Scanner scanner) {
+        System.out.println("Press any key to continue...");
+        scanner.nextLine();
+    }
 }
