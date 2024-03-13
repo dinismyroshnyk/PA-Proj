@@ -1,32 +1,16 @@
-import java.util.ArrayList;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Scanner;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.PreparedStatement;
+import java.lang.reflect.Field;
 
 public class Main {
-    // Class level variables
-    static Statement st = null;
-    static ResultSet rs = null;
-    static Connection conn = null;
-    static StringBuffer sqlQuery = null;
-
     public static void main(String[] args) throws Exception {
         // Open scanner for user input
         Scanner scanner = new Scanner(System.in);
-        // Connect to the database
-        setUpDatabase(scanner);
+        // Prepare and connect to the database
+        Database.setUpDatabase(scanner);
         // Application and SQL handling
         try {
             doUsersExist(scanner);
@@ -35,23 +19,23 @@ public class Main {
         } catch (Exception e) {
             System.out.println("Exception: " + e);
             try {
-                conn.rollback();
+                Database.conn.rollback();
             } catch (SQLException e2) {
                 System.out.println("Failed to rollback transaction.");
                 System.out.println("Exception: " + e2);
             }
         } finally {
-            if (st != null) {
+            if (Database.st != null) {
                 try {
-                    st.close();
+                    Database.st.close();
                 } catch (SQLException e) {
                     System.out.println("Failed to close statement.");
                     System.out.println("Exception: " + e);
                 }
             }
-            if (conn != null) {
+            if (Database.conn != null) {
                 try {
-                    conn.close();
+                    Database.conn.close();
                 } catch (SQLException e) {
                     System.out.println("Failed to close connection.");
                     System.out.println("Exception: " + e);
@@ -63,90 +47,14 @@ public class Main {
         System.exit(0);
     }
 
-    // Set up the database connection
-    private static void setUpDatabase(Scanner scanner) {
-        // Path to the credentials file
-        String credentialsPath = ".credentials";
-        File credentialsFile = new File(credentialsPath);
-        // Check if the credentials file exists
-        if (credentialsFile.exists()) {
-            // Read the credentials from the file
-            try (BufferedReader reader = new BufferedReader(new FileReader(credentialsFile))) {
-                String user = reader.readLine();
-                String password = reader.readLine();
-                password = Security.encryptDecryptString(password, "-d");
-                connectToDatabase(user, password);
-            } catch (IOException e) {
-                System.out.println("Error reading credentials file: " + e.getMessage());
-                System.exit(1);
-            }
-        } else {
-            // Prompt the user for credentials
-            System.out.print("Database User: ");
-            String user = scanner.nextLine();
-            System.out.print("Database Password: ");
-            String password = scanner.nextLine();
-            // Attempt to connect with the provided credentials
-            if (connectToDatabase(user, password)) {
-                // If successful, encrypt and save the credentials
-                password = Security.encryptDecryptString(password, "-e");
-                try (PrintWriter writer = new PrintWriter(new FileWriter(credentialsPath))) {
-                    writer.println(user);
-                    writer.println(password);
-                } catch (IOException e) {
-                    System.out.println("Error saving credentials: " + e.getMessage());
-                    System.exit(1);
-                }
-            } else {
-                System.out.println("Invalid credentials. Please try again.");
-                setUpDatabase(scanner);
-            }
-        }
-    }
-
-    // Connect to the database
-    private static boolean connectToDatabase(String user, String password) {
-        String ip = "localhost";
-        String port = "3306";
-        String database = "projeto";
-        String parameters = "?useTimezone=true&serverTimezone=UTC&verifyServerCertificate=false&useSSL=true";
-        String url = "jdbc:mysql://" + ip + ":" + port + "/" + database + parameters;
-        // Load the JDBC driver
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            System.out.println("MySQL JDBC Driver not found.");
-            System.out.println("Exception: " + e);
-            return false;
-        }
-        // Connect to the database
-        try {
-            conn = DriverManager.getConnection(url, user, password);
-            st = conn.createStatement();
-        } catch (SQLException e) {
-            System.out.println("Connection failed.");
-            System.out.println("Exception: " + e);
-            return false;
-        }
-        // Transaction control
-        try {
-            conn.setAutoCommit(false);
-        } catch (SQLException e) {
-            System.out.println("Failed to turn off auto-commit.");
-            System.out.println("Exception: " + e);
-            return false;
-        }
-        return true;
-    }
-
     // Create a manager if no users exist
     private static void doUsersExist(Scanner scanner) {
         // Check if there are any users in the database
-        rs = null;
-        sqlQuery = new StringBuffer();
-        sqlQuery.append(" SELECT username FROM UTILIZADORES ");
+        Database.rs = null;
+        Database.sqlQuery = new StringBuffer();
+        Database.sqlQuery.append(" SELECT username FROM UTILIZADORES ");
         try {
-            rs = st.executeQuery(sqlQuery.toString());
+            Database.rs = Database.st.executeQuery(Database.sqlQuery.toString());
         } catch (SQLException e) {
             System.out.println("Failed to execute query.");
             System.out.println("Exception: " + e);
@@ -154,7 +62,7 @@ public class Main {
         }
         // If no users are found, create a manager
         try {
-            if (!rs.next()) {
+            if (!Database.rs.next()) {
                 System.out.println("No users found. Creating a manager...");
                 System.out.print("Login: ");
                 String login = scanner.nextLine();
@@ -168,16 +76,16 @@ public class Main {
                 Manager manager = Manager.register(login, password, name, email);
                 List<Object> values = getUserValues(manager);
                 // Insert the manager into the database
-                sqlQuery = new StringBuffer();
-                sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)");
+                Database.sqlQuery = new StringBuffer();
+                Database.sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)");
                 PreparedStatement ps = null;
                 try {
-                    ps = conn.prepareStatement(sqlQuery.toString());
+                    ps = Database.conn.prepareStatement(Database.sqlQuery.toString());
                     for (int i = 0; i < values.size(); i++) {
                         ps.setObject(i + 1, values.get(i));
                     }
                     ps.executeUpdate();
-                    conn.commit();
+                    Database.conn.commit();
                     System.out.println("Manager created successfully.");
                 } catch (SQLException e) {
                     System.out.println("Failed to insert manager into database. Rolling back transaction.");
