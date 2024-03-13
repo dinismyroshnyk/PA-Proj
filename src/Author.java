@@ -24,7 +24,7 @@ public class Author extends User{
         String email = validateEmail(scanner);
         System.out.print("NIF: ");
         String nif = scanner.nextLine();
-        if (Database.Exists(nif, "NIF") ) {
+        if (Database.existsInDatabase(nif, "NIF") ) {
             System.out.println("NIF already in use . Please try again.");
             nif=User.validateNIF(scanner);   
         }
