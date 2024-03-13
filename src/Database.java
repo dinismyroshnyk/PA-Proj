@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Scanner;
 
 public class Database {
@@ -92,5 +94,37 @@ public class Database {
             return false;
         }
         return true;
+    }
+
+    // Insert into the database
+    public static void insertUserIntoDatabase(List<Object> values, Scanner scanner) {
+        // Insert the manager into the database
+        sqlQuery = new StringBuffer();
+        sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            for (int i = 0; i < values.size(); i++) {
+                ps.setObject(i + 1, values.get(i));
+            }
+            ps.executeUpdate();
+            conn.commit();
+            Main.clearConsole();
+            System.out.println("Manager created successfully.");
+            Main.pressAnyKey(scanner);
+        } catch (SQLException e) {
+            System.out.println("Failed to insert manager into database. Rolling back transaction.");
+            System.out.println("Exception: " + e);
+            System.exit(1);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                }
+            }
+        }
     }
 }

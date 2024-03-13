@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.lang.reflect.Field;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         // Open scanner for user input
         Scanner scanner = new Scanner(System.in);
         // Prepare and connect to the database
@@ -63,43 +63,9 @@ public class Main {
         try {
             if (!Database.rs.next()) {
                 System.out.println("No users found. Creating a manager...");
-                System.out.print("Login: ");
-                String login = scanner.nextLine();
-                System.out.print("Password: ");
-                String password = scanner.nextLine();
-                password = Security.hashPassword(password);
-                System.out.print("Name: ");
-                String name = scanner.nextLine();
-                System.out.print("Email: ");
-                String email = scanner.nextLine();
-                Manager manager = Manager.register(login, password, name, email);
+                User manager = User.createUser("manager", scanner);
                 List<Object> values = getUserValues(manager);
-                // Insert the manager into the database
-                Database.sqlQuery = new StringBuffer();
-                Database.sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)");
-                PreparedStatement ps = null;
-                try {
-                    ps = Database.conn.prepareStatement(Database.sqlQuery.toString());
-                    for (int i = 0; i < values.size(); i++) {
-                        ps.setObject(i + 1, values.get(i));
-                    }
-                    ps.executeUpdate();
-                    Database.conn.commit();
-                    System.out.println("Manager created successfully.");
-                } catch (SQLException e) {
-                    System.out.println("Failed to insert manager into database. Rolling back transaction.");
-                    System.out.println("Exception: " + e);
-                    System.exit(1);
-                } finally {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        } catch (SQLException e) {
-                            System.out.println("Failed to close prepared statement.");
-                            System.out.println("Exception: " + e);
-                        }
-                    }
-                }
+                Database.insertUserIntoDatabase(values, scanner);
             }
         } catch (SQLException e) {
             System.out.println("Failed to check if users exist.");
@@ -147,8 +113,12 @@ public class Main {
                         loggedUserLoop(scanner, user);
                     break;
                 case "2":
-                    clearConsole();
-                    System.out.println("Register menu...");
+                    List<Object> values = registerUser(scanner);
+                    if (values != null) {
+                        System.out.println("User created successfully.");
+                        System.out.println("Values: " + values);
+                        //insertUserIntoDatabase(values);
+                    }
                     pressAnyKey(scanner);
                     break;
                 case "0":
@@ -201,6 +171,35 @@ public class Main {
         }
     }
 
+    // Register a new user
+    private static List<Object> registerUser(Scanner scanner) {
+        clearConsole();
+        System.out.println("Register a new user: ");
+        System.out.println("1. Register as Author");
+        System.out.println("2. Register as Reviewer");
+        System.out.println("0. Go back");
+        System.out.print("\nOption: ");
+        String option = scanner.nextLine();
+        switch (option) {
+            case "1":
+                clearConsole();
+                User author = User.createUser("author", scanner);
+                return getUserValues(author);
+            case "2":
+                clearConsole();
+                User reviewer = User.createUser("reviewer", scanner);
+                return getUserValues(reviewer);
+            case "0":
+                break;
+            default:
+                clearConsole();
+                System.out.println("Invalid option. Please try again.");
+                pressAnyKey(scanner);
+                break;
+        }
+        return null;
+    }
+
     // Attempt to login a user
     private static String loginUser(Scanner scanner) {
         clearConsole();
@@ -220,6 +219,7 @@ public class Main {
             Database.rs = ps.executeQuery();
             if (Database.rs.next()) {
                 String user = Database.rs.getString("nome");
+                clearConsole();
                 System.out.println("Login successful.");
                 System.out.println("Welcome, " + user + "!");
                 pressAnyKey(scanner);
@@ -244,14 +244,15 @@ public class Main {
             }
         }
     }
+
     // Clear the console
-    private static void clearConsole() {
+    public static void clearConsole() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
 
     // Press any key to continue
-    private static void pressAnyKey(Scanner scanner) {
+    public static void pressAnyKey(Scanner scanner) {
         System.out.println("Press any key to continue...");
         scanner.nextLine();
     }
