@@ -21,7 +21,6 @@ public class Reviewer extends User{
     public static Reviewer register (Scanner scanner) {
         System.out.print("Name: ");
         String name = scanner.nextLine();
-        System.out.print("Email: ");
         String email = validateEmail(scanner);
         System.out.print("NIF: ");
         String nif = scanner.nextLine();
@@ -33,12 +32,7 @@ public class Reviewer extends User{
         String specialization = scanner.nextLine();
         System.out.print("Academic Background: ");
         String academicBackground = scanner.nextLine();
-        System.out.print("Login: ");
-        String login = scanner.nextLine();
-        if (Database.existsInDatabase(login, "login")) {
-            System.out.println("Email already in use. Please try again.");
-            login=User.getLogin(scanner, login);
-        }
+        String login = validateLogin(scanner);
         System.out.print("Password: ");
         String password = scanner.nextLine();
         password = Security.hashPassword(password);

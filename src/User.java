@@ -39,14 +39,15 @@ public abstract class User {
                 throw new IllegalArgumentException("Invalid user type: " + type);
         }
     }
-    public static String getLogin(Scanner scanner, String login) {
-        while (Database.existsInDatabase(login, "login")) {
-            System.out.print("Login: ");
-            login = scanner.nextLine();
-            Database.existsInDatabase(login, "login");
-        }
-        return login;
-    }
+
+    //public static String getLogin(Scanner scanner, String login) {
+    //    while (Database.existsInDatabase(login, "login")) {
+    //        System.out.print("Login: ");
+    //        login = scanner.nextLine();
+    //        Database.existsInDatabase(login, "login");
+    //    }
+    //    return login;
+    //}
 
     public static boolean isEmailValid(String email) {
         return email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
@@ -65,5 +66,17 @@ public abstract class User {
             }
         } while (!isEmailValid(email));
         return email;
+    }
+
+    public static String validateLogin(Scanner scanner) {
+        String login;
+        do {
+            System.out.print("Login: ");
+            login = scanner.nextLine();
+            if (Database.existsInDatabase(login, "login")) {
+                System.out.println("Login already in use. Please try again.");
+            }
+        } while (Database.existsInDatabase(login, "login"));
+        return login;
     }
 }
