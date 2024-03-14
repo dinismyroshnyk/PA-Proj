@@ -20,18 +20,18 @@ public class Author extends User{
     // getters, setters, and other author-specific methods
     public static Author register (Scanner scanner) {
         Main.clearConsole();
-        String name = User.validateName(scanner);
-        String email = User.validateInputInDatabase(scanner, "Email", User::isValidEmail);
-        String nif = User.validateInputInDatabase(scanner, "NIF", User::isValidNIF);
-        String phone = validatePhone(scanner);
+        String name = Validator.validateName(scanner);
+        String email = Validator.validateInputInDatabase(scanner, "Email", Validator::isValidEmail);
+        String nif = Validator.validateInputInDatabase(scanner, "NIF", Validator::isValidNIF);
+        String phone = Validator.validatePhone(scanner);
         System.out.print("Address: ");
         String address = scanner.nextLine();
         System.out.print("Literary Style: ");
         String style = scanner.nextLine();
         System.out.print("Start Date: ");
         String startDate = scanner.nextLine();
-        String login = User.validateInputInDatabase(scanner, "Login", null);
-        String password = validatePassword(scanner);
+        String login = Validator.validateInputInDatabase(scanner, "Login", null);
+        String password = Validator.validatePassword(scanner);
         return new Author(login, password, name, email, nif, phone, address, style, startDate);
     }
 }
