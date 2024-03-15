@@ -90,7 +90,8 @@ public class Main {
             try {
                 values.add(field.get(user));
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                System.out.println("Failed to access field.");
+                System.out.println("Exception: " + e);
             }
         }
         return values;

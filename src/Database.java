@@ -153,7 +153,7 @@ public class Database {
             }
         } catch (SQLException e) {
             System.out.println("Failed to execute query.");
-            e.printStackTrace();
+            System.out.println("Exception: " + e);
         }
         return false;
     }

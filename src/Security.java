@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -27,7 +30,8 @@ public class Security {
                 return null;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Error encrypting/decrypting string.");
+            System.out.println("Exception: " + e);
             return null;
         }
     }
@@ -43,8 +47,26 @@ public class Security {
             }
             return pass.toString();
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            System.out.println("Error hashing password.");
+            System.out.println("Exception: " + e);
             return null;
         }
+    }
+
+    // Password masking
+    public static String maskPassword() {
+        Mask mask = new Mask("Password: ");
+        Thread thread = new Thread(mask);
+        thread.start();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String password = null;
+        try {
+            password = reader.readLine();
+        } catch (IOException e) {
+            System.out.println("Error reading password.");
+            System.out.println("Exception: " + e);
+        }
+        mask.maskEnd();
+        return password;
     }
 }

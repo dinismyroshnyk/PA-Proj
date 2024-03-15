@@ -15,11 +15,11 @@ public class Validator {
     }
 
     private static boolean isValidName(String name) {
-        return name.matches("^[A-Z](?=.{1,99}$)[A-Za-z]*(?:\\h+[A-Z][A-Za-z]*)*$");
+        return name.matches("^[A-Z](?=.{2,100}$)[A-Za-z]*(?:\\h+[A-Z][A-Za-z]*)*$");
     }
 
     private static boolean isValidPassword(String password) {
-        return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8,20}$");
+        return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,20}$");
     }
 
     //private static boolean isValidAddress(String address) {}
@@ -81,13 +81,14 @@ public class Validator {
                     - At least one digit
                     - At least one lowercase letter
                     - At least one uppercase letter
-                    - At least one special character (!@#$%&*()-+=^)
                     - No whitespaces
-                    """;
+            """;
             System.out.println(textBlock);
-            System.out.print("Password: ");
-            password = scanner.nextLine();
-            if (!isValidPassword(password)) {
+            password = Security.maskPassword();
+            if (password == null) {
+                System.out.println("Failed to read password. Please try again.");
+            }
+            if (!isValidPassword(password) && password != null) {
                 System.out.println("Invalid password. Please try again.");
             }
         } while (!isValidPassword(password));

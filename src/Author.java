@@ -20,6 +20,7 @@ public class Author extends User{
     // getters, setters, and other author-specific methods
     public static Author register (Scanner scanner) {
         Main.clearConsole();
+        String password = Validator.validatePassword(scanner);
         String name = Validator.validateName(scanner);
         String email = Validator.validateInputInDatabase(scanner, "Email", Validator::isValidEmail);
         String nif = Validator.validateInputInDatabase(scanner, "NIF", Validator::isValidNIF);
@@ -31,7 +32,7 @@ public class Author extends User{
         System.out.print("Start Date: ");
         String startDate = scanner.nextLine();
         String login = Validator.validateInputInDatabase(scanner, "Login", null);
-        String password = Validator.validatePassword(scanner);
+        
         return new Author(login, password, name, email, nif, phone, address, style, startDate);
     }
 }
