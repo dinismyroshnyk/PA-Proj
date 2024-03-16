@@ -55,9 +55,9 @@ public class Security {
 
     // Password masking
     public static String maskPassword() {
+        System.out.println("Warning: Due to limitations, the first * is permanent. That character is not part of the password.");
         Mask mask = new Mask("Password: ");
-        Thread thread = new Thread(mask);
-        thread.start();
+        new Thread(mask).start();
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String password = null;
         try {

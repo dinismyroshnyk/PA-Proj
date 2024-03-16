@@ -202,8 +202,7 @@ public class Main {
         clearConsole();
         System.out.print("Login: ");
         String login = scanner.nextLine();
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
+        String password = Security.maskPassword();
         // Check if the user exists
         Database.rs = null;
         Database.sqlQuery = new StringBuffer();

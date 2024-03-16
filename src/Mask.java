@@ -3,6 +3,7 @@ public class Mask implements Runnable {
 
     public Mask(String prompt) {
         System.out.print(prompt);
+        System.out.print(" ");
     }
 
     public void run() {
