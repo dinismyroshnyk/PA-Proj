@@ -7,6 +7,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import com.sun.jna.platform.win32.WinDef;
+import com.sun.jna.platform.win32.WinNT;
 
 public class Security {
     // Encryption key
@@ -58,59 +60,33 @@ public class Security {
         String password =  "";
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         try {
-            String os = System.getProperty("os.name");
-            if (os.contains("Windows")) {
-                System.out.println("Warning: Due to limitations, the first * is permanent. That character is not part of the password.");
-                Mask mask = new Mask("Password: ");
-                new Thread(mask).start();
-                password = reader.readLine();
-                mask.maskEnd();
-            } else {
-                System.out.print("Password: ");
-                consoleRaw();
-                int c;
-                while ((c = reader.read()) != -1) {
-                    switch (c) {
-                        case 10: case 13:
-                            consoleReset();
-                            return password;
-                        case 8: case 127:
-                            if (password.length() > 0) {
-                                System.out.print("\b \b");
-                                password = password.substring(0, password.length() - 1);
-                            }
-                            break;
-                        default:
-                            System.out.print("*");
-                            password += (char) c;
-                    }
+            System.out.print("Password: ");
+            Pair<WinNT.HANDLE, WinDef.DWORDByReference> osInfo = OS.prepareOS();
+            WinNT.HANDLE handle = osInfo.getKey();
+            WinDef.DWORDByReference mode = osInfo.getValue();
+            OS.consoleRaw(handle, mode);
+            int c;
+            while ((c = reader.read()) != -1) {
+                switch (c) {
+                    case 10: case 13:
+                        OS.consoleReset(handle, mode);
+                        return password;
+                    case 8: case 127:
+                        if (password.length() > 0) {
+                            System.out.print("\b \b");
+                            password = password.substring(0, password.length() - 1);
+                        }
+                        break;
+                    default:
+                        System.out.print("*");
+                        password += (char) c;
                 }
-                consoleReset();
             }
+            OS.consoleReset(handle, mode);
         } catch (IOException e) {
             System.out.println("Error reading password.");
             System.out.println("Exception: " + e);
         }
         return password;
-    }
-
-    private static void consoleRaw() {
-        String cmd[] = {"/bin/sh", "-c", "stty raw -echo </dev/tty"};
-        try {
-            Runtime.getRuntime().exec(cmd).waitFor();
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Error setting terminal to raw mode.");
-            System.out.println("Exception: " + e);
-        }
-    }
-
-    private static void consoleReset() {
-        String reset[] = {"/bin/sh", "-c", "stty sane </dev/tty"};
-        try {
-            Runtime.getRuntime().exec(reset).waitFor();
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Error resetting terminal.");
-            System.out.println("Exception: " + e);
-        }
     }
 }
