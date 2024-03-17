@@ -249,7 +249,7 @@ public class Main {
 
     // Press any key to continue
     public static void pressAnyKey(Scanner scanner) {
-        System.out.println("Press any key to continue...");
+        System.out.print("Press any key to continue...");
         scanner.nextLine();
     }
 }

@@ -55,18 +55,53 @@ public class Security {
 
     // Password masking
     public static String maskPassword() {
-        System.out.println("Warning: Due to limitations, the first * is permanent. That character is not part of the password.");
-        Mask mask = new Mask("Password: ");
-        new Thread(mask).start();
+        String password =  "";
+        System.out.print("Password: ");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String password = null;
         try {
-            password = reader.readLine();
+            consoleRaw();
+            int c;
+            while ((c = reader.read()) != -1) {
+                switch (c) {
+                    case 10: case 13:
+                        consoleReset();
+                        return password;
+                    case 8: case 127:
+                        if (password.length() > 0) {
+                            System.out.print("\b \b");
+                            password = password.substring(0, password.length() - 1);
+                        }
+                        break;
+                    default:
+                        System.out.print("*");
+                        password += (char) c;
+                }
+            }
+            consoleReset();
         } catch (IOException e) {
             System.out.println("Error reading password.");
             System.out.println("Exception: " + e);
         }
-        mask.maskEnd();
         return password;
+    }
+
+    private static void consoleRaw() {
+        String cmd[] = {"/bin/sh", "-c", "stty raw -echo </dev/tty"};
+        try {
+            Runtime.getRuntime().exec(cmd).waitFor();
+        } catch (IOException | InterruptedException e) {
+            System.out.println("Error setting terminal to raw mode.");
+            System.out.println("Exception: " + e);
+        }
+    }
+
+    private static void consoleReset() {
+        String reset[] = {"/bin/sh", "-c", "stty sane </dev/tty"};
+        try {
+            Runtime.getRuntime().exec(reset).waitFor();
+        } catch (IOException | InterruptedException e) {
+            System.out.println("Error resetting terminal.");
+            System.out.println("Exception: " + e);
+        }
     }
 }
