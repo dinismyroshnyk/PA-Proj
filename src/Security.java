@@ -56,28 +56,37 @@ public class Security {
     // Password masking
     public static String maskPassword() {
         String password =  "";
-        System.out.print("Password: ");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         try {
-            consoleRaw();
-            int c;
-            while ((c = reader.read()) != -1) {
-                switch (c) {
-                    case 10: case 13:
-                        consoleReset();
-                        return password;
-                    case 8: case 127:
-                        if (password.length() > 0) {
-                            System.out.print("\b \b");
-                            password = password.substring(0, password.length() - 1);
-                        }
-                        break;
-                    default:
-                        System.out.print("*");
-                        password += (char) c;
+            String os = System.getProperty("os.name");
+            if (os.contains("Windows")) {
+                System.out.println("Warning: Due to limitations, the first * is permanent. That character is not part of the password.");
+                Mask mask = new Mask("Password: ");
+                new Thread(mask).start();
+                password = reader.readLine();
+                mask.maskEnd();
+            } else {
+                System.out.print("Password: ");
+                consoleRaw();
+                int c;
+                while ((c = reader.read()) != -1) {
+                    switch (c) {
+                        case 10: case 13:
+                            consoleReset();
+                            return password;
+                        case 8: case 127:
+                            if (password.length() > 0) {
+                                System.out.print("\b \b");
+                                password = password.substring(0, password.length() - 1);
+                            }
+                            break;
+                        default:
+                            System.out.print("*");
+                            password += (char) c;
+                    }
                 }
+                consoleReset();
             }
-            consoleReset();
         } catch (IOException e) {
             System.out.println("Error reading password.");
             System.out.println("Exception: " + e);
