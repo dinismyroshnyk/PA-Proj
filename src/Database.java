@@ -30,6 +30,7 @@ public class Database {
             // Read the credentials from the file
             try (BufferedReader reader = new BufferedReader(new FileReader(credentialsFile))) {
                 String user = reader.readLine();
+                user = Security.encryptDecryptString(user, "-d");
                 String password = reader.readLine();
                 password = Security.encryptDecryptString(password, "-d");
                 connectToDatabase(user, password);
