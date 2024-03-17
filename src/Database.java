@@ -39,14 +39,18 @@ public class Database {
             }
         } else {
             // Prompt the user for credentials
-            System.out.print("Database User: ");
+            System.out.println("[Database Setup]");
+            System.out.print("User: ");
             String user = scanner.nextLine();
-            System.out.print("Database Password: ");
-            String password = scanner.nextLine();
+            String password = Security.maskPassword();
             // Attempt to connect with the provided credentials
             if (connectToDatabase(user, password)) {
                 // If successful, encrypt and save the credentials
                 password = Security.encryptDecryptString(password, "-e");
+                if (password == null) {
+                    System.out.println("Failed to encrypt password. Exiting application.");
+                    System.exit(1);
+                }
                 try (PrintWriter writer = new PrintWriter(new FileWriter(credentialsPath))) {
                     writer.println(user);
                     writer.println(password);
@@ -55,8 +59,8 @@ public class Database {
                     System.exit(1);
                 }
             } else {
-                System.out.println("Invalid credentials. Please try again.");
-                setUpDatabase(scanner);
+                System.out.println("Invalid credentials. Exiting application.");
+                System.exit(1);
             }
         }
     }

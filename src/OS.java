@@ -1,11 +1,13 @@
 import java.io.IOException;
+import java.util.Map;
+
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.win32.StdCallLibrary;
 
 public class OS {
-        public static Pair<WinNT.HANDLE, WinDef.DWORDByReference> prepareOS() {
+    public static Pair<WinNT.HANDLE, WinDef.DWORDByReference> prepareOS() {
         String os = System.getProperty("os.name").toLowerCase();
         WinNT.HANDLE handle = null;
         WinDef.DWORDByReference mode = null;
@@ -50,5 +52,30 @@ public class OS {
         WinNT.HANDLE GetStdHandle(WinDef.DWORD stdHandle);
         boolean SetConsoleMode(WinNT.HANDLE hConsoleHandle, WinDef.DWORD dwMode);
         boolean GetConsoleMode(WinNT.HANDLE hConsoleHandle, WinDef.DWORDByReference lpMode);
+    }
+
+    public static void setSystemVariable(String key, String value) {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+            try {
+                ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", "echo $var");
+                Map<String, String> env = builder.environment();
+                env.put("var", "isthisworking?");
+                Process process = builder.start();
+                process.waitFor();
+            } catch (IOException | InterruptedException e) {
+                System.out.println("Error setting system variable.");
+                System.out.println("Exception: " + e);
+            }
+        } else {
+            try {
+                ProcessBuilder builder = new ProcessBuilder("/bin/sh", "-c", "export " + key + "=" + value);
+                Process process = builder.start();
+                process.waitFor();
+            } catch (IOException | InterruptedException e) {
+                System.out.println("Error setting system variable.");
+                System.out.println("Exception: " + e);
+            }
+        }
     }
 }
