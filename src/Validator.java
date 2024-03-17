@@ -26,7 +26,7 @@ public class Validator {
     //private static boolean isValidLiteraryStyle(String literaryStyle) {}
     //private static boolean isValidAcademicBackground(String academicBackground) {}
     //private static boolean isValidSpecialization(String specialization) {}
-    //private static boolean isValidDate(String date) {}
+    //private static boolean isValidDate(String date) {} // should probably be changed to Date type
 
     public static String validateInputInDatabase(Scanner scanner, String type, Function<String, Boolean> validator) {
         String input;

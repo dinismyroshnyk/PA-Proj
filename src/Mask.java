@@ -9,12 +9,6 @@ public class Mask implements Runnable {
     public void run() {
         while (!end) {
             System.out.print("\b*");
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                System.out.println("Error masking password.");
-                System.out.println("Exception: " + e);
-            }
         }
     }
 
