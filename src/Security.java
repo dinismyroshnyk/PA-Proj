@@ -4,7 +4,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -12,28 +11,13 @@ import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
 
 public class Security {
-    // Generate a random key
-    private static String generateKey() {
-        SecureRandom random = new SecureRandom();
-        byte[] key = new byte[24];
-        random.nextBytes(key);
-        return Base64.getEncoder().encodeToString(key);
-    }
-
-    // Manage the encryption key
-    private static String keyManager() {
-        String key = System.getenv("PA_DB_KEY");
-        if (key == null) {
-            key = generateKey();
-            OS.setSystemVariable("PA_DB_KEY=", key);
-        }
-        return key;
-    }
+    // Encryption key
+    private static final String ENCRYPTION_KEY = "6w|Uq)X.77hdh*=H8r[w[&EG*!i~HN]]";
 
     // Encrypt or decrypt a string using AES
     public static String encryptDecryptString(String string, String param) {
         try {
-            SecretKeySpec key = new SecretKeySpec(keyManager().getBytes("UTF-8"), "AES");
+            SecretKeySpec key = new SecretKeySpec(ENCRYPTION_KEY.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES");
             if(param.equals("-e")) {
                 cipher.init(Cipher.ENCRYPT_MODE, key);

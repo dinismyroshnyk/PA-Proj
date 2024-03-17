@@ -46,6 +46,7 @@ public class Database {
             // Attempt to connect with the provided credentials
             if (connectToDatabase(user, password)) {
                 // If successful, encrypt and save the credentials
+                user = Security.encryptDecryptString(user, "-e");
                 password = Security.encryptDecryptString(password, "-e");
                 if (password == null) {
                     System.out.println("Failed to encrypt password. Exiting application.");
