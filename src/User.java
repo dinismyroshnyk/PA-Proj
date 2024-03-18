@@ -3,15 +3,17 @@ import java.util.Scanner;
 public abstract class User {
     private String login;
     private String password;
+    private byte[] salt;
     private String name;
     private String email;
     private String type;
     private String status;
 
     // constructor
-    public User(String login, String password, String name, String email, String type, String status) {
+    public User(String login, String password, byte[] salt, String name, String email, String type, String status) {
         this.login = login;
         this.password = password;
+        this.salt = salt;
         this.name = name;
         this.email = email;
         this.type = type;

@@ -8,8 +8,8 @@ public class Author extends User{
     private String startDate;
 
     // constructor
-    public Author(String login, String password, String name, String email, String nif, String phone, String address, String literaryStyle, String startDate) {
-        super(login, password, name, email, "author", "inactive");
+    public Author(String login, String password, byte[] salt, String name, String email, String nif, String phone, String address, String literaryStyle, String startDate) {
+        super(login, password, salt, name, email, "author", "inactive");
         this.nif = nif;
         this.phone = phone;
         this.address = address;
@@ -22,6 +22,7 @@ public class Author extends User{
         Main.clearConsole();
         String name = Validator.validateName(scanner);
         String email = Validator.validateInputInDatabase(scanner, "Email", Validator::isValidEmail);
+        byte[] salt = Security.generateSalt();
         String nif = Validator.validateInputInDatabase(scanner, "NIF", Validator::isValidNIF);
         String phone = Validator.validatePhone(scanner);
         System.out.print("Address: ");
@@ -31,7 +32,7 @@ public class Author extends User{
         System.out.print("Start Date: ");
         String startDate = scanner.nextLine();
         String login = Validator.validateInputInDatabase(scanner, "Login", null);
-        String password = Validator.validatePassword(scanner);
-        return new Author(login, password, name, email, nif, phone, address, style, startDate);
+        String password = Validator.validatePassword(scanner, salt);
+        return new Author(login, password, salt, name, email, nif, phone, address, style, startDate);
     }
 }

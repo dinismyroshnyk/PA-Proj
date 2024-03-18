@@ -90,6 +90,7 @@ create table UTILIZADORES
    NOME                 varchar(100) not null,
    USERNAME             varchar(20) not null,
    PASSWORD             varchar(60) not null,
+   SALT                 varbinary(16) not null,
    ESTADO               varchar(15) not null,
    EMAIL                text not null,
    TIPO                 varchar(8) not null,

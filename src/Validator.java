@@ -72,16 +72,16 @@ public class Validator {
         return name;
     }
 
-    public static String validatePassword(Scanner scanner) {
+    public static String validatePassword(Scanner scanner, byte[] salt) {
         String password;
         do {
             String textBlock = """
-                    Password must contain:
-                    - Between 8 and 20 characters
-                    - At least one digit
-                    - At least one lowercase letter
-                    - At least one uppercase letter
-                    - No whitespaces
+            Password must contain:
+                - Between 8 and 20 characters
+                - At least one digit
+                - At least one uppercase letter
+                - At least one lowercase letter
+                - No whitespaces
             """;
             System.out.println(textBlock);
             password = Security.maskPassword();
@@ -92,6 +92,6 @@ public class Validator {
                 System.out.println("Invalid password. Please try again.");
             }
         } while (!isValidPassword(password));
-        return Security.hashPassword(password);
+        return Security.hashPassword(password, salt);
     }
 }

@@ -62,6 +62,7 @@ public class Main {
         // If no users are found, create a manager
         try {
             if (!Database.rs.next()) {
+                clearConsole();
                 System.out.println("No users found. Creating a manager...");
                 pressAnyKey(scanner);
                 User manager = User.createUser("manager", scanner);
@@ -203,39 +204,49 @@ public class Main {
         System.out.print("Login: ");
         String login = scanner.nextLine();
         String password = Security.maskPassword();
-        // Check if the user exists
+        // Retrieve the salt and the hashed password
         Database.rs = null;
         Database.sqlQuery = new StringBuffer();
-        Database.sqlQuery.append(" SELECT * FROM UTILIZADORES WHERE username = ? AND password = ?");
+        Database.sqlQuery.append(" SELECT salt, password, nome FROM UTILIZADORES WHERE username = ?");
         PreparedStatement ps = null;
         try {
             ps = Database.conn.prepareStatement(Database.sqlQuery.toString());
             ps.setString(1, login);
-            ps.setString(2, Security.hashPassword(password));
             Database.rs = ps.executeQuery();
             if (Database.rs.next()) {
-                String user = Database.rs.getString("nome");
-                clearConsole();
-                System.out.println("Login successful.");
-                System.out.println("Welcome, " + user + "!");
-                pressAnyKey(scanner);
-                return user;
+                byte[] salt = Database.rs.getBytes("salt");
+                String hash = Database.rs.getString("password");
+                String input = Security.hashPassword(password, salt);
+                if (hash.equals(input)) {
+                    String user = Database.rs.getString("nome");
+                    clearConsole();
+                    System.out.println("Login successful.");
+                    System.out.println("Welcome, " + user + "!");
+                    pressAnyKey(scanner);
+                    return user;
+                } else {
+                    System.out.println("\nLogin failed.");
+                    pressAnyKey(scanner);
+                    return null;
+                }
             } else {
-                System.out.println("Login failed.");
+                System.out.println("\nLogin failed.");
                 pressAnyKey(scanner);
                 return null;
             }
         } catch (SQLException e) {
-            System.out.println("Failed to execute query.");
+            System.out.println("\nFailed to execute query.");
             System.out.println("Exception: " + e);
+            pressAnyKey(scanner);
             return null;
         } finally {
             if (ps != null) {
                 try {
                     ps.close();
                 } catch (SQLException e) {
-                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("\nFailed to close prepared statement.");
                     System.out.println("Exception: " + e);
+                    pressAnyKey(scanner);
                 }
             }
         }

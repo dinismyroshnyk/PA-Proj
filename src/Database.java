@@ -106,11 +106,11 @@ public class Database {
     public static void insertUserIntoDatabase(List<Object> values, Scanner scanner) {
         sqlQuery = new StringBuffer();
         if (values.contains("manager")) {
-            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)");
+            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, salt, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?, ?)");
         } else if (values.contains("author")) {
-            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado, contribuinte, telefone, morada, estilo_literario, data_inicio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, salt, nome, email, tipo, estado, contribuinte, telefone, morada, estilo_literario, data_inicio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         } else if (values.contains("reviewer")) {
-            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado, contribuinte, telefone, morada, area_especializacao, formacao_academica) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, salt, nome, email, tipo, estado, contribuinte, telefone, morada, area_especializacao, formacao_academica) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         }
         PreparedStatement ps = null;
         try {

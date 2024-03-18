@@ -1,11 +1,14 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.Base64;
 import javax.crypto.Cipher;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
@@ -38,21 +41,26 @@ public class Security {
         }
     }
 
-    // Hash the password using MD5
-    public static String hashPassword(String password) {
+    // Hash the password using PBKDF2
+    public static String hashPassword(String password, byte[] salt) {
+        char[] passwordChars = password.toCharArray();
         try {
-            MessageDigest algorithm = MessageDigest.getInstance("MD5");
-            byte pwd[] = algorithm.digest(password.getBytes("UTF-8"));
-            StringBuilder pass = new StringBuilder();
-            for (byte b : pwd) {
-                pass.append(String.format("%02X", 0xFF & b));
-            }
-            return pass.toString();
-        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+            SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+            KeySpec spec = new PBEKeySpec(passwordChars, salt, 65536, 128);
+            byte[] hash = skf.generateSecret(spec).getEncoded();
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             System.out.println("Error hashing password.");
             System.out.println("Exception: " + e);
             return null;
         }
+    }
+
+    // Generate a random salt
+    public static byte[] generateSalt() {
+        byte[] salt = new byte[16];
+        new SecureRandom().nextBytes(salt);
+        return salt;
     }
 
     // Password masking
