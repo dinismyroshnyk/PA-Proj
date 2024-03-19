@@ -1,12 +1,13 @@
+import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Function;
 
 public class Validator {
-    public static boolean isValidEmail(String email) {
+    private static boolean isValidEmail(String email) {
         return email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
     }
 
-    public static boolean isValidNIF(String nif) {
+    private static boolean isValidNIF(String nif) {
         return nif.matches("^[0-9]{9}$");
     }
 
@@ -18,26 +19,55 @@ public class Validator {
         return name.matches("^[A-Z](?=.{2,100}$)[A-Za-z]*(?:\\h+[A-Z][A-Za-z]*)*$");
     }
 
+    private static boolean isValidLogin(String login) {
+        return login.matches("^[A-Za-z0-9]{3,20}$");
+    }
+
     private static boolean isValidPassword(String password) {
         return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,20}$");
     }
 
-    //private static boolean isValidAddress(String address) {}
-    //private static boolean isValidLiteraryStyle(String literaryStyle) {}
-    //private static boolean isValidAcademicBackground(String academicBackground) {}
-    //private static boolean isValidSpecialization(String specialization) {}
+    private static boolean isValidAddress(String address) {
+        return address.matches("^[\\w\\s,\\.]{1,100}$");
+    }
+
+    private static boolean isValidLiteraryStyle(String literaryStyle) {
+        return literaryStyle.matches("^[\\w\\s]{1,100}$");
+    }
+
+    private static boolean isValidAcademicBackground(String academicBackground) {
+        return academicBackground.matches("^[\\w\\s,\\.]{1,100}$");
+    }
+
+    private static boolean isValidSpecialization(String specialization) {
+        return specialization.matches("^[\\w\\s]{1,100}$");
+    }
+
     //private static boolean isValidDate(String date) {} // should probably be changed to Date type
 
-    public static String validateInputInDatabase(Scanner scanner, String type, Function<String, Boolean> validator) {
+    private static final Map<String, Function<String, Boolean>> validators = Map.of(
+        "email", Validator::isValidEmail,
+        "nif", Validator::isValidNIF,
+        "phone number", Validator::isValidPhoneNumber,
+        "name", Validator::isValidName,
+        "login", Validator::isValidLogin,
+        "password", Validator::isValidPassword,
+        "address", Validator::isValidAddress,
+        "literary style", Validator::isValidLiteraryStyle,
+        "academic background", Validator::isValidAcademicBackground,
+        "specialization", Validator::isValidSpecialization
+    );
+
+    public static String validateInput(Scanner scanner, String type, boolean checkDatabase) {
         String input;
         boolean check = false;
         do {
             System.out.print(type + ": ");
             input = scanner.nextLine();
-            boolean isValid = validator == null || validator.apply(input);
-            boolean isUnique = !Database.existsInDatabase(input, type.toLowerCase());
+            boolean isValid = validators.get(type.toLowerCase()).apply(input);
+            boolean isUnique = !checkDatabase || !Database.existsInDatabase(input, type.toLowerCase());
             check = isValid && isUnique;
-            if (!check) {
+            if (!isValid || !isUnique) {
                 if (!isValid) {
                     System.out.println("Invalid " + type + ". Please try again.");
                 } else {
@@ -48,31 +78,7 @@ public class Validator {
         return input;
     }
 
-    public static String validatePhone(Scanner scanner) {
-        String phone;
-        do {
-            System.out.print("Phone: ");
-            phone = scanner.nextLine();
-            if (!isValidPhoneNumber(phone)) {
-                System.out.println("Invalid phone number. Please try again.");
-            }
-        } while (!isValidPhoneNumber(phone));
-        return phone;
-    }
-
-    public static String validateName(Scanner scanner) {
-        String name;
-        do {
-            System.out.print("Name: ");
-            name = scanner.nextLine();
-            if (!isValidName(name)) {
-                System.out.println("Invalid name. Please try again.");
-            }
-        } while (!isValidName(name));
-        return name;
-    }
-
-    public static String validatePassword(Scanner scanner, byte[] salt) {
+    public static String validatePassword(byte[] salt) {
         String password;
         do {
             String textBlock = """

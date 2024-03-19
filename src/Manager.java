@@ -9,11 +9,11 @@ public class Manager extends User {
     // getters, setters, and other manager-specific methods
     public static Manager register (Scanner scanner) {
         Main.clearConsole();
-        String name = Validator.validateName(scanner);
-        String email = Validator.validateInputInDatabase(scanner, "Email", Validator::isValidEmail);
+        String name = Validator.validateInput(scanner, "Name", false);
+        String email = Validator.validateInput(scanner, "Email", true);
+        String login = Validator.validateInput(scanner, "Login", true);
         byte[] salt = Security.generateSalt();
-        String login = Validator.validateInputInDatabase(scanner, "Login", null);
-        String password = Validator.validatePassword(scanner, salt);
+        String password = Validator.validatePassword(salt);
         return new Manager(login, password, salt, name, email);
     }
 }
