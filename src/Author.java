@@ -1,5 +1,6 @@
 import java.sql.Date;
-
+import java.util.Map;
+import java.util.function.Function;
 public class Author extends User{
     private String nif;
     private String phone;
@@ -8,8 +9,8 @@ public class Author extends User{
     private Date startDate;
 
     // constructor
-    public Author(String login, String password, byte[] salt, String name, String email, String nif, String phone, String address, String literaryStyle, Date startDate) {
-        super(login, password, salt, name, email, "author", "inactive");
+    public Author(String login, String password, String name, String email, String nif, String phone, String address, String literaryStyle, Date startDate) {
+        super(login, password, name, email, "author", "inactive");
         this.nif = nif;
         this.phone = phone;
         this.address = address;
@@ -18,7 +19,27 @@ public class Author extends User{
     }
 
     // getters, setters, and other author-specific methods
-    public static Author register () {
+    private String getNIF () {
+        return nif;
+    }
+
+    private String getPhone () {
+        return phone;
+    }
+
+    private String getAddress () {
+        return address;
+    }
+
+    private String getLiteraryStyle () {
+        return literaryStyle;
+    }
+
+    private Date getStartDate () {
+        return startDate;
+    }
+
+    public static Author register (byte[] salt) {
         Main.clearConsole();
         String name = Validator.validateInput("Name", false);
         String email = Validator.validateInput("Email", true);
@@ -28,8 +49,22 @@ public class Author extends User{
         String style = Validator.validateInput("Literary style", false);
         Date startDate = Validator.validateDate();
         String login = Validator.validateInput("Login", true);
-        byte[] salt = Security.generateSalt();
         String password = Validator.validatePassword(salt);
-        return new Author(login, password, salt, name, email, nif, phone, address, style, startDate);
+        return new Author(login, password, name, email, nif, phone, address, style, startDate);
+    }
+
+    private static final Map<String, Function<Author, String>> getters = Map.of(
+        "nif", Author::getNIF,
+        "phone", Author::getPhone,
+        "address", Author::getAddress,
+        "style", Author::getLiteraryStyle
+    );
+
+    public static String getValue (Author user, String value) {
+        if (value.equals("date")) {
+            return user.getStartDate().toString();
+        } else {
+            return getters.get(value.toLowerCase()).apply(user);
+        }
     }
 }

@@ -1,7 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
 import java.lang.reflect.Field;
 
 public class Main {
@@ -61,8 +60,9 @@ public class Main {
                 clearConsole();
                 System.out.println("No users found. Creating a manager...");
                 pressAnyKey();
-                User manager = User.createUser("manager");
-                List<Object> values = getUserValues(manager);
+                byte[] salt = Security.generateSalt();
+                User manager = User.registerNewUser("manager", salt);
+                List<Object> values = getUserValueList(manager, salt);
                 Database.insertUserIntoDatabase(values);
             }
         } catch (SQLException e) {
@@ -73,7 +73,7 @@ public class Main {
     }
 
     // Extract the values of the fields of a given object
-    private static List<Object> getUserValues(User user) {
+    private static List<Object> getUserValueList(User user, byte[] salt) {
         List<Object> values = new ArrayList<>();
         Field[] userFields = User.class.getDeclaredFields();
         Field[] objectFields = user.getClass().getDeclaredFields();
@@ -91,6 +91,7 @@ public class Main {
                 System.out.println("Exception: " + e);
             }
         }
+        values.add(salt);
         return values;
     }
 
@@ -107,9 +108,7 @@ public class Main {
             String option = Input.readLine();
             switch (option) {
                 case "1":
-                    String user = loginUser();
-                    if (user != null)
-                        loggedUserLoop(user);
+                    loginUser();
                     break;
                 case "2":
                     List<Object> values = registerUser();
@@ -130,43 +129,6 @@ public class Main {
         }
     }
 
-    // Logged user loop
-    private static void loggedUserLoop(String user) {
-        boolean running = true;
-        while (running) {
-            clearConsole();
-            System.out.println("Logged as " + user);
-            System.out.println("1. Option 1");
-            System.out.println("2. Option 2");
-            System.out.println("0. Logout");
-            System.out.print("\nOption: ");
-            String option = Input.readLine();
-            switch (option) {
-                case "1":
-                    clearConsole();
-                    System.out.println("Option 1...");
-                    pressAnyKey();
-                    break;
-                case "2":
-                    clearConsole();
-                    System.out.println("Option 2...");
-                    pressAnyKey();
-                    break;
-                case "0":
-                    clearConsole();
-                    System.out.println("Goodbye, " + user + "!");
-                    pressAnyKey();
-                    running = false;
-                    break;
-                default:
-                    clearConsole();
-                    System.out.println("Invalid option. Please try again.");
-                    pressAnyKey();
-                    break;
-            }
-        }
-    }
-
     // Register a new user
     private static List<Object> registerUser() {
         clearConsole();
@@ -176,13 +138,14 @@ public class Main {
         System.out.println("0. Go back");
         System.out.print("\nOption: ");
         String option = Input.readLine();
+        byte[] salt = Security.generateSalt();
         switch (option) {
             case "1":
-                User author = User.createUser("author");
-                return getUserValues(author);
+                User author = User.registerNewUser("author", salt);
+                return getUserValueList(author, salt);
             case "2":
-                User reviewer = User.createUser("reviewer");
-                return getUserValues(reviewer);
+                User reviewer = User.registerNewUser("reviewer", salt);
+                return getUserValueList(reviewer, salt);
             case "0":
                 break;
             default:
@@ -195,56 +158,20 @@ public class Main {
     }
 
     // Attempt to login a user
-    private static String loginUser() {
+    private static void loginUser() {
         clearConsole();
         System.out.print("Login: ");
         String login = Input.readLine();
         String password = Security.maskPassword();
-        // Retrieve the salt and the hashed password
-        Database.rs = null;
-        Database.sqlQuery = new StringBuffer();
-        Database.sqlQuery.append(" SELECT salt, password, nome FROM UTILIZADORES WHERE username = ?");
-        PreparedStatement ps = null;
-        try {
-            ps = Database.conn.prepareStatement(Database.sqlQuery.toString());
-            ps.setString(1, login);
-            Database.rs = ps.executeQuery();
-            if (Database.rs.next()) {
-                byte[] salt = Database.rs.getBytes("salt");
-                String hash = Database.rs.getString("password");
-                String input = Security.hashPassword(password, salt);
-                if (hash.equals(input)) {
-                    String user = Database.rs.getString("nome");
-                    clearConsole();
-                    System.out.println("Login successful.");
-                    System.out.println("Welcome, " + user + "!");
-                    pressAnyKey();
-                    return user;
-                } else {
-                    System.out.println("\nLogin failed.");
-                    pressAnyKey();
-                    return null;
-                }
-            } else {
-                System.out.println("\nLogin failed.");
-                pressAnyKey();
-                return null;
-            }
-        } catch (SQLException e) {
-            System.out.println("\nFailed to execute query.");
-            System.out.println("Exception: " + e);
+        User user = Database.getUserValues(login, password);
+        if (user != null) {
+            clearConsole();
+            System.out.println("Login successful.");
+            System.out.println("Welcome, " + User.getValue(user, "name") + "!");
             pressAnyKey();
-            return null;
-        } finally {
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                    System.out.println("\nFailed to close prepared statement.");
-                    System.out.println("Exception: " + e);
-                    pressAnyKey();
-                }
-            }
+        } else {
+            System.out.println("Invalid login. Please try again.");
+            pressAnyKey();
         }
     }
 

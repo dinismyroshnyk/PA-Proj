@@ -1,4 +1,7 @@
-public class Reviewer extends User{
+import java.util.Map;
+import java.util.function.Function;
+
+public class Reviewer extends User {
     private String nif;
     private String phone;
     private String address;
@@ -6,8 +9,8 @@ public class Reviewer extends User{
     private String academicBackground;
 
     // constructor
-    public Reviewer(String login, String password, byte[] salt, String name, String email, String nif, String phone, String address, String specialization, String academicBackground) {
-        super(login, password, salt, name, email, "reviewer", "inactive");
+    public Reviewer(String login, String password, String name, String email, String nif, String phone, String address, String specialization, String academicBackground) {
+        super(login, password, name, email, "reviewer", "inactive");
         this.nif = nif;
         this.phone = phone;
         this.address = address;
@@ -16,7 +19,27 @@ public class Reviewer extends User{
     }
 
     // getters, setters, and other reviewer-specific methods
-    public static Reviewer register () {
+    private String getNIF () {
+        return nif;
+    }
+
+    private String getPhone () {
+        return phone;
+    }
+
+    private String getAddress () {
+        return address;
+    }
+
+    private String getSpecialization () {
+        return specialization;
+    }
+
+    private String getAcademicBackground () {
+        return academicBackground;
+    }
+
+    public static Reviewer register (byte[] salt) {
         Main.clearConsole();
         String name = Validator.validateInput("Name", false);
         String email = Validator.validateInput("Email", true);
@@ -26,8 +49,19 @@ public class Reviewer extends User{
         String specialization = Validator.validateInput("Specialization", false);
         String academicBackground = Validator.validateInput("Academic background", false);
         String login = Validator.validateInput("Login", true);
-        byte[] salt = Security.generateSalt();
         String password = Validator.validatePassword(salt);
-        return new Reviewer(login, password, salt, name, email, nif, phone, address, specialization, academicBackground);
+        return new Reviewer(login, password, name, email, nif, phone, address, specialization, academicBackground);
+    }
+
+    private static final Map<String, Function<Reviewer, String>> getters = Map.of(
+        "nif", Reviewer::getNIF,
+        "phone", Reviewer::getPhone,
+        "address", Reviewer::getAddress,
+        "specialization", Reviewer::getSpecialization,
+        "academic background", Reviewer::getAcademicBackground
+    );
+
+    public static String getValue (Reviewer user, String value) {
+        return getters.get(value.toLowerCase()).apply(user);
     }
 }

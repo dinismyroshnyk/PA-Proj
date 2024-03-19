@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Database {
@@ -105,11 +106,11 @@ public class Database {
     public static void insertUserIntoDatabase(List<Object> values) {
         sqlQuery = new StringBuffer();
         if (values.contains("manager")) {
-            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, salt, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado, salt) VALUES (?, ?, ?, ?, ?, ?, ?)");
         } else if (values.contains("author")) {
-            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, salt, nome, email, tipo, estado, contribuinte, telefone, morada, estilo_literario, data_inicio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado, contribuinte, telefone, morada, estilo_literario, data_inicio, salt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         } else if (values.contains("reviewer")) {
-            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, salt, nome, email, tipo, estado, contribuinte, telefone, morada, area_especializacao, formacao_academica) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, nome, email, tipo, estado, contribuinte, telefone, morada, area_especializacao, formacao_academica, salt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         }
         PreparedStatement ps = null;
         try {
@@ -123,7 +124,7 @@ public class Database {
             System.out.println("User created successfully.");
             Main.pressAnyKey();
         } catch (SQLException e) {
-            System.out.println("Failed to insert user into database. Rolling back transaction.");
+            System.out.println("\nFailed to insert user into database. Rolling back transaction.");
             System.out.println("Exception: " + e);
             System.exit(1);
         } finally {
@@ -161,5 +162,59 @@ public class Database {
             System.out.println("Exception: " + e);
         }
         return false;
+    }
+
+    // Get user values from the database
+    public static User getUserValues(String login, String password) {
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT * FROM UTILIZADORES WHERE username = ?");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, login);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                byte[] salt = Database.rs.getBytes("salt");
+                String hash = Database.rs.getString("password");
+                String input = Security.hashPassword(password, salt);
+                if (hash.equals(input)) {
+                    List<Object> values = new ArrayList<>();
+                    values.add(rs.getString("nome"));
+                    values.add(rs.getString("email"));
+                    values.add(rs.getString("username"));
+                    values.add(rs.getString("password"));
+                    values.add(rs.getString("tipo"));
+                    if (rs.getString("tipo").equals("author")) {
+                        values.add(rs.getString("contribuinte"));
+                        values.add(rs.getString("telefone"));
+                        values.add(rs.getString("morada"));
+                        values.add(rs.getString("estilo_literario"));
+                        values.add(rs.getDate("data_inicio"));
+                    } else if (rs.getString("tipo").equals("reviewer")) {
+                        values.add(rs.getString("contribuinte"));
+                        values.add(rs.getString("telefone"));
+                        values.add(rs.getString("morada"));
+                        values.add(rs.getString("area_especializacao"));
+                        values.add(rs.getString("formacao_academica"));
+                    }
+                    return User.createUserObject(values);
+                } else {
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to execute query.");
+            System.out.println("Exception: " + e);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                }
+            }
+        }
+        return null;
     }
 }
