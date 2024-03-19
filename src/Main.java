@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.sql.SQLException;
 import java.lang.reflect.Field;
@@ -85,7 +86,9 @@ public class Main {
         for (Field field : allFields) {
             field.setAccessible(true);
             try {
-                values.add(field.get(user));
+                if (!Map.class.isAssignableFrom(field.getType())) {
+                    values.add(field.get(user));
+                }
             } catch (IllegalAccessException e) {
                 System.out.println("Failed to access field.");
                 System.out.println("Exception: " + e);
