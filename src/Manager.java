@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class Manager extends User {
     // constructor
     public Manager(String login, String password, String name, String email) {
@@ -28,7 +30,10 @@ public class Manager extends User {
             String option = Input.readLine();
             switch (option) {
                 case "1":
-                    // Create new manager
+                    byte[] salt = Security.generateSalt();
+                    User manager = User.registerNewUser("manager", salt);
+                    List<Object> values = Main.getUserValueList(manager, salt);
+                    Database.insertUserIntoDatabase(values);
                     break;
                 case "2":
                     // Manage new users

@@ -74,7 +74,7 @@ public class Main {
     }
 
     // Extract the values of the fields of a given object
-    private static List<Object> getUserValueList(User user, byte[] salt) {
+    public static List<Object> getUserValueList(User user, byte[] salt) {
         List<Object> values = new ArrayList<>();
         Field[] userFields = User.class.getDeclaredFields();
         Field[] objectFields = user.getClass().getDeclaredFields();
@@ -171,11 +171,18 @@ public class Main {
         String password = Security.maskPassword();
         User user = Database.getUserValues(login, password);
         if (user != null) {
-            clearConsole();
-            System.out.println("Login successful.");
-            System.out.println("Welcome, " + User.getValue(user, "name") + "!");
-            pressAnyKey();
-            return user;
+            if (User.getValue(user, "status").equals("active")) {
+                clearConsole();
+                System.out.println("Login successful.");
+                System.out.println("Welcome, " + User.getValue(user, "name") + "!");
+                pressAnyKey();
+                return user;
+            } else {
+                clearConsole();
+                System.out.println("This account is being reviewed. Please try again later.");
+                pressAnyKey();
+                return null;
+            }
         } else {
             System.out.println("Invalid login. Please try again.");
             pressAnyKey();
