@@ -1,5 +1,4 @@
 import java.util.Map;
-import java.util.Scanner;
 import java.util.function.Function;
 
 public class Validator {
@@ -58,12 +57,12 @@ public class Validator {
         "specialization", Validator::isValidSpecialization
     );
 
-    public static String validateInput(Scanner scanner, String type, boolean checkDatabase) {
+    public static String validateInput(String type, boolean checkDatabase) {
         String input;
         boolean check = false;
         do {
             System.out.print(type + ": ");
-            input = scanner.nextLine();
+            input = Input.getScanner().nextLine();
             boolean isValid = validators.get(type.toLowerCase()).apply(input);
             boolean isUnique = !checkDatabase || !Database.existsInDatabase(input, type.toLowerCase());
             check = isValid && isUnique;

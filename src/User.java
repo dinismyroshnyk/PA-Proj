@@ -1,5 +1,3 @@
-import java.util.Scanner;
-
 public abstract class User {
     private String login;
     private String password;
@@ -21,14 +19,14 @@ public abstract class User {
     }
 
     // getters, setters, and other methods
-    public static User createUser(String type, Scanner scanner) {
+    public static User createUser(String type) {
         switch (type) {
             case "manager":
-                return Manager.register(scanner);
+                return Manager.register();
             case "author":
-                return Author.register(scanner);
+                return Author.register();
             case "reviewer":
-                return Reviewer.register(scanner);
+                return Reviewer.register();
             default:
                 throw new IllegalArgumentException("Invalid user type: " + type);
         }

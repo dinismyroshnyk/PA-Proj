@@ -1,5 +1,4 @@
 import java.util.List;
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -7,14 +6,12 @@ import java.lang.reflect.Field;
 
 public class Main {
     public static void main(String[] args) {
-        // Open scanner for user input
-        Scanner scanner = new Scanner(System.in);
         // Prepare and connect to the database
-        Database.setUpDatabase(scanner);
+        Database.setUpDatabase();
         // Application and SQL handling
         try {
-            doUsersExist(scanner);
-            mainLoop(scanner);
+            doUsersExist();
+            mainLoop();
         } catch (Exception e) {
             System.out.println("Exception: " + e);
             try {
@@ -41,13 +38,12 @@ public class Main {
                 }
             }
         }
-        // Close scanner and exit application
-        scanner.close();
+        Input.closeScanner();
         System.exit(0);
     }
 
     // Create a manager if no users exist
-    private static void doUsersExist(Scanner scanner) {
+    private static void doUsersExist() {
         // Check if there are any users in the database
         Database.rs = null;
         Database.sqlQuery = new StringBuffer();
@@ -64,10 +60,10 @@ public class Main {
             if (!Database.rs.next()) {
                 clearConsole();
                 System.out.println("No users found. Creating a manager...");
-                pressAnyKey(scanner);
-                User manager = User.createUser("manager", scanner);
+                pressAnyKey();
+                User manager = User.createUser("manager");
                 List<Object> values = getUserValues(manager);
-                Database.insertUserIntoDatabase(values, scanner);
+                Database.insertUserIntoDatabase(values);
             }
         } catch (SQLException e) {
             System.out.println("Failed to check if users exist.");
@@ -99,7 +95,7 @@ public class Main {
     }
 
     // Main loop of the application
-    private static void mainLoop(Scanner scanner) {
+    private static void mainLoop() {
         boolean running = true;
         while (running) {
             clearConsole();
@@ -108,17 +104,17 @@ public class Main {
             System.out.println("2. Register");
             System.out.println("0. Exit");
             System.out.print("\nOption: ");
-            String option = scanner.nextLine();
+            String option = Input.getScanner().nextLine();
             switch (option) {
                 case "1":
-                    String user = loginUser(scanner);
+                    String user = loginUser();
                     if (user != null)
-                        loggedUserLoop(scanner, user);
+                        loggedUserLoop(user);
                     break;
                 case "2":
-                    List<Object> values = registerUser(scanner);
+                    List<Object> values = registerUser();
                     if (values != null) {
-                        Database.insertUserIntoDatabase(values, scanner);
+                        Database.insertUserIntoDatabase(values);
                     }
                     break;
                 case "0":
@@ -128,14 +124,14 @@ public class Main {
                 default:
                     clearConsole();
                     System.out.println("Invalid option. Please try again.");
-                    pressAnyKey(scanner);
+                    pressAnyKey();
                     break;
             }
         }
     }
 
     // Logged user loop
-    private static void loggedUserLoop(Scanner scanner, String user) {
+    private static void loggedUserLoop(String user) {
         boolean running = true;
         while (running) {
             clearConsole();
@@ -144,65 +140,65 @@ public class Main {
             System.out.println("2. Option 2");
             System.out.println("0. Logout");
             System.out.print("\nOption: ");
-            String option = scanner.nextLine();
+            String option = Input.getScanner().nextLine();
             switch (option) {
                 case "1":
                     clearConsole();
                     System.out.println("Option 1...");
-                    pressAnyKey(scanner);
+                    pressAnyKey();
                     break;
                 case "2":
                     clearConsole();
                     System.out.println("Option 2...");
-                    pressAnyKey(scanner);
+                    pressAnyKey();
                     break;
                 case "0":
                     clearConsole();
                     System.out.println("Goodbye, " + user + "!");
-                    pressAnyKey(scanner);
+                    pressAnyKey();
                     running = false;
                     break;
                 default:
                     clearConsole();
                     System.out.println("Invalid option. Please try again.");
-                    pressAnyKey(scanner);
+                    pressAnyKey();
                     break;
             }
         }
     }
 
     // Register a new user
-    private static List<Object> registerUser(Scanner scanner) {
+    private static List<Object> registerUser() {
         clearConsole();
         System.out.println("Register a new user: ");
         System.out.println("1. Register as Author");
         System.out.println("2. Register as Reviewer");
         System.out.println("0. Go back");
         System.out.print("\nOption: ");
-        String option = scanner.nextLine();
+        String option = Input.getScanner().nextLine();
         switch (option) {
             case "1":
-                User author = User.createUser("author", scanner);
+                User author = User.createUser("author");
                 return getUserValues(author);
             case "2":
-                User reviewer = User.createUser("reviewer", scanner);
+                User reviewer = User.createUser("reviewer");
                 return getUserValues(reviewer);
             case "0":
                 break;
             default:
                 clearConsole();
                 System.out.println("Invalid option. Please try again.");
-                pressAnyKey(scanner);
+                pressAnyKey();
                 break;
         }
         return null;
     }
 
     // Attempt to login a user
-    private static String loginUser(Scanner scanner) {
+    private static String loginUser() {
         clearConsole();
         System.out.print("Login: ");
-        String login = scanner.nextLine();
+        String login = Input.getScanner().nextLine();
         String password = Security.maskPassword();
         // Retrieve the salt and the hashed password
         Database.rs = null;
@@ -222,22 +218,22 @@ public class Main {
                     clearConsole();
                     System.out.println("Login successful.");
                     System.out.println("Welcome, " + user + "!");
-                    pressAnyKey(scanner);
+                    pressAnyKey();
                     return user;
                 } else {
                     System.out.println("\nLogin failed.");
-                    pressAnyKey(scanner);
+                    pressAnyKey();
                     return null;
                 }
             } else {
                 System.out.println("\nLogin failed.");
-                pressAnyKey(scanner);
+                pressAnyKey();
                 return null;
             }
         } catch (SQLException e) {
             System.out.println("\nFailed to execute query.");
             System.out.println("Exception: " + e);
-            pressAnyKey(scanner);
+            pressAnyKey();
             return null;
         } finally {
             if (ps != null) {
@@ -246,7 +242,7 @@ public class Main {
                 } catch (SQLException e) {
                     System.out.println("\nFailed to close prepared statement.");
                     System.out.println("Exception: " + e);
-                    pressAnyKey(scanner);
+                    pressAnyKey();
                 }
             }
         }
@@ -259,8 +255,8 @@ public class Main {
     }
 
     // Press any key to continue
-    public static void pressAnyKey(Scanner scanner) {
-        System.out.print("Press any key to continue...");
-        scanner.nextLine();
+    public static void pressAnyKey() {
+        System.out.println("Press Enter to continue...");
+        Input.getScanner().nextLine();
     }
 }

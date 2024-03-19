@@ -1,5 +1,3 @@
-import java.util.Scanner;
-
 public class Author extends User{
     private String nif;
     private String phone;
@@ -18,17 +16,17 @@ public class Author extends User{
     }
 
     // getters, setters, and other author-specific methods
-    public static Author register (Scanner scanner) {
+    public static Author register () {
         Main.clearConsole();
-        String name = Validator.validateInput(scanner, "Name", false);
-        String email = Validator.validateInput(scanner, "Email", true);
-        String nif = Validator.validateInput(scanner, "NIF", true);
-        String phone = Validator.validateInput(scanner, "Phone number", false);
-        String address = Validator.validateInput(scanner, "Address", false);
-        String style = Validator.validateInput(scanner, "Literary style", false);
+        String name = Validator.validateInput("Name", false);
+        String email = Validator.validateInput("Email", true);
+        String nif = Validator.validateInput("NIF", true);
+        String phone = Validator.validateInput("Phone number", false);
+        String address = Validator.validateInput("Address", false);
+        String style = Validator.validateInput("Literary style", false);
         System.out.print("Start Date: ");
-        String startDate = scanner.nextLine();
-        String login = Validator.validateInput(scanner, "Login", true);
+        String startDate = Input.getScanner().nextLine();
+        String login = Validator.validateInput("Login", true);
         byte[] salt = Security.generateSalt();
         String password = Validator.validatePassword(salt);
         return new Author(login, password, salt, name, email, nif, phone, address, style, startDate);

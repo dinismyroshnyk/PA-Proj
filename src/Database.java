@@ -11,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Scanner;
 
 public class Database {
     // Class level variables
@@ -21,7 +20,7 @@ public class Database {
     static StringBuffer sqlQuery = null;
 
     // Set up the database connection
-    public static void setUpDatabase(Scanner scanner) {
+    public static void setUpDatabase() {
         // Path to the credentials file
         String credentialsPath = ".credentials";
         File credentialsFile = new File(credentialsPath);
@@ -42,7 +41,7 @@ public class Database {
             // Prompt the user for credentials
             System.out.println("[Database Setup]");
             System.out.print("User: ");
-            String user = scanner.nextLine();
+            String user = Input.getScanner().nextLine();
             String password = Security.maskPassword();
             // Attempt to connect with the provided credentials
             if (connectToDatabase(user, password)) {
@@ -103,7 +102,7 @@ public class Database {
     }
 
     // Insert a user into the database
-    public static void insertUserIntoDatabase(List<Object> values, Scanner scanner) {
+    public static void insertUserIntoDatabase(List<Object> values) {
         sqlQuery = new StringBuffer();
         if (values.contains("manager")) {
             sqlQuery.append(" INSERT INTO UTILIZADORES (username, password, salt, nome, email, tipo, estado) VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -122,7 +121,7 @@ public class Database {
             conn.commit();
             Main.clearConsole();
             System.out.println("User created successfully.");
-            Main.pressAnyKey(scanner);
+            Main.pressAnyKey();
         } catch (SQLException e) {
             System.out.println("Failed to insert user into database. Rolling back transaction.");
             System.out.println("Exception: " + e);
