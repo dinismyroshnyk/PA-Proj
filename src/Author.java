@@ -9,8 +9,8 @@ public class Author extends User{
     private Date startDate;
 
     // constructor
-    public Author(String login, String password, String name, String email, String nif, String phone, String address, String literaryStyle, Date startDate) {
-        super(login, password, name, email, "author", "inactive");
+    public Author(String login, String password, String name, String email,String status, String nif, String phone, String address, String literaryStyle, Date startDate) {
+        super(login, password, name, email, "author", status);
         this.nif = nif;
         this.phone = phone;
         this.address = address;
@@ -50,7 +50,8 @@ public class Author extends User{
         Date startDate = Validator.validateDate();
         String login = Validator.validateInput("Login", true);
         String password = Validator.validatePassword(salt);
-        return new Author(login, password, name, email, nif, phone, address, style, startDate);
+        String status = "inactive";
+        return new Author(login, password, name, email, status, nif, phone, address, style, startDate);
     }
 
     private static final Map<String, Function<Author, String>> getters = Map.of(

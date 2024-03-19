@@ -65,23 +65,24 @@ public abstract class User {
         String login = values.get(2).toString();
         String password = values.get(3).toString();
         String type = values.get(4).toString();
+        String status = values.get(5).toString();
         switch (type) {
             case "manager":
                 return new Manager(login, password, name, email);
             case "author":
-                String nif = values.get(5).toString();
-                String phone = values.get(6).toString();
-                String address = values.get(7).toString();
-                String style = values.get(8).toString();
-                Date date = (Date) values.get(9);
-                return new Author(login, password, name, email, nif, phone, address, style, date);
+                String nif = values.get(6).toString();
+                String phone = values.get(7).toString();
+                String address = values.get(8).toString();
+                String style = values.get(9).toString();
+                Date date = (Date) values.get(10);
+                return new Author(login, password, name, email, status, nif, phone, address, style, date);
             case "reviewer":
-                String nif2 = values.get(5).toString();
-                String phone2 = values.get(6).toString();
-                String address2 = values.get(7).toString();
-                String specialization = values.get(8).toString();
-                String academicBackground = values.get(9).toString();
-                return new Reviewer(login, password, name, email, nif2, phone2, address2, specialization, academicBackground);
+                String nif2 = values.get(6).toString();
+                String phone2 = values.get(7).toString();
+                String address2 = values.get(8).toString();
+                String specialization = values.get(9).toString();
+                String academicBackground = values.get(10).toString();
+                return new Reviewer(login, password, name, email, status, nif2, phone2, address2, specialization, academicBackground);
             default:
                 throw new IllegalArgumentException("Invalid user type: " + type);
         }

@@ -184,6 +184,7 @@ public class Database {
                     values.add(rs.getString("username"));
                     values.add(rs.getString("password"));
                     values.add(rs.getString("tipo"));
+                    values.add(rs.getString("estado"));
                     if (rs.getString("tipo").equals("author")) {
                         values.add(rs.getString("contribuinte"));
                         values.add(rs.getString("telefone"));

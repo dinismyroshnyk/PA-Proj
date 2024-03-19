@@ -9,8 +9,8 @@ public class Reviewer extends User {
     private String academicBackground;
 
     // constructor
-    public Reviewer(String login, String password, String name, String email, String nif, String phone, String address, String specialization, String academicBackground) {
-        super(login, password, name, email, "reviewer", "inactive");
+    public Reviewer(String login, String password, String name, String email, String status, String nif, String phone, String address, String specialization, String academicBackground) {
+        super(login, password, name, email, "reviewer", status);
         this.nif = nif;
         this.phone = phone;
         this.address = address;
@@ -50,7 +50,8 @@ public class Reviewer extends User {
         String academicBackground = Validator.validateInput("Academic background", false);
         String login = Validator.validateInput("Login", true);
         String password = Validator.validatePassword(salt);
-        return new Reviewer(login, password, name, email, nif, phone, address, specialization, academicBackground);
+        String status = "inactive";
+        return new Reviewer(login, password, name, email, status, nif, phone, address, specialization, academicBackground);
     }
 
     private static final Map<String, Function<Reviewer, String>> getters = Map.of(
