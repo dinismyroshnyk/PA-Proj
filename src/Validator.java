@@ -1,3 +1,6 @@
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -19,7 +22,7 @@ public class Validator {
     }
 
     private static boolean isValidLogin(String login) {
-        return login.matches("^[A-Za-z0-9]{3,20}$");
+        return login.matches("^[A-Za-z0-9_-]{3,20}$");
     }
 
     private static boolean isValidPassword(String password) {
@@ -42,8 +45,6 @@ public class Validator {
         return specialization.matches("^[\\w\\s]{1,100}$");
     }
 
-    //private static boolean isValidDate(String date) {} // should probably be changed to Date type
-
     private static final Map<String, Function<String, Boolean>> validators = Map.of(
         "email", Validator::isValidEmail,
         "nif", Validator::isValidNIF,
@@ -62,7 +63,7 @@ public class Validator {
         boolean check = false;
         do {
             System.out.print(type + ": ");
-            input = Input.getScanner().nextLine();
+            input = Input.readLine();
             boolean isValid = validators.get(type.toLowerCase()).apply(input);
             boolean isUnique = !checkDatabase || !Database.existsInDatabase(input, type.toLowerCase());
             check = isValid && isUnique;
@@ -98,5 +99,25 @@ public class Validator {
             }
         } while (!isValidPassword(password));
         return Security.hashPassword(password, salt);
+    }
+
+    public static Date validateDate() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate currenDate = LocalDate.now();
+        LocalDate date = null;
+        do {
+            System.out.print("Start date (dd-mm-yyyy): ");
+            String input = Input.readLine();
+            try {
+                date = LocalDate.parse(input, formatter);
+                if (date.isAfter(currenDate)) {
+                    System.out.println("Date cannot be a future date. Please try again.");
+                    date = null;
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid date. Please try again.");
+            }
+        } while (date == null);
+        return Date.valueOf(date);
     }
 }

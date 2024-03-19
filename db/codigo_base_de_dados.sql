@@ -91,31 +91,31 @@ create table UTILIZADORES
    USERNAME             varchar(20) not null,
    PASSWORD             varchar(60) not null,
    SALT                 varbinary(16) not null,
-   ESTADO               varchar(15) not null,
-   EMAIL                text not null,
+   ESTADO               ENUM('active', 'inactive') not null,
+   EMAIL                varchar(100) not null,
    TIPO                 varchar(8) not null,
    CONTRIBUINTE         varchar(9),
    TELEFONE             varchar(9),
-   MORADA               text,
-   ESTILO_LITERARIO     varchar(30),
-   DATA_INICIO          varchar(10),
-   AREA_ESPECIALIZACAO  text,
-   FORMACAO_ACADEMICA   varchar(50),
+   MORADA               varchar(100),
+   ESTILO_LITERARIO     varchar(20),
+   DATA_INICIO          date,
+   AREA_ESPECIALIZACAO  varchar(20),
+   FORMACAO_ACADEMICA   varchar(20),
    primary key (ID_UTILIZADORES)
 );
 
 alter table ANOTACAO add constraint FK_REVISAO_ANOTACAO foreign key (ID_REVISAO)
-      references REVISAO (ID_REVISAO) on delete restrict on update restrict;
+   references REVISAO (ID_REVISAO) on delete restrict on update restrict;
 
 alter table OBRAS add constraint FK_OBRAS_LICENCA foreign key (ID_LICENCA)
-      references LICENCA (ID_LICENCA) on delete restrict on update restrict;
+   references LICENCA (ID_LICENCA) on delete restrict on update restrict;
 
 alter table OBRAS add constraint FK_UTILIZADORES_OBRAS foreign key (ID_UTILIZADORES)
-      references UTILIZADORES (ID_UTILIZADORES) on delete restrict on update restrict;
+   references UTILIZADORES (ID_UTILIZADORES) on delete restrict on update restrict;
 
 alter table REVISAO add constraint FK_OBRAS_REVISAO foreign key (ID_OBRA)
-      references OBRAS (ID_OBRA) on delete restrict on update restrict;
+   references OBRAS (ID_OBRA) on delete restrict on update restrict;
 
 alter table REVISAO add constraint FK_UTILIZADORES_REVISAO foreign key (ID_UTILIZADORES)
-      references UTILIZADORES (ID_UTILIZADORES) on delete restrict on update restrict;
+   references UTILIZADORES (ID_UTILIZADORES) on delete restrict on update restrict;
 

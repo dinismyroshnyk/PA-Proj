@@ -1,12 +1,14 @@
+import java.sql.Date;
+
 public class Author extends User{
     private String nif;
     private String phone;
     private String address;
     private String literaryStyle;
-    private String startDate;
+    private Date startDate;
 
     // constructor
-    public Author(String login, String password, byte[] salt, String name, String email, String nif, String phone, String address, String literaryStyle, String startDate) {
+    public Author(String login, String password, byte[] salt, String name, String email, String nif, String phone, String address, String literaryStyle, Date startDate) {
         super(login, password, salt, name, email, "author", "inactive");
         this.nif = nif;
         this.phone = phone;
@@ -24,8 +26,7 @@ public class Author extends User{
         String phone = Validator.validateInput("Phone number", false);
         String address = Validator.validateInput("Address", false);
         String style = Validator.validateInput("Literary style", false);
-        System.out.print("Start Date: ");
-        String startDate = Input.getScanner().nextLine();
+        Date startDate = Validator.validateDate();
         String login = Validator.validateInput("Login", true);
         byte[] salt = Security.generateSalt();
         String password = Validator.validatePassword(salt);

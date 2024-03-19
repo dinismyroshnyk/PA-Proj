@@ -41,7 +41,7 @@ public class Database {
             // Prompt the user for credentials
             System.out.println("[Database Setup]");
             System.out.print("User: ");
-            String user = Input.getScanner().nextLine();
+            String user = Input.readLine();
             String password = Security.maskPassword();
             // Attempt to connect with the provided credentials
             if (connectToDatabase(user, password)) {

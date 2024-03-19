@@ -104,7 +104,7 @@ public class Main {
             System.out.println("2. Register");
             System.out.println("0. Exit");
             System.out.print("\nOption: ");
-            String option = Input.getScanner().nextLine();
+            String option = Input.readLine();
             switch (option) {
                 case "1":
                     String user = loginUser();
@@ -140,7 +140,7 @@ public class Main {
             System.out.println("2. Option 2");
             System.out.println("0. Logout");
             System.out.print("\nOption: ");
-            String option = Input.getScanner().nextLine();
+            String option = Input.readLine();
             switch (option) {
                 case "1":
                     clearConsole();
@@ -175,7 +175,7 @@ public class Main {
         System.out.println("2. Register as Reviewer");
         System.out.println("0. Go back");
         System.out.print("\nOption: ");
-        String option = Input.getScanner().nextLine();
+        String option = Input.readLine();
         switch (option) {
             case "1":
                 User author = User.createUser("author");
@@ -198,7 +198,7 @@ public class Main {
     private static String loginUser() {
         clearConsole();
         System.out.print("Login: ");
-        String login = Input.getScanner().nextLine();
+        String login = Input.readLine();
         String password = Security.maskPassword();
         // Retrieve the salt and the hashed password
         Database.rs = null;
@@ -256,7 +256,7 @@ public class Main {
 
     // Press any key to continue
     public static void pressAnyKey() {
-        System.out.println("Press Enter to continue...");
-        Input.getScanner().nextLine();
+        System.out.print("Press Enter to continue...");
+        Input.readLine();
     }
 }
