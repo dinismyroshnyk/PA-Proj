@@ -110,4 +110,20 @@ public abstract class User {
             }
         }
     }
+
+    public static void loggedUserLoop(User user) {
+        switch (user.getType()) {
+            case "manager":
+                Manager.loggedUserLoop((Manager) user);
+                break;
+            case "author":
+                Author.loggedUserLoop((Author) user);
+                break;
+            case "reviewer":
+                Reviewer.loggedUserLoop((Reviewer) user);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid user type: " + user.getType());
+        }
+    }
 }

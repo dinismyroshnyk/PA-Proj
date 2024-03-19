@@ -13,4 +13,41 @@ public class Manager extends User {
         String password = Validator.validatePassword(salt);
         return new Manager(login, password, name, email);
     }
+
+    public static void loggedUserLoop(Manager user) {
+        boolean running = true;
+        while (running) {
+            Main.clearConsole();
+            System.out.println("Logged as " + User.getValue(user, "name") + "!");
+            System.out.println("1. Create new manager");
+            System.out.println("2. Manage new users");
+            System.out.println("3. Manage existing users");
+            System.out.println("4. Manage account deletion");
+            System.out.println("0. Log out");
+            System.out.print("\nOption: ");
+            String option = Input.readLine();
+            switch (option) {
+                case "1":
+                    // Create new manager
+                    break;
+                case "2":
+                    // Manage new users
+                    break;
+                case "3":
+                    // Manage existing users
+                    break;
+                case "4":
+                    // Manage account deletion
+                    break;
+                case "0":
+                    running = false;
+                    break;
+                default:
+                    Main.clearConsole();
+                    System.out.println("Invalid option. Please try again.");
+                    Main.pressAnyKey();
+                    break;
+            }
+        }
+    }
 }

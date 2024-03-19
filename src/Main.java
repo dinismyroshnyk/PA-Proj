@@ -108,7 +108,10 @@ public class Main {
             String option = Input.readLine();
             switch (option) {
                 case "1":
-                    loginUser();
+                    User user = loginUser();
+                    if (user != null) {
+                        User.loggedUserLoop(user);
+                    }
                     break;
                 case "2":
                     List<Object> values = registerUser();
@@ -158,7 +161,7 @@ public class Main {
     }
 
     // Attempt to login a user
-    private static void loginUser() {
+    private static User loginUser() {
         clearConsole();
         System.out.print("Login: ");
         String login = Input.readLine();
@@ -169,9 +172,11 @@ public class Main {
             System.out.println("Login successful.");
             System.out.println("Welcome, " + User.getValue(user, "name") + "!");
             pressAnyKey();
+            return user;
         } else {
             System.out.println("Invalid login. Please try again.");
             pressAnyKey();
+            return null;
         }
     }
 

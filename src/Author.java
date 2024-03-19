@@ -67,4 +67,29 @@ public class Author extends User{
             return getters.get(value.toLowerCase()).apply(user);
         }
     }
+
+    public static void loggedUserLoop(Author user) {
+        boolean running = true;
+        while (running) {
+            Main.clearConsole();
+            System.out.println("Logged as " + User.getValue(user, "name") + "!");
+            System.out.println("1. Delete account");
+            System.out.println("0. Log out");
+            System.out.print("\nOption: ");
+            String option = Input.readLine();
+            switch (option) {
+                case "1":
+                    // delete account
+                    break;
+                case "0":
+                    running = false;
+                    break;
+                default:
+                    Main.clearConsole();
+                    System.out.println("Invalid option. Please try again.");
+                    Main.pressAnyKey();
+                    break;
+            }
+        }
+    }
 }
