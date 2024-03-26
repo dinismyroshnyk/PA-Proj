@@ -27,9 +27,9 @@ public class Manager extends User {
             Main.clearConsole();
             System.out.println("Logged as " + User.getValue(user, "name") + "!");
             System.out.println("1. Create new User");
-            System.out.println("2. Manage new users");
-            System.out.println("3. Manage existing users");
-            System.out.println("4. Manage deletion requests");
+            System.out.println("2. Manage existing users");
+            System.out.println("3. Manage registration requests " + "\033[33m" + "[" + Database.getUsersCount("pending-activation") + "]" + "\033[0m");
+            System.out.println("4. Manage deletion requests " + "\033[33m" + "[" + Database.getUsersCount("pending-deletion") + "]" + "\033[0m");
             System.out.println("0. Log out");
             System.out.print("\nOption: ");
             String option = Input.readLine();
@@ -38,13 +38,13 @@ public class Manager extends User {
                     createActiveUser();
                     break;
                 case "2":
-                    manageUsersMenu(user, "pending-activation");
-                    break;
-                case "3":
                     manageUsersMenu(user, "active");
                     break;
+                case "3":
+                    manageUsersMenu(user, "pending-activation");
+                    break;
                 case "4":
-                    // Manage account deletion requests
+                    manageUsersMenu(user, "pending-deletion");
                     break;
                 case "0":
                     running = false;
@@ -202,9 +202,9 @@ public class Manager extends User {
     }
 
     private static final Map<String, BiConsumer<String, String>> managerActions = Map.of(
-        "pending-activation", (userID, callerType) -> Manager.manageUser(userID),
-        "active", (userID, callerType) -> Database.manageExistingUserByID(userID, callerType)
-        // "pending-deletion", Manager::manageDeletionRequest
+        "pending-activation", (userID, callerType) -> Manager.manageUserRequests(userID),
+        "active", (userID, callerType) -> Database.manageExistingUserByID(userID, callerType),
+        "pending-deletion", (userID, callerType) -> Manager.manageUserRequests(userID)
     );
 
     // List new users in the database
@@ -215,7 +215,7 @@ public class Manager extends User {
         ArrayList<String> ids = new ArrayList<>();
         while (true) {
             ResultSet rs = Database.getUsers(page, pageSize, status, user);
-            if (rs != null) {
+            if (totalUsers > 0) {
                 ids = displayUsers(rs);
                 String option = handlePagination(totalUsers, page, pageSize, ids);
                 try {
@@ -238,30 +238,30 @@ public class Manager extends User {
                 }
             } else {
                 Main.clearConsole();
-                System.out.println("No new users to manage.");
+                System.out.println("No users to manage.");
                 Main.pressEnterKey();
                 return;
             }
         }
     }
 
-    private static void manageUser(String userID) {
+    private static void manageUserRequests(String userID) {
         boolean running = true;
         while (running) {
             Main.clearConsole();
             System.out.println("Selected user: " + userID);
-            System.out.println("1. Accept user");
-            System.out.println("2. Reject user");
+            System.out.println("1. Approve request");
+            System.out.println("2. Reject request");
             System.out.println("0. Go back");
             System.out.print("\nOption: ");
             String option = Input.readLine();
             switch (option) {
                 case "1":
-                    Database.acceptRejectUser(userID, "accept");
+                    Database.manageUserRequests(userID, "approve");
                     running = false;
                     break;
                 case "2":
-                    Database.acceptRejectUser(userID, "reject");
+                    Database.manageUserRequests(userID, "reject");
                     running = false;
                     break;
                 case "0":

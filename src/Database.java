@@ -476,42 +476,6 @@ public class Database {
         }
     };
 
-    public static void acceptRejectUser(String userID, String decision) {
-        String action = decision.equals("accept") ?
-            "UPDATE UTILIZADORES SET estado = 'active' WHERE id_utilizadores = ?" :
-            "DELETE FROM UTILIZADORES WHERE id_utilizadores = ?";
-        String message = decision.equals("accept") ?
-            "User activated successfully." :
-            "User deleted successfully.";
-        String error = decision.equals("accept") ?
-            "Failed to activate user." :
-            "Failed to reject user.";
-        sqlQuery = new StringBuffer();
-        sqlQuery.append(action);
-        PreparedStatement ps = null;
-        try {
-            ps = conn.prepareStatement(sqlQuery.toString());
-            ps.setString(1, userID);
-            ps.executeUpdate();
-            conn.commit();
-            Main.clearConsole();
-            System.out.println(message);
-        } catch (SQLException e) {
-            System.out.println(error + " Rolling back transaction.");
-            System.out.println("Exception: " + e);
-            System.exit(1);
-        } finally {
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                    System.out.println("Failed to close prepared statement.");
-                    System.out.println("Exception: " + e);
-                }
-            }
-        }
-    }
-
     public static boolean requestAccountDeletion(User user) {
         Main.clearConsole();
         String textBlock = """
@@ -559,4 +523,97 @@ public class Database {
         }
         return false;
     }
+
+    public static void manageUserRequests(String userID, String decision) {
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT estado FROM UTILIZADORES WHERE id_utilizadores = ?");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, userID);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                if (rs.getString("estado").equals("pending-activation")) {
+                    manageRequest(userID, decision, "registration");
+                } else if (rs.getString("estado").equals("pending-deletion")) {
+                    manageRequest(userID, decision, "deletion");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to accept/reject request.");
+            System.out.println("Exception: " + e);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                }
+            }
+        }
+    }
+
+    private static void manageRequest(String userID, String decision, String requestType) {
+        String action = querryOptions.get(requestType).get(decision);
+        String message = messageOptions.get(requestType).get(decision);
+        String error = errorOptions.get(requestType).get(decision);
+        sqlQuery = new StringBuffer();
+        sqlQuery.append(action);
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, userID);
+            ps.executeUpdate();
+            conn.commit();
+            Main.clearConsole();
+            System.out.println(message);
+        } catch (SQLException e) {
+            System.out.println(error + " Rolling back transaction.");
+            System.out.println("Exception: " + e);
+            System.exit(1);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                }
+            }
+        }
+    }
+
+    private static final Map<String, Map<String, String>> querryOptions = Map.of(
+        "registration", Map.of(
+            "approve", "UPDATE UTILIZADORES SET estado = 'active' WHERE id_utilizadores = ?",
+            "reject", "DELETE FROM UTILIZADORES WHERE id_utilizadores = ?"
+        ),
+        "deletion", Map.of(
+            "approve", "UPDATE UTILIZADORES SET estado = 'deleted' WHERE id_utilizadores = ?",
+            "reject", "UPDATE UTILIZADORES SET estado = 'active' WHERE id_utilizadores = ?"
+        )
+    );
+
+    private static final Map<String, Map<String, String>> messageOptions = Map.of(
+        "registration", Map.of(
+            "approve", "User registration approved.",
+            "reject", "User registration rejected."
+        ),
+        "deletion", Map.of(
+            "approve", "User deletion request approved. User account deleted.",
+            "reject", "User deletion request rejected. User account restored."
+        )
+    );
+
+    private static final Map<String, Map<String, String>> errorOptions = Map.of(
+        "registration", Map.of(
+            "approve", "Failed to activate user.",
+            "reject", "Failed to delete user."
+        ),
+        "deletion", Map.of(
+            "approve", "Failed to delete user account.",
+            "reject", "Failed to restore user account."
+        )
+    );
 }

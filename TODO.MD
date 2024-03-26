@@ -7,7 +7,7 @@
 - [x] [R5] O email deve apresentar um formato válido.
 > [!NOTE]
 > [designação] @ [entidade] . [domínio]
-- [ ] [R6] Cada utilizador apenas pode alterar a sua própria informação, não podendo alterar ou visualizar dados de outros utilizadores, ou criar utilizadores.
+- [x] [R6] Cada utilizador apenas pode alterar a sua própria informação, não podendo alterar ou visualizar dados de outros utilizadores, ou criar utilizadores.
 - [x] [R7] A exceção ao requisito anterior são os gestores, que podem visualizar e alterar dados de todos os utilizadores e criar utilizadores, nomeadamente outros gestores.
 - [x] [R8] Tanto os autores como os revisores têm adicionalmente os parâmetros número de contribuinte, contacto telefónico e morada. Os autores possuem ainda estilo literário (e.g. drama, ficção, thriller) e data de início de atividade. Os revisores possuem, adicionalmente, área de especialização e formação académica.
 > [!NOTE]
@@ -15,11 +15,11 @@
 - [x] [R9] O atributo número de contribuinte deve ser único e possuir 9 dígitos.
 - [x] [R10] O atributo contacto telefónico deve possuir 9 dígitos e iniciar pelos dígitos 9, 2 ou 3.
 - [x] [R11] Os autores e revisores devem registar-se na plataforma. Os gestores são criados por outros gestores.
-- [ ] [R12] Todos os pedidos de registo de novos utilizadores devem ser notificados aos gestores através da aplicação.
+- [x] [R12] Todos os pedidos de registo de novos utilizadores devem ser notificados aos gestores através da aplicação.
 - [x] [R13] Os gestores aprovam ou rejeitam os pedidos de registo dos utilizadores. Todos os pedidos devem ser aprovados antes de poderem ser usados para autenticação.
 - [x] [R14] Caso uma conta seja reprovada pelo gestor ou ainda não tenha sido analisada, quando o utilizador tentar usar essas credenciais deve surgir uma mensagem informativa.
 - [x] [R15] Em qualquer momento um gestor pode inativar ou ativar uma conta de um utilizador.
-- [ ] [R16] Um utilizador pode solicitar que a sua conta seja removida do sistema. Neste caso deve surgir uma notificação aos gestores que podem aceitar ou recusar o pedido. Se o pedido for aceite, a informação pessoal do utilizador deve ser omitida do sistema, embora os registos associados ao utilizador devem ser mantidos.
+- [x] [R16] Um utilizador pode solicitar que a sua conta seja removida do sistema. Neste caso deve surgir uma notificação aos gestores que podem aceitar ou recusar o pedido. Se o pedido for aceite, a informação pessoal do utilizador deve ser omitida do sistema, embora os registos associados ao utilizador devem ser mantidos.
 - [x] [R17] Caso não existiam utilizadores criados na primeira execução, a aplicação deve solicitar credenciais para criar uma conta gestor.
 - [x] [R18] Após a autenticação, a aplicação deve apresentar a mensagem `Bem-vindo [nome utilizador]`.
 - [x] [R19] Quando a aplicação estiver a encerrar, deve apresentar a mensagem `Adeus [nome utilizador]`.
