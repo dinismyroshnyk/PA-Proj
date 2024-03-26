@@ -465,4 +465,52 @@ public class Database {
             }
         }
     }
+
+    public static boolean requestAccountDeletion(User user) {
+        Main.clearConsole();
+        String textBlock = """
+            WARNING: This action is irreversible.
+            Your account will be inaccessible until your request is reviewed and processed.
+            In case of acceptance, your account will be permanently deleted.
+            Are you sure you wish to proceed?
+            """;
+        System.out.println(textBlock);
+        System.out.print("Type 'Yes, delete my account' to confirm: ");
+        String confirmation = Input.readLine();
+        if (!confirmation.equalsIgnoreCase("Yes, delete my account")) {
+            Main.clearConsole();
+            System.out.println("Account deletion request cancelled.");
+            Main.pressEnterKey();
+            return false;
+        }
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("UPDATE UTILIZADORES SET estado = 'pending-deletion' WHERE username = ?");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, User.getValue(user, "login"));
+            ps.executeUpdate();
+            conn.commit();
+            Main.clearConsole();
+            System.out.println("Account deletion request submitted successfully.");
+            System.out.println("The result of your request will be sent to the registered email address.");
+            System.out.println("You will be logged out.");
+            Main.pressEnterKey();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Failed to submit account deletion request. Rolling back transaction.");
+            System.out.println("Exception: " + e);
+            System.exit(1);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                }
+            }
+        }
+        return false;
+    }
 }

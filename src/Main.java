@@ -166,7 +166,7 @@ public class Main {
     private static final Map<String, String> userStatusErrorMessage = Map.of(
         "inactive", "This account was deactivated. Please contact a manager.",
         "pending-activation", "Your registration request is being reviewed. Please try again later.",
-        "pending-deletion", "Your deletion request is being reviewed. Please try again later.",
+        "pending-deletion", "A deletion request is pending for this account. Access denied.",
         "deleted", "This account was deleted. Your login credentials will soon be deactivated."
     );
 

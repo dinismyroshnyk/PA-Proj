@@ -72,12 +72,18 @@ public class Reviewer extends User {
             Main.clearConsole();
             System.out.println("Logged as " + User.getValue(user, "name") + "!");
             System.out.println("1. Delete account");
+            System.out.println("2. Edit profile");
             System.out.println("0. Log out");
             System.out.print("\nOption: ");
             String option = Input.readLine();
             switch (option) {
                 case "1":
-                    // delete account
+                    if (Database.requestAccountDeletion(user)) {
+                        running = false;
+                    }
+                    break;
+                case "2":
+                    // edit profile
                     break;
                 case "0":
                     running = false;
