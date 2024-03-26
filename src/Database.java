@@ -307,11 +307,13 @@ public class Database {
         )
     );
 
-    public static void manageExistingUser(String userID) {
+    public static void manageExistingUserByID(String userID, String callerType) {
         boolean running = true;
         while (running) {
             Main.clearConsole();
-            System.out.println("Selected user: " + userID);
+            if (callerType.equals("manager")) {
+                System.out.println("Selected user: " + userID);
+            }
             sqlQuery = new StringBuffer();
             sqlQuery.append("SELECT * FROM UTILIZADORES WHERE id_utilizadores = ?");
             PreparedStatement ps = null;
@@ -320,20 +322,11 @@ public class Database {
                 ps.setString(1, userID);
                 rs = ps.executeQuery();
                 if (rs.next()) {
-                    displayUserInfo(rs);
+                    displayUserInfo(rs, callerType);
                     System.out.println("0. Go back");
                     System.out.print("\nOption: ");
                     String option = Input.readLine();
-                    if (option.equals("0")) {
-                        running = false;
-                    } else if (userOptions.get(rs.getString("tipo")).containsKey(option)) {
-                        String value = userOptions.get(rs.getString("tipo")).get(option);
-                        updateValueForUserID(value, userID, rs);
-                    } else {
-                        Main.clearConsole();
-                        System.out.println("Invalid option.");
-                        Main.pressEnterKey();
-                    }
+                    running = handleUserOptions(option, userID, callerType, rs);
                 }
             } catch (SQLException e) {
                 System.out.println("Failed to display user.");
@@ -351,7 +344,60 @@ public class Database {
         }
     }
 
-    private static void displayUserInfo(ResultSet rs) {
+    private static boolean handleUserOptions(String option, String userID, String callerType, ResultSet rs) {
+        boolean running = true;
+        try {
+            if (option.equals("0")) {
+                running = false;
+            } else if (userOptions.get(rs.getString("tipo")).containsKey(option)) {
+                if (!callerType.equals("manager") && option.equals("9")) {
+                    Main.clearConsole();
+                    System.out.println("Invalid option.");
+                    Main.pressEnterKey();
+                } else {
+                    String value = userOptions.get(rs.getString("tipo")).get(option);
+                    updateValueForUserID(value, userID, rs);
+                }
+            } else {
+                Main.clearConsole();
+                System.out.println("Invalid option.");
+                Main.pressEnterKey();
+            }
+        } catch (Exception e) {
+            System.out.println("Failed to handle user options.");
+            System.out.println("Exception: " + e);
+        }
+        return running;
+    }
+
+    public static String convertUsernameToID(String username) {
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT id_utilizadores FROM UTILIZADORES WHERE username = ?");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, username);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("id_utilizadores");
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to convert username to ID.");
+            System.out.println("Exception: " + e);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                }
+            }
+        }
+        return null;
+    }
+
+    private static void displayUserInfo(ResultSet rs, String callerType) {
         try {
             System.out.println("1. Name: " + rs.getString("nome"));
             System.out.println("2. Login: " + rs.getString("username"));
@@ -370,7 +416,7 @@ public class Database {
                 System.out.println("7. Specialization: " + rs.getString("area_especializacao"));
                 System.out.println("8. Academic background: " + rs.getString("formacao_academica"));
             }
-            if (!rs.getString("tipo").equals("manager")) {
+            if (!rs.getString("tipo").equals("manager") && callerType.equals("manager")) {
                 System.out.println("9. Toggle user state. Current state: " + rs.getString("estado"));
             }
         } catch (SQLException e) {

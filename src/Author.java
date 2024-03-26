@@ -86,7 +86,13 @@ public class Author extends User{
                     }
                     break;
                 case "2":
-                    // edit profile
+                    String userID = Database.convertUsernameToID(User.getValue(user, "login"));
+                    if (userID != null) {
+                        Database.manageExistingUserByID(userID, User.getValue(user, "type"));
+                    } else {
+                        System.out.println("An error occurred while trying to edit your profile.");
+                        Main.pressEnterKey();
+                    }
                     break;
                 case "0":
                     running = false;

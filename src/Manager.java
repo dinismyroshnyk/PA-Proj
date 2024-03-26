@@ -3,7 +3,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public class Manager extends User {
     // constructor
@@ -201,9 +201,9 @@ public class Manager extends User {
         return null;
     }
 
-    private static final Map<String, Consumer<String>> managerActions = Map.of(
-        "pending-activation", Manager::manageUser,
-        "active", Database::manageExistingUser
+    private static final Map<String, BiConsumer<String, String>> managerActions = Map.of(
+        "pending-activation", (userID, callerType) -> Manager.manageUser(userID),
+        "active", (userID, callerType) -> Database.manageExistingUserByID(userID, callerType)
         // "pending-deletion", Manager::manageDeletionRequest
     );
 
@@ -229,7 +229,7 @@ public class Manager extends User {
                         case "exit":
                             return;
                         default:
-                            managerActions.get(status).accept(option);
+                            managerActions.get(status).accept(option, User.getValue(user, "type"));
                             totalUsers = Database.getUsersCount(status);
                             break;
                     }
