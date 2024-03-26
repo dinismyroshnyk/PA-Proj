@@ -47,7 +47,7 @@ public class Main {
         // Check if there are any users in the database
         Database.rs = null;
         Database.sqlQuery = new StringBuffer();
-        Database.sqlQuery.append(" SELECT username FROM UTILIZADORES ");
+        Database.sqlQuery.append(" SELECT tipo FROM UTILIZADORES WHERE tipo = 'manager'");
         try {
             Database.rs = Database.st.executeQuery(Database.sqlQuery.toString());
         } catch (SQLException e) {
@@ -60,7 +60,7 @@ public class Main {
             if (!Database.rs.next()) {
                 clearConsole();
                 System.out.println("No users found. Creating a manager...");
-                pressAnyKey();
+                pressEnterKey();
                 byte[] salt = Security.generateSalt();
                 User manager = User.registerNewUser("manager", salt);
                 List<Object> values = getUserValueList(manager, salt);
@@ -129,7 +129,7 @@ public class Main {
                 default:
                     clearConsole();
                     System.out.println("Invalid option. Please try again.");
-                    pressAnyKey();
+                    pressEnterKey();
                     break;
             }
         }
@@ -157,35 +157,42 @@ public class Main {
             default:
                 clearConsole();
                 System.out.println("Invalid option. Please try again.");
-                pressAnyKey();
+                pressEnterKey();
                 break;
         }
         return null;
     }
+
+    private static final Map<String, String> userStatusErrorMessage = Map.of(
+        "inactive", "This account was deactivated. Please contact a manager.",
+        "pending-activation", "Your registration request is being reviewed. Please try again later.",
+        "pending-deletion", "Your deletion request is being reviewed. Please try again later.",
+        "deleted", "This account was deleted. Your login credentials will soon be deactivated."
+    );
 
     // Attempt to login a user
     private static User loginUser() {
         clearConsole();
         System.out.print("Login: ");
         String login = Input.readLine();
-        String password = Security.maskPassword();
+        String password = Security.maskPassword("Password");
         User user = Database.getUserValues(login, password);
         if (user != null) {
             if (User.getValue(user, "status").equals("active")) {
                 clearConsole();
                 System.out.println("Login successful.");
                 System.out.println("Welcome, " + User.getValue(user, "name") + "!");
-                pressAnyKey();
+                pressEnterKey();
                 return user;
             } else {
                 clearConsole();
-                System.out.println("This account is being reviewed. Please try again later.");
-                pressAnyKey();
+                System.out.println(userStatusErrorMessage.get(User.getValue(user, "status")));
+                pressEnterKey();
                 return null;
             }
         } else {
-            System.out.println("Invalid login. Please try again.");
-            pressAnyKey();
+            System.out.println("\nInvalid credentials. Please try again.");
+            pressEnterKey();
             return null;
         }
     }
@@ -197,7 +204,7 @@ public class Main {
     }
 
     // Press any key to continue
-    public static void pressAnyKey() {
+    public static void pressEnterKey() {
         System.out.print("Press Enter to continue...");
         Input.readLine();
     }

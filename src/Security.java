@@ -64,11 +64,11 @@ public class Security {
     }
 
     // Password masking
-    public static String maskPassword() {
+    public static String maskPassword(String type) {
         String password =  "";
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         try {
-            System.out.print("Password: ");
+            System.out.print(type + ": ");
             Pair<WinNT.HANDLE, WinDef.DWORDByReference> osInfo = OS.prepareOS();
             WinNT.HANDLE handle = osInfo.getKey();
             WinDef.DWORDByReference mode = osInfo.getValue();

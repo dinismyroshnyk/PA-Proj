@@ -1,0 +1,21 @@
+/* Populate database with 15 pre-generated users */
+INSERT INTO UTILIZADORES (ID_UTILIZADORES, NOME, USERNAME, PASSWORD, SALT, ESTADO, EMAIL, TIPO, CONTRIBUINTE, TELEFONE, MORADA, ESTILO_LITERARIO, DATA_INICIO, AREA_ESPECIALIZACAO, FORMACAO_ACADEMICA)
+VALUES
+/* Managers - password: Adm1n-pass */
+(1, 'Nelia Carmo', 'admin-log', 'oPM6sSalNE/oNZ8dVrjT7g==', unhex('6ec49afee7a55118e4d76fd382419459'), 'active', 'n.carmo@hotmail.com', 'manager', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 'Francisco Pais', 'admin2-log', 'ihwNsLeCZwMrOIKJx5fkYw==', unhex('68122a5194bdb0bc15354e05f3f4043f'), 'inactive', 'francisco.pais@gmail.com', 'manager', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(7, 'Elisa Freire', 'admin3-log', 'sFQdMDCSSDVBSlm50d6f7w==', unhex('4e133274f844f436521447122f9e251c'), 'active', 'elisafreire@hotmail.com', 'manager', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(15, 'Carlos Manuel Câmara', 'admin4-log', '1zcpnt3xiEtz6oPk8rsVlw==', unhex('9b0cf450182b7fe97ef501bbd2ced22d'), 'inactive', 'c.m.câmara@gmail.com', 'manager', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+/* Authors - password: Auth-pa5s */
+(5, 'Almerinda Pedroso', 'auth-log', 'vVSiszHPfIoupexbPQsM4g==', unhex('16eeefc9eb05ea9747f119a3efda6895'), 'active', 'almerindap@gmail.com', 'author', '234810408', '289127663', 'R Armazéns 103, Porto', 'Science Fiction', '2017-10-12', NULL, NULL),
+(6, 'Fernandes Faria', 'auth2-log', 'WORDbC62C27idL+NXJZbrA==', unhex('15f8deb9575db81b6c135b232dc967c7'), 'pending-activation', 'fernandesfaria@gmail.com', 'author', '273643177', '965559582', 'Rua Doutor Teófilo Braga 9, Évora', 'Romance', '2019-02-14', NULL, NULL),
+(8, 'Elias Filipe', 'auth3-log', 'DcSp7BTtpLKYoL8ZXCxRGQ==', unhex('c87a4e932f9356a3d0aa7993a49cb420'), 'inactive', 'eliasf@hotmail.com', 'author', '279585284', '922555710', 'Avenida Boavista 59, Viana do Castelo', 'Mystery', '1988-04-05', NULL, NULL),
+(10, 'Leandro Ramalho', 'auth4-log', '0sY93P+5CTeoEOLCDi7G5A==', unhex('0812e96c571a8d1f085152f7d1cde052'), 'active', 'leandro.ramalho@gmail.com', 'author', '269908668', '272555253', 'R Moura 59, Beja', 'Thriller', '1990-08-28', NULL, NULL),
+(13, 'Lucília Catarino', 'auth5-log', 'LyiNNPB3RcBuU/gZe0/kPQ==', unhex('affa4c95af4830013f7c23262df99147'), 'inactive', 'lucilia.catarino@hotmail.com', 'author', '201261235', '935557687', 'Rua Vale Formoso 34, Faro', 'Historical Fiction', '2009-06-25', NULL, NULL),
+(14, 'Ronaldo Couto', 'auth6-log', 'FNiJFXHrUXnVi+ewwlJtIA==', unhex('123cba6daea0ca795174a11c80ea2a74'), 'pending-activation', 'ronaldo.couto@hotmail.com', 'author', '239716744', '915550759', 'Avenida José Costa Mealha 3, Faro', 'Fantasy', '1991-06-06', NULL, NULL),
+/* Reviewers - password: R3v-pass */
+(3, 'Ermelinda Frazão', 'rev-log', '0xR8mSfVrMSD/By3ees2XQ==', unhex('f88a1cdfe5c1101888a75b9782badb12'), 'active', 'e.frazão@hotmail.com', 'reviewer', '231354460', '207555157', 'R Miguel Bombarda 39, Leiria', NULL, NULL, 'Science Fiction', 'MSc in Data Science'),
+(4, 'Telma Ramalho', 'rev2-log', 'j9bp3ACtgGLKHi8XbWNRSw==', unhex('ca694b3c0d049d19ab18a4b44c2b560c'), 'active', 'telmaramalho@gmail.com', 'reviewer', '209448032', '935551998', 'R Doutor Alfredo Freitas 51, Aveiro', NULL, NULL, 'Drama', 'MFA in Dramatic Writing'),
+(9, 'Caio Rolo', 're3-log', 'vuyOV5Bz0sVii+DdMBysiw==', unhex('c0307da8bb8f5e7cde268a2bec2220b7'), 'pending-activation', 'crolo@gmail.com', 'reviewer', '269539131', '915558640', 'R Cerdeira Ervas 99, Braga', NULL, NULL, 'Fiction', 'PhD in Creative Writing'),
+(11, 'Marcos Alves', 'rev4-log', 'XtopJiWK/feqwLcRYHhgng==', unhex('61af4bc6e38428c0ed5177813c8161f6'), 'inactive', 'marcos.alves@hotmail.com', 'reviewer', '205009034', '965553698', 'R Muro Bacalhoeiros 14, Porto', NULL, NULL, 'Poetry', 'MSc in Digital Humanities'),
+(12, 'Virgílio Vidal', 'rev5-log', 'neHkJvlliqnFEpFGCuUiHQ==', unhex('6fdde7d01d686c25374b7e4a7cf3cfbb'), 'pending-activation', 'vvidal@gmail.com', 'reviewer', '251289060', '965553211', 'R Doutor Manuel Arriaga 3, Lisboa', NULL, NULL, 'Non-Fiction', 'BA in Media Studies');

@@ -30,19 +30,19 @@ public class Validator {
     }
 
     private static boolean isValidAddress(String address) {
-        return address.matches("^[\\w\\s,\\.]{1,100}$");
+        return address.matches("^[\\w\\s,\\.]{2,100}$");
     }
 
     private static boolean isValidLiteraryStyle(String literaryStyle) {
-        return literaryStyle.matches("^[\\w\\s]{1,100}$");
+        return literaryStyle.matches("^[\\w\\s]{2,20}$");
     }
 
     private static boolean isValidAcademicBackground(String academicBackground) {
-        return academicBackground.matches("^[\\w\\s,\\.]{1,100}$");
+        return academicBackground.matches("^[\\w\\s,\\.]{2,100}$");
     }
 
     private static boolean isValidSpecialization(String specialization) {
-        return specialization.matches("^[\\w\\s]{1,100}$");
+        return specialization.matches("^[\\w\\s]{2,20}$");
     }
 
     private static final Map<String, Function<String, Boolean>> validators = Map.of(
@@ -51,34 +51,35 @@ public class Validator {
         "phone number", Validator::isValidPhoneNumber,
         "name", Validator::isValidName,
         "login", Validator::isValidLogin,
-        "password", Validator::isValidPassword,
         "address", Validator::isValidAddress,
         "literary style", Validator::isValidLiteraryStyle,
         "academic background", Validator::isValidAcademicBackground,
         "specialization", Validator::isValidSpecialization
     );
 
-    public static String validateInput(String type, boolean checkDatabase) {
+    public static String validateInput(String typeString, boolean checkDatabase) {
         String input;
         boolean check = false;
         do {
-            System.out.print(type + ": ");
+            System.out.print(typeString + ": ");
+            String type = typeString.replaceAll("(?i)updated\\s+", "").toLowerCase();
             input = Input.readLine();
-            boolean isValid = validators.get(type.toLowerCase()).apply(input);
-            boolean isUnique = !checkDatabase || !Database.existsInDatabase(input, type.toLowerCase());
+            boolean isValid = validators.get(type).apply(input);
+            boolean isUnique = !checkDatabase || !Database.existsInDatabase(input, type);
             check = isValid && isUnique;
             if (!isValid || !isUnique) {
                 if (!isValid) {
                     System.out.println("Invalid " + type + ". Please try again.");
                 } else {
-                    System.out.println(type + " already in use. Please try again.");
+                    String capitalizedType = type.substring(0, 1).toUpperCase() + type.substring(1);
+                    System.out.println(capitalizedType + " already in use. Please try again.");
                 }
             }
         } while (!check);
         return input;
     }
 
-    public static String validatePassword(byte[] salt) {
+    public static String validatePassword(byte[] salt, String type) {
         String password;
         do {
             String textBlock = """
@@ -90,7 +91,7 @@ public class Validator {
                 - No whitespaces
             """;
             System.out.println(textBlock);
-            password = Security.maskPassword();
+            password = Security.maskPassword(type);
             if (password == null) {
                 System.out.println("Failed to read password. Please try again.");
             }

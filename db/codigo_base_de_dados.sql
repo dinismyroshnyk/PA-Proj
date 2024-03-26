@@ -7,6 +7,19 @@ drop database if exists projeto;
 CREATE DATABASE projeto;
 USE projeto;
 
+SET GLOBAL event_scheduler = ON;
+
+/*==============================================================*/
+/* Event: FREE_USER_CREDENTIALS                                 */
+/*==============================================================*/
+CREATE EVENT FREE_USER_CREDENTIALS
+ON SCHEDULE EVERY 5 MINUTE
+STARTS CURRENT_DATE
+DO
+   UPDATE UTILIZADORES
+   SET USERNAME = NULL, PASSWORD = NULL, SALT = NULL
+   WHERE CONTRIBUINTE IS NULL AND TIPO != 'manager';
+
 drop table if exists ANOTACAO;
 
 drop table if exists LICENCA;
@@ -88,19 +101,19 @@ create table UTILIZADORES
 (
    ID_UTILIZADORES      int not null AUTO_INCREMENT,
    NOME                 varchar(100) not null,
-   USERNAME             varchar(20) not null,
-   PASSWORD             varchar(60) not null,
-   SALT                 varbinary(16) not null,
-   ESTADO               ENUM('active', 'inactive') not null,
-   EMAIL                varchar(100) not null,
-   TIPO                 varchar(8) not null,
+   USERNAME             varchar(20),
+   PASSWORD             varchar(60),
+   SALT                 varbinary(16),
+   ESTADO               ENUM('active', 'inactive', 'pending-activation', 'pending-deletion', 'deleted') not null,
+   EMAIL                varchar(100),
+   TIPO                 ENUM('manager', 'author', 'reviewer'),
    CONTRIBUINTE         varchar(9),
    TELEFONE             varchar(9),
    MORADA               varchar(100),
    ESTILO_LITERARIO     varchar(20),
    DATA_INICIO          date,
    AREA_ESPECIALIZACAO  varchar(20),
-   FORMACAO_ACADEMICA   varchar(20),
+   FORMACAO_ACADEMICA   varchar(100),
    primary key (ID_UTILIZADORES)
 );
 

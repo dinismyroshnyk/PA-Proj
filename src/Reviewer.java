@@ -49,8 +49,8 @@ public class Reviewer extends User {
         String specialization = Validator.validateInput("Specialization", false);
         String academicBackground = Validator.validateInput("Academic background", false);
         String login = Validator.validateInput("Login", true);
-        String password = Validator.validatePassword(salt);
-        String status = "inactive";
+        String password = Validator.validatePassword(salt, "Password");
+        String status = "pending-activation";
         return new Reviewer(login, password, name, email, status, nif, phone, address, specialization, academicBackground);
     }
 
@@ -85,7 +85,7 @@ public class Reviewer extends User {
                 default:
                     Main.clearConsole();
                     System.out.println("Invalid option. Please try again.");
-                    Main.pressAnyKey();
+                    Main.pressEnterKey();
                     break;
             }
         }

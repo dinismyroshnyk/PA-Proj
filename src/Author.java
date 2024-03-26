@@ -49,8 +49,8 @@ public class Author extends User{
         String style = Validator.validateInput("Literary style", false);
         Date startDate = Validator.validateDate();
         String login = Validator.validateInput("Login", true);
-        String password = Validator.validatePassword(salt);
-        String status = "inactive";
+        String password = Validator.validatePassword(salt, "Password");
+        String status = "pending-activation";
         return new Author(login, password, name, email, status, nif, phone, address, style, startDate);
     }
 
@@ -88,7 +88,7 @@ public class Author extends User{
                 default:
                     Main.clearConsole();
                     System.out.println("Invalid option. Please try again.");
-                    Main.pressAnyKey();
+                    Main.pressEnterKey();
                     break;
             }
         }
