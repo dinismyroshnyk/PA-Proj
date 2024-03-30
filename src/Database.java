@@ -253,12 +253,16 @@ public class Database {
     public static ResultSet getUsers(int page, int pageSize, String status, User user) {
         int offset = (page - 1) * pageSize;
         String status2 = null;
+        //list users in ascending or descending order
+        System.out.println("List users in ascending order or descending order? ('asc' or 'desc')");
+        String order = Input.readLine();
+
         if (status.equals("active")) {
             status2 = "inactive";
         }
         String currUser = User.getValue(user, "login");
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT * FROM UTILIZADORES WHERE username != ? AND (estado = ? OR estado = ?) ORDER BY username ASC LIMIT ? OFFSET ?");
+        sqlQuery.append("SELECT * FROM UTILIZADORES WHERE username != ? AND (estado = ? OR estado = ?) ORDER BY username "+ order +" LIMIT ? OFFSET ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
