@@ -210,7 +210,7 @@ public class Manager extends User {
     // List new users in the database
     public static void paginationMenu(User user, String status) {
         int page = 1;
-        int pageSize = 3;
+        int pageSize = 10;
         int totalUsers = Database.getUsersCount(status);
         ArrayList<String> ids = new ArrayList<>();
         while (true) {

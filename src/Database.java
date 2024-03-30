@@ -258,7 +258,7 @@ public class Database {
         }
         String currUser = User.getValue(user, "login");
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT * FROM UTILIZADORES WHERE username != ? AND (estado = ? OR estado = ?) LIMIT ? OFFSET ?");
+        sqlQuery.append("SELECT * FROM UTILIZADORES WHERE username != ? AND (estado = ? OR estado = ?) ORDER BY username ASC LIMIT ? OFFSET ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
