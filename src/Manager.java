@@ -114,12 +114,16 @@ public class Manager extends User {
                 System.out.println("Manage deletion requests: ");
             }
             System.out.println("1. List users");
+            System.out.println("2. Search user");
             System.out.println("0. Go back");
             System.out.print("\nOption: ");
             String option = Input.readLine();
             switch (option) {
                 case "1":
                     paginationMenu(user, status);
+                    break;
+                case "2":
+                    searchUser(user, status);
                     break;
                 case "0":
                     running = false;
@@ -132,6 +136,47 @@ public class Manager extends User {
             }
         }
     }
+    //search users by name, login or type
+    public static void searchUser(User user, String status) {
+        int page = 1;
+        int pageSize = 10;
+        int totalUsers = Database.getUsersCount(status);
+        System.out.println("Enter search criteria (nome, username ou tipo):");
+        String searchCriteria = Input.readLine();
+        System.out.println("Enter the value to search:");
+        String searchValue = Input.readLine();
+        while (true) {
+            ResultSet rs = Database.searchUser(searchCriteria, searchValue);
+            ArrayList<String> ids = displayUsers(rs);
+            if (totalUsers > 0) {
+                String option = handlePagination(totalUsers, page, pageSize, ids);
+                try {
+                    switch (option) {
+                        case "next":
+                            page++;
+                            break;
+                        case "previous":
+                            page--;
+                            break;
+                        case "exit":
+                            return;
+                        default:
+                            managerActions.get(status).accept(option, User.getValue(user, "type"));
+                            totalUsers = Database.getUsersCount(status);
+                            break;
+                    }
+                } catch (NullPointerException e) {
+                    continue;
+                }
+            } else {
+                Main.clearConsole();
+                System.out.println("No users to manage.");
+                Main.pressEnterKey();
+                return;
+            }
+            
+        }
+    }
 
         // Display the new users in the database
     private static ArrayList<String> displayUsers (ResultSet rs) {
@@ -141,6 +186,7 @@ public class Manager extends User {
         try {
             while (rs.next()) {
                 System.out.println("ID: " + rs.getString("id_utilizadores"));
+                System.out.println("Name: " + rs.getString("nome"));
                 System.out.println("Login: " + rs.getString("username"));
                 System.out.println("Type: " + rs.getString("tipo"));
                 if (rs.getString("tipo").equals("author")) {

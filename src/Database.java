@@ -248,6 +248,21 @@ public class Database {
             return count;
         } else return count - 1;
     }
+    // Search for a user in the database
+    public static ResultSet searchUser(String searchCriteria, String searchValue) {
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT * FROM UTILIZADORES WHERE " + searchCriteria + " LIKE ?");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, searchValue + "%");
+            rs = ps.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Failed to execute query.");
+            System.out.println("Exception: " + e);
+        }
+        return rs;
+    }
 
     // Get a list of new users from the database (pagination)
     public static ResultSet getUsers(int page, int pageSize, String status, User user) {
