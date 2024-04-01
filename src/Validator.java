@@ -45,16 +45,41 @@ public class Validator {
         return specialization.matches("^[\\w\\s]{2,20}$");
     }
 
-    private static final Map<String, Function<String, Boolean>> validators = Map.of(
-        "email", Validator::isValidEmail,
-        "nif", Validator::isValidNIF,
-        "phone number", Validator::isValidPhoneNumber,
-        "name", Validator::isValidName,
-        "login", Validator::isValidLogin,
-        "address", Validator::isValidAddress,
-        "literary style", Validator::isValidLiteraryStyle,
-        "academic background", Validator::isValidAcademicBackground,
-        "specialization", Validator::isValidSpecialization
+    private static boolean isValidTitle(String title) {
+        return title.matches("^[\\w\\s,\\.]{2,100}$");
+    }
+
+    private static boolean isValidSubtitle(String subtitle) {
+        return subtitle.matches("^$|^[\\w\\s,\\.]{2,100}$");
+    }
+
+    private static boolean isValidPublicationType(String publicationType) {
+        return publicationType.matches("^[\\w\\s]{2,20}$");
+    }
+
+    private static boolean isValidLicenseNumber(String licenseNumber) {
+        return licenseNumber.matches("^[A-Za-z0-9]{1,20}$");
+    }
+
+    private static boolean isValidComment(String comments) {
+        return comments.matches("^$|^[^\\r\\n\\t]{2,100}$");
+    }
+
+    private static final Map<String, Function<String, Boolean>> validators = Map.ofEntries(
+        Map.entry("email", Validator::isValidEmail),
+        Map.entry("nif", Validator::isValidNIF),
+        Map.entry("phone number", Validator::isValidPhoneNumber),
+        Map.entry("name", Validator::isValidName),
+        Map.entry("login", Validator::isValidLogin),
+        Map.entry("address", Validator::isValidAddress),
+        Map.entry("literary style", Validator::isValidLiteraryStyle),
+        Map.entry("academic background", Validator::isValidAcademicBackground),
+        Map.entry("specialization", Validator::isValidSpecialization),
+        Map.entry("title", Validator::isValidTitle),
+        Map.entry("subtitle", Validator::isValidSubtitle),
+        Map.entry("publication type", Validator::isValidPublicationType),
+        Map.entry("license number", Validator::isValidLicenseNumber),
+        Map.entry("comments", Validator::isValidComment)
     );
 
     public static String validateInput(String typeString, boolean checkDatabase) {
@@ -62,18 +87,23 @@ public class Validator {
         boolean check = false;
         do {
             System.out.print(typeString + ": ");
-            String type = typeString.replaceAll("(?i)updated\\s+", "").toLowerCase();
+            String type = typeString.replaceAll("\\s*\\(optional\\)|(?i)updated\\s+", "").toLowerCase();
             input = Input.readLine();
             boolean isValid = validators.get(type).apply(input);
-            boolean isUnique = !checkDatabase || !Database.existsInDatabase(input, type);
+            if (!isValid) {
+                System.out.println("Invalid " + type + ". Please try again.");
+                continue;
+            }
+            boolean isUnique = false;
+            if (checkDatabase) {
+                isUnique = !Database.existsInDatabase(input, type);
+            } else {
+                isUnique = true;
+            }
             check = isValid && isUnique;
-            if (!isValid || !isUnique) {
-                if (!isValid) {
-                    System.out.println("Invalid " + type + ". Please try again.");
-                } else {
-                    String capitalizedType = type.substring(0, 1).toUpperCase() + type.substring(1);
-                    System.out.println(capitalizedType + " already in use. Please try again.");
-                }
+            if (!isUnique) {
+                String capitalizedType = type.substring(0, 1).toUpperCase() + type.substring(1);
+                System.out.println(capitalizedType + " already in use. Please try again.");
             }
         } while (!check);
         return input;
@@ -120,5 +150,22 @@ public class Validator {
             }
         } while (date == null);
         return Date.valueOf(date);
+    }
+
+    public static int validateInt(String prompt) {
+        int input = 0;
+        do {
+            System.out.print(prompt + ": ");
+            while (!Input.hasNextInt()) {
+                System.out.println("Invalid input. Please try again.");
+                System.out.print(prompt + ": ");
+                Input.readLine();
+            }
+            input = Integer.parseInt(Input.readLine());
+            if (input <= 0) {
+                System.out.println("Input must be greater than 0. Please try again.");
+            }
+        } while (input <= 0);
+        return input;
     }
 }

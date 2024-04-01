@@ -28,14 +28,14 @@
 - [ ] [R20] Os revisores gerem (aprovam e finalizam) o processo de revisão.
 - [ ] [R21] Os autores submetem obras para revisão, que devem ser revistas por um ou mais revisores, e realizam o respetivo pagamento.
 - [ ] [R22] Os revisores são responsáveis rela realização da revisão.
-- [ ] [R23] Cada obra para revisão é caracterizada pelo autor, título, subtítulo (opcional), estilo literário (e.g. drama, ficção, thriller), tipo de publicação (e.g. capa dura, de bolso) número de páginas, número de palavras, código ISBN, número de edição, data de submissão e data de aprovação. O código ISBN deve possuir um valor único.
-- [ ] [R24] Uma revisão está associada a uma obra, autor, gestor e revisor responsável.
-- [ ] [R25] Uma revisão é caracterizada por um número de série, composto por um número sequencial (a cada pedido o número incrementa), seguido da data no formato `AAAAMMDDHHMMSS`. Por exemplo, se já ocorreram 95 pedidos até ao momento, e às 10h20m10s do dia 21 de fevereiro de 2023 surge um novo pedido, o mesmo terá o número 9620230221102010.
-- [ ] [R26] Adicionalmente, uma revisão inclui a data da realização, o tempo decorrido (calculado automaticamente desde o início até ao fim da revisão) uma listagem de anotações realizadas, observações genéricas inseridas pelo revisor, um custo do processo e o seu estado.
-- [ ] [R27] As anotações são caracterizadas por uma descrição, a página e o parágrafo onde ocorrem e a data em que foram realizadas.
+- [x] [R23] Cada obra para revisão é caracterizada pelo autor, título, subtítulo (opcional), estilo literário (e.g. drama, ficção, thriller), tipo de publicação (e.g. capa dura, de bolso) número de páginas, número de palavras, código ISBN, número de edição, data de submissão e data de aprovação. O código ISBN deve possuir um valor único.
+- [x] [R24] Uma revisão está associada a uma obra, autor, gestor e revisor responsável.
+- [x] [R25] Uma revisão é caracterizada por um número de série, composto por um número sequencial (a cada pedido o número incrementa), seguido da data no formato `AAAAMMDDHHMMSS`. Por exemplo, se já ocorreram 95 pedidos até ao momento, e às 10h20m10s do dia 21 de fevereiro de 2023 surge um novo pedido, o mesmo terá o número 9620230221102010.
+- [x] [R26] Adicionalmente, uma revisão inclui a data da realização, o tempo decorrido (calculado automaticamente desde o início até ao fim da revisão) uma listagem de anotações realizadas, observações genéricas inseridas pelo revisor, um custo do processo e o seu estado.
+- [x] [R27] As anotações são caracterizadas por uma descrição, a página e o parágrafo onde ocorrem e a data em que foram realizadas.
 
 ### Ações → Processo
-- [ ] [R28] O processo inicia com o autor, que solicita uma revisão para uma das suas obras. Cada pedido recebe um número ISBN aleatório entre 1 e 1 000 000.
+- [x] [R28] O processo inicia com o autor, que solicita uma revisão para uma das suas obras. Cada pedido recebe um número ISBN aleatório entre 1 e 1 000 000.
 - [ ] [R29] O pedido de revisão tem de ser aprovado pelo gestor. O pedido pode ser aceite ou rejeitado. Se aceitar o pedido, o gestor deve atribuir um ou mais revisores. Deve sempre existir um revisor responsável. Se o pedido for rejeitado, o autor deve ser notificado e o processo arquivado.
 - [ ] [R30] Quando um processo de revisão é atribuído a um revisor este deve ser notificado. O revisor pode aceitar ou rejeitar o processo.
 - [ ] [R31] Caso um revisor rejeite um processo, o gestor responsável pelo processo deve ser notificado e selecionar outro revisor. Na nova listagem de possíveis revisores a atribuir, não deve surgir o(s) revisor(s) que rejeitou (rejeitaram) anteriormente o pedido.
@@ -49,14 +49,14 @@
 > c) decorrer (revisor iniciou a revisão)\
 > d) finalizada (revisor terminou a revisão)\
 > e) arquivado (o gestor encerra o processo após o autor pagar o processo)
-- [ ] [R36] Cada autor pode possuir diversas obras e cada obra só está associada a um autor.
-- [ ] [R37] Sempre que uma nova obra é inserida no sistema deve-se verificar se o título já existe, bloqueando a sua inserção em caso de duplicação.
-- [ ] [R38] Uma obra pode possuir várias revisões.
+- [x] [R36] Cada autor pode possuir diversas obras e cada obra só está associada a um autor.
+- [x] [R37] Sempre que uma nova obra é inserida no sistema deve-se verificar se o título já existe, bloqueando a sua inserção em caso de duplicação.
+- [x] [R38] Uma obra pode possuir várias revisões.
 - [ ] [R39] Para garantir que as obras não contêm plágio, são utilizadas aplicações específicas. Estas aplicações possuem um número limitado de licenças, com prazo de utilização (usualmente um ano). Cada revisão pode usar uma ou mais licenças.
-- [ ] [R40] O gestor é responsável pela inserção de licenças no sistema e atualização do seu número.
+- [x] [R40] O gestor é responsável pela inserção de licenças no sistema e atualização do seu número.
 
 ### Notificações
-- [ ] [R41] Quando um novo utilizador se registou na plataforma o gestor deve ser notificado.
+- [x] [R41] Quando um novo utilizador se registou na plataforma o gestor deve ser notificado.
 - [ ] [R42] Sempre que existe um pedido de revisão o gestor deve ser notificado.
 - [ ] [R43] Se um pedido de revisão for rejeitado, o autor deve ser notificado.
 - [ ] [R44] Quando um pedido de revisão é atribuído a um revisor, este deve ser notificado.

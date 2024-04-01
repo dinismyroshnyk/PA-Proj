@@ -20,6 +20,16 @@ public class Input {
         }
     }
 
+    public static boolean hasNextInt() {
+        try {
+            return getScanner().hasNextInt();
+        } catch (Exception e) {
+            System.out.println("Error reading input.");
+            System.out.println("Exception: " + e);
+            return false;
+        }
+    }
+
     public static void closeScanner() {
         if (scanner != null) {
             scanner.close();

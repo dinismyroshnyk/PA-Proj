@@ -152,6 +152,8 @@ public class Database {
                 sqlQuery.append("SELECT * FROM UTILIZADORES WHERE username = ?");
             }else if (type.equals("nif")) {
                 sqlQuery.append("SELECT * FROM UTILIZADORES WHERE contribuinte = ?");
+            } else if (type.equals("title")) {
+                sqlQuery.append("SELECT * FROM OBRAS WHERE titulo = ?");
             }
             PreparedStatement ps = conn.prepareStatement(sqlQuery.toString());
             ps.setString(1, st);
@@ -334,7 +336,7 @@ public class Database {
                 System.out.println("Selected user: " + userID);
             }
             sqlQuery = new StringBuffer();
-            sqlQuery.append("SELECT * FROM UTILIZADORES WHERE id_utilizadores = ?");
+            sqlQuery.append("SELECT * FROM UTILIZADORES WHERE id_utilizador = ?");
             PreparedStatement ps = null;
             try {
                 ps = conn.prepareStatement(sqlQuery.toString());
@@ -391,14 +393,14 @@ public class Database {
 
     public static String convertUsernameToID(String username) {
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT id_utilizadores FROM UTILIZADORES WHERE username = ?");
+        sqlQuery.append("SELECT id_utilizador FROM UTILIZADORES WHERE username = ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
             ps.setString(1, username);
             rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getString("id_utilizadores");
+                return rs.getString("id_utilizador");
             }
         } catch (SQLException e) {
             System.out.println("Failed to convert username to ID.");
@@ -457,7 +459,7 @@ public class Database {
 
     private static void updateValueForUserID(String value, String userID, ResultSet rs) {
         sqlQuery = new StringBuffer();
-        sqlQuery.append("UPDATE UTILIZADORES SET " + value + " = ? WHERE id_utilizadores = ?");
+        sqlQuery.append("UPDATE UTILIZADORES SET " + value + " = ? WHERE id_utilizador = ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -545,7 +547,7 @@ public class Database {
 
     public static void manageUserRequests(String userID, String decision) {
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT estado FROM UTILIZADORES WHERE id_utilizadores = ?");
+        sqlQuery.append("SELECT estado FROM UTILIZADORES WHERE id_utilizador = ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -605,12 +607,12 @@ public class Database {
 
     private static final Map<String, Map<String, String>> querryOptions = Map.of(
         "registration", Map.of(
-            "approve", "UPDATE UTILIZADORES SET estado = 'active' WHERE id_utilizadores = ?",
-            "reject", "DELETE FROM UTILIZADORES WHERE id_utilizadores = ?"
+            "approve", "UPDATE UTILIZADORES SET estado = 'active' WHERE id_utilizador = ?",
+            "reject", "DELETE FROM UTILIZADORES WHERE id_utilizador = ?"
         ),
         "deletion", Map.of(
-            "approve", "UPDATE UTILIZADORES SET estado = 'deleted' WHERE id_utilizadores = ?",
-            "reject", "UPDATE UTILIZADORES SET estado = 'active' WHERE id_utilizadores = ?"
+            "approve", "UPDATE UTILIZADORES SET estado = 'deleted' WHERE id_utilizador = ?",
+            "reject", "UPDATE UTILIZADORES SET estado = 'active' WHERE id_utilizador = ?"
         )
     );
 
@@ -635,4 +637,316 @@ public class Database {
             "reject", "Failed to restore user account."
         )
     );
+
+    public static int getReviewsCount(String status) {
+        int count = 0;
+        sqlQuery = new StringBuffer();
+        if (status.equals("pending")) {
+            sqlQuery.append("SELECT * FROM REVISOES WHERE estado = 'initiated'");
+        } else if (status.equals("all")) {
+            sqlQuery.append("SELECT * FROM REVISOES");
+        }
+        try {
+            rs = st.executeQuery(sqlQuery.toString());
+            while (rs.next()) {
+                count++;
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to get reviews count.");
+            System.out.println("Exception: " + e);
+        }
+        return count;
+    }
+
+    public static void insertBookIntoDatabase(Book book) {
+        if (book == null) {
+            System.out.println("Failed to insert book into database. Book object is null.");
+            Main.pressEnterKey();
+            return;
+        }
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("INSERT INTO OBRAS (id_utilizador, titulo, subtitulo, estilo_literario, tipo_publicacao, n_paginas, n_palavras, codigo_isbn, n_edicao, data_submissao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            Author author = (Author) Book.getValue(book, "author");
+            String authorID = Database.convertUsernameToID(User.getValue(author, "login"));
+            ps.setString(1, authorID);
+            ps.setString(2, Book.getValue(book, "title").toString());
+            String subtitle = Book.getValue(book, "subtitle").toString();
+            if (subtitle.isEmpty()) {
+                ps.setNull(3, java.sql.Types.VARCHAR);
+            } else {
+                ps.setString(3, subtitle);
+            }
+            ps.setString(4, Book.getValue(book, "literaryStyle").toString());
+            ps.setString(5, Book.getValue(book, "publicationType").toString());
+            ps.setInt(6, Integer.parseInt(Book.getValue(book, "numberOfPages").toString()));
+            ps.setInt(7, Integer.parseInt(Book.getValue(book, "numberOfWords").toString()));
+            ps.setString(8, Book.getValue(book, "isbn").toString());
+            ps.setInt(9, Integer.parseInt(Book.getValue(book, "edition").toString()));
+            ps.setDate(10, (Date) Book.getValue(book, "submissionDate"));
+            ps.executeUpdate();
+            conn.commit();
+            Main.clearConsole();
+            System.out.println("Book inserted successfully.");
+            Main.pressEnterKey();
+        } catch (SQLException e) {
+            System.out.println("Failed to insert book into database. Rolling back transaction.");
+            System.out.println("Exception: " + e);
+            System.exit(1);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                }
+            }
+        }
+    }
+
+    public static void insertLicenseIntoDatabase(License license) {
+        if (license == null) {
+            System.out.println("Failed to insert license into database. License object is null.");
+            Main.pressEnterKey();
+            return;
+        }
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("INSERT INTO LICENCAS (numero, data_inicio, data_fim, n_disponivel, comentarios) VALUES (?, ?, ?, ?, ?)");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, License.getValue(license, "licenseNumber").toString());
+            ps.setDate(2, (Date) License.getValue(license, "validFrom"));
+            ps.setDate(3, (Date) License.getValue(license, "validTo"));
+            ps.setInt(4, Integer.parseInt(License.getValue(license, "usageLimit").toString()));
+            String comments = License.getValue(license, "comments").toString();
+            if (comments.isEmpty()) {
+                ps.setNull(5, java.sql.Types.VARCHAR);
+            } else {
+                ps.setString(5, comments);
+            }
+            ps.executeUpdate();
+            conn.commit();
+            Main.clearConsole();
+            System.out.println("License inserted successfully.");
+            Main.pressEnterKey();
+        } catch (SQLException e) {
+            System.out.println("Failed to insert license into database. Rolling back transaction.");
+            System.out.println("Exception: " + e);
+            System.exit(1);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                }
+            }
+        }
+    }
+
+    public static int getBookCount(Author author) {
+        int count = 0;
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT * FROM OBRAS WHERE OBRAS.id_utilizador = ? AND NOT EXISTS (SELECT 1 FROM REVISOES WHERE OBRAS.id_obra = REVISOES.id_obra AND (REVISOES.estado = 'initiated' OR REVISOES.estado = 'accepted' OR REVISOES.estado = 'in_progress'))");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            String authorID = Database.convertUsernameToID(User.getValue(author, "login"));
+            ps.setString(1, authorID);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                count++;
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to get book count.");
+            System.out.println("Exception: " + e);
+        }
+        return count;
+    }
+
+    public static ResultSet getBooks(int page, int pageSize, Author author) {
+        int offset = (page - 1) * pageSize;
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT * FROM OBRAS WHERE OBRAS.id_utilizador = ? AND NOT EXISTS (SELECT 1 FROM REVISOES WHERE OBRAS.id_obra = REVISOES.id_obra AND (REVISOES.estado = 'initiated' OR REVISOES.estado = 'accepted' OR REVISOES.estado = 'in_progress')) LIMIT ? OFFSET ?");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            String authorID = Database.convertUsernameToID(User.getValue(author, "login"));
+            ps.setString(1, authorID);
+            ps.setInt(2, pageSize);
+            ps.setInt(3, offset);
+            rs = ps.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Failed to get books.");
+            System.out.println("Exception: " + e);
+        }
+        return rs;
+    }
+
+    public static Book getBookByID(Author author, String bookID) {
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT * FROM OBRAS WHERE id_obra = ?");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, bookID);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                String title = rs.getString("titulo");
+                String subtitle = rs.getString("subtitulo");
+                String literaryStyle = rs.getString("estilo_literario");
+                String publicationType = rs.getString("tipo_publicacao");
+                int numberOfPages = rs.getInt("n_paginas");
+                int nuberOfWords = rs.getInt("n_palavras");
+                int edition = rs.getInt("n_edicao");
+                String isbn = rs.getString("codigo_isbn");
+                Date submissionDate = rs.getDate("data_submissao");
+                Date approvalDate = null;
+                try {
+                    approvalDate = rs.getDate("data_aprovacao");
+                } catch (SQLException e) {
+                    approvalDate = null;
+                }
+                Book book = new Book(author, title, subtitle, literaryStyle, publicationType, numberOfPages, nuberOfWords, isbn, edition, submissionDate, approvalDate);
+                return book;
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to get book by ID.");
+            System.out.println("Exception: " + e);
+        }
+        return null;
+    }
+
+    public static void insertReviewIntoDatabase(Review review) {
+        if (review == null) {
+            System.out.println("Failed to submit review request. Review object is null.");
+            Main.pressEnterKey();
+            return;
+        }
+        String sqlQueryReview = "INSERT INTO REVISOES (id_revisao, id_obra, data_submissao, tempo_decorrido, n_serie, custo, estado) VALUES (?, ?, CURRENT_TIMESTAMP, TIME('00:00:00'), ?, ?, ?)";
+        String sqlQuerryUser = "INSERT INTO REVISOES_UTILIZADORES (id_revisao, id_utilizador) VALUES (?, ?)";
+        PreparedStatement psReview = null;
+        PreparedStatement psUser = null;
+        try {
+            psReview = conn.prepareStatement(sqlQueryReview.toString());
+            psReview.setInt(1, Integer.parseInt(Review.getValue(review, "id").toString()));
+            Book book = (Book) Review.getValue(review, "book");
+            String bookID = getBookID(book);
+            psReview.setString(2, bookID);
+            psReview.setString(3, Review.getValue(review, "serialNumber").toString());
+            psReview.setNull(4, java.sql.Types.FLOAT);
+            psReview.setString(5, Review.getValue(review, "status").toString());
+            psReview.executeUpdate();
+            Author author = (Author) Book.getValue(book, "author");
+            String authorID = Database.convertUsernameToID(User.getValue(author, "login"));
+            psUser = conn.prepareStatement(sqlQuerryUser);
+            psUser.setInt(1, Integer.parseInt(Review.getValue(review, "id").toString()));
+            psUser.setString(2, authorID);
+            psUser.executeUpdate();
+            conn.commit();
+            Main.clearConsole();
+            System.out.println("Review request submitted successfully.");
+            Main.pressEnterKey();
+        } catch (SQLException e) {
+            System.out.println("Failed to submit review request. Rolling back transaction.");
+            System.out.println("Exception: " + e);
+            System.exit(1);
+        } finally {
+            if (psReview != null) {
+                try {
+                    psReview.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                    Main.pressEnterKey();
+                }
+            }
+            if (psUser != null) {
+                try {
+                    psUser.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                    Main.pressEnterKey();
+                }
+            }
+        }
+    }
+
+    private static String getBookID(Book book) {
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT id_obra FROM OBRAS WHERE titulo = ? AND id_utilizador = ?");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, Book.getValue(book, "title").toString());
+            Author author = (Author) Book.getValue(book, "author");
+            String authorID = Database.convertUsernameToID(User.getValue(author, "login"));
+            ps.setString(2, authorID);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("id_obra");
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to get book ID.");
+            System.out.println("Exception: " + e);
+        }
+        return null;
+    }
+
+    public static ResultSet getReviews(int page, int pageSize, String status) {
+        int offset = (page - 1) * pageSize;
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADOR = UTILIZADORES.ID_UTILIZADOR JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO = ? AND UTILIZADORES.TIPO = 'author' LIMIT ? OFFSET ?");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, status);
+            ps.setInt(2, pageSize);
+            ps.setInt(3, offset);
+            rs = ps.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Failed to get reviews.");
+            System.out.println("Exception: " + e);
+        }
+        return rs;
+    }
+
+    public static void manageReviewRequests(String reviewID, String decision) {
+        sqlQuery = new StringBuffer();
+        if (decision.equals("approve")) {
+            sqlQuery.append("UPDATE REVISOES SET estado = 'accepted' WHERE id_revisao = ?");
+        } else if (decision.equals("reject")) {
+            sqlQuery.append("UPDATE REVISOES SET estado = 'archived' WHERE id_revisao = ?");
+        }
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, reviewID);
+            ps.executeUpdate();
+            conn.commit();
+            Main.clearConsole();
+            System.out.println("Review request " + decision + "ed successfully.");
+            Main.pressEnterKey();
+        } catch (SQLException e) {
+            System.out.println("Failed to " + decision + " review request. Rolling back transaction.");
+            System.out.println("Exception: " + e);
+            System.exit(1);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                    Main.pressEnterKey();
+                }
+            }
+        }
+    }
 }

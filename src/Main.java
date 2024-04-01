@@ -1,6 +1,7 @@
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.lang.reflect.Field;
 
@@ -207,5 +208,10 @@ public class Main {
     public static void pressEnterKey() {
         System.out.print("Press Enter to continue...");
         Input.readLine();
+    }
+
+    // Get current date
+    public static Date getCurrentDate() {
+        return new Date(System.currentTimeMillis());
     }
 }
