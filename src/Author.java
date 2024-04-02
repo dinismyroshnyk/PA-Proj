@@ -1,5 +1,7 @@
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.function.Function;
@@ -107,7 +109,7 @@ public class Author extends User{
                     initiateReviewProcess(user);
                     break;
                 case "5":
-                    Review.listReviews(user);
+                    listReviews(user);
                     break;
                 case "0":
                     running = false;
@@ -213,7 +215,7 @@ public class Author extends User{
     }
 
     private static String handlePagination(int totalBooks, int page, int pageSize, ArrayList<String> ids) {
-        System.out.print("\nOption or book ID: ");
+        System.out.print("\nOption: ");
         String option = Input.readLine();
         switch (option) {
             case "n":
@@ -249,5 +251,120 @@ public class Author extends User{
                 break;
         }
         return null;
+    }
+
+    private static void listReviews(Author author) {
+        boolean running = true;
+        while (running) {
+            Main.clearConsole();
+            System.out.println("List reviews:");
+            System.out.println("1. List all reviews");
+            System.out.println("2. List ongoing reviews");
+            System.out.println("3. List archived reviews " + "\033[33m" + "[" + Database.getReviewsCount(author, "archived") + "]" + "\033[0m");
+            System.out.println("0. Go back");
+            System.out.print("\nOption: ");
+            String option = Input.readLine();
+            switch (option) {
+                case "1":
+                    listReviewsByState(author, "");
+                    break;
+                case "2":
+                    listReviewsByState(author, "ongoing");
+                    break;
+                case "3":
+                    listReviewsByState(author, "archived");
+                    break;
+                case "0":
+                    running = false;
+                    break;
+                default:
+                    Main.clearConsole();
+                    System.out.println("Invalid option. Please try again.");
+                    Main.pressEnterKey();
+                    break;
+            }
+        }
+    }
+
+    private static void listReviewsByState(Author author, String state) {
+        int page = 1;
+        int pageSize = 10;
+        int totalReviews = Database.getReviewsCount(author, state);
+        ArrayList<String> ids = new ArrayList<>();
+        while (true) {
+            ResultSet rs = Database.getReviews(page, pageSize, state, "", author);
+            if (totalReviews > 0) {
+                ids = displayReviews(rs);
+                String option = handlePagination(totalReviews, page, pageSize, ids);
+                try {
+                    switch (option) {
+                        case "next":
+                            page++;
+                            break;
+                        case "previous":
+                            page--;
+                            break;
+                        case "exit":
+                            return;
+                        default:
+                            break;
+                    }
+                } catch (NullPointerException e) {
+                    continue;
+                }
+            } else {
+                Main.clearConsole();
+                System.out.println("No reviews found.");
+                Main.pressEnterKey();
+                return;
+            }
+        }
+    }
+
+    private static ArrayList<String> displayReviews(ResultSet rs) {
+        Main.clearConsole();
+        ArrayList<String> ids = new ArrayList<>();
+        System.out.println("Next page: n | Previous page: p | Go back: 0\n");
+        try {
+            while (rs.next()) {
+                System.out.println("ID: " + rs.getString("id_revisao"));
+                System.out.println("Book: " + rs.getString("titulo"));
+                Database.sqlQuery = new StringBuffer();
+                Database.sqlQuery.append("SELECT REVISOES_UTILIZADORES.ID_UTILIZADORES FROM REVISOES_UTILIZADORES JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES WHERE REVISOES_UTILIZADORES.ID_REVISAO = ? AND UTILIZADORES.TIPO = 'reviewer'");
+                PreparedStatement ps = null;
+                try {
+                    ps = Database.conn.prepareStatement(Database.sqlQuery.toString());
+                    ps.setString(1, rs.getString("id_revisao"));
+                    Database.rs = ps.executeQuery();
+                    System.out.print("Reviewers: ");
+                    while (Database.rs.next()) {
+                        System.out.print(Database.rs.getString("id_utilizadores") + " ");
+                    }
+                    System.out.println();
+                } catch (SQLException e) {
+                    System.out.println("Failed to display reviewer.");
+                    System.out.println("Exception: " + e);
+                } finally {
+                    if (ps != null) {
+                        try {
+                            ps.close();
+                        } catch (SQLException e) {
+                            System.out.println("Failed to close prepared statement.");
+                            System.out.println("Exception: " + e);
+                        }
+                    }
+                }
+                System.out.println("Request date: " + rs.getString("data"));
+                System.out.println("Serial number: " + rs.getString("n_serie"));
+                System.out.println("Review status: " + rs.getString("estado"));
+                System.out.println();
+                ids.add(rs.getString("id_revisao"));
+            }
+            return ids;
+        } catch (Exception e) {
+            System.out.println("Failed to display reviews.");
+            System.out.println("Exception: " + e);
+            return null;
+        }
     }
 }

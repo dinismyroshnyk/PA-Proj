@@ -639,16 +639,33 @@ public class Database {
         )
     );
 
-    public static int getReviewsCount(String status) {
+    public static int getReviewsCount(User user, String status) {
         int count = 0;
-        sqlQuery = new StringBuffer();
-        if (status.equals("initiated")) {
-            sqlQuery.append("SELECT * FROM REVISOES WHERE estado = 'initiated'");
-        } else if (status.equals("accepted")) {
-            sqlQuery.append("SELECT * FROM REVISOES WHERE estado = 'accepted'");
-        } else sqlQuery.append("SELECT * FROM REVISOES");
+        StringBuffer new_sqlQuery = new StringBuffer();
+        if (user != null) {
+            String userID = convertUsernameToID(User.getValue(user, "login"));
+            if (status.equals("initiated")) {
+                new_sqlQuery.append("SELECT * FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO WHERE REVISOES.ESTADO = 'initiated' AND REVISOES_UTILIZADORES.ESTADO != 'rejected' AND REVISOES_UTILIZADORES.ID_UTILIZADORES = " + userID);
+            } else if (status.equals("accepted")) {
+                new_sqlQuery.append("SELECT * FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO WHERE REVISOES.ESTADO = 'accepted' AND REVISOES_UTILIZADORES.ESTADO != 'rejected' AND REVISOES_UTILIZADORES.ID_UTILIZADORES = " + userID);
+            } else if (status.equals("ongoing")) {
+                new_sqlQuery.append("SELECT * FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO WHERE REVISOES.ESTADO IN ('accepted', 'in_progress') AND REVISOES_UTILIZADORES.ESTADO != 'rejected' AND REVISOES_UTILIZADORES.ID_UTILIZADORES = " + userID);
+            } else if (status.equals("archived")) {
+                new_sqlQuery.append("SELECT * FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO WHERE REVISOES.ESTADO = 'archived' AND REVISOES_UTILIZADORES.ESTADO != 'rejected' AND REVISOES_UTILIZADORES.ID_UTILIZADORES = " + userID);
+            } else new_sqlQuery.append("SELECT * FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO WHERE REVISOES_UTILIZADORES.ESTADO != 'rejected' AND REVISOES_UTILIZADORES.ID_UTILIZADORES = " + userID);
+        } else {
+            if (status.equals("initiated")) {
+                new_sqlQuery.append("SELECT * FROM REVISOES WHERE REVISOES.ESTADO = 'initiated'");
+            } else if (status.equals("accepted")) {
+                new_sqlQuery.append("SELECT * FROM REVISOES WHERE REVISOES.ESTADO = 'accepted'");
+            } else if (status.equals("ongoing")) {
+                new_sqlQuery.append("SELECT * FROM REVISOES WHERE REVISOES.ESTADO IN ('accepted', 'in_progress')");
+            } else if (status.equals("archived")) {
+                new_sqlQuery.append("SELECT * FROM REVISOES WHERE REVISOES.ESTADO = 'archived'");
+            } else new_sqlQuery.append("SELECT * FROM REVISOES");
+        }
         try {
-            rs = st.executeQuery(sqlQuery.toString());
+            rs = st.executeQuery(new_sqlQuery.toString());
             while (rs.next()) {
                 count++;
             }
@@ -900,25 +917,57 @@ public class Database {
         return null;
     }
 
-    public static ResultSet getReviews(int page, int pageSize, String status, String order) {
+    public static ResultSet getReviews(int page, int pageSize, String status, String order, User user) {
         // Cálculo do offset
         int offset = (page - 1) * pageSize;
         // Criação da string de consulta SQL
         StringBuffer sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO = ? AND UTILIZADORES.TIPO = 'author' ORDER BY ? ASC LIMIT ? OFFSET ?");
-        // Preparação da consulta e definição dos parâmetros
-        PreparedStatement ps = null;
-        try {
-            ps = conn.prepareStatement(sqlQuery.toString());
-            ps.setString(1, status);
-            ps.setString(2, order);
-            ps.setInt(3, pageSize);
-            ps.setInt(4, offset);
-            // Execução da consulta e obtenção do resultado
-            rs = ps.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Falha ao obter revisões.");
-            System.out.println("Exceção: " + e);
+        String sqlStatus = "";
+        if (user != null) {
+            String userID = convertUsernameToID(User.getValue(user, "login"));
+            if (status.isEmpty()) {
+                sqlStatus = "REVISOES.ESTADO IN ('initiated', 'accepted', 'in_progress', 'completed', 'archived') AND REVISOES_UTILIZADORES.ID_UTILIZADORES = " + userID;
+            } else if (status.equals("ongoing")) {
+                sqlStatus = "REVISOES.ESTADO IN ('accepted', 'in_progress') AND REVISOES_UTILIZADORES.ID_UTILIZADORES = " + userID;
+            } else {
+                sqlStatus = "REVISOES.ESTADO = '" + status + "' AND REVISOES_UTILIZADORES.ID_UTILIZADORES = " + userID;
+            }
+            sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie, REVISOES.ESTADO FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE " + sqlStatus + " AND REVISOES_UTILIZADORES.ESTADO != 'rejected' ORDER BY ? LIMIT ? OFFSET ?");
+            // Preparação da consulta e definição dos parâmetros
+            PreparedStatement ps = null;
+            try {
+                ps = conn.prepareStatement(sqlQuery.toString());
+                ps.setString(1, order);
+                ps.setInt(2, pageSize);
+                ps.setInt(3, offset);
+                // Execução da consulta e obtenção do resultado
+                rs = ps.executeQuery();
+            } catch (SQLException e) {
+                System.out.println("Falha ao obter revisões.");
+                System.out.println("Exceção: " + e);
+            }
+        } else {
+            if (status.isEmpty()) {
+                sqlStatus = "REVISOES.ESTADO IN ('initiated', 'accepted', 'in_progress', 'completed', 'archived')";
+            } else if (status.equals("ongoing")) {
+                sqlStatus = "REVISOES.ESTADO IN ('accepted', 'in_progress')";
+            } else {
+                sqlStatus = "REVISOES.ESTADO = '" + status + "'";
+            }
+            sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie, REVISOES.ESTADO FROM REVISOES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA JOIN UTILIZADORES ON OBRAS.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES WHERE " + sqlStatus + " ORDER BY ? LIMIT ? OFFSET ?");
+            // Preparação da consulta e definição dos parâmetros
+            PreparedStatement ps = null;
+            try {
+                ps = conn.prepareStatement(sqlQuery.toString());
+                ps.setString(1, order);
+                ps.setInt(2, pageSize);
+                ps.setInt(3, offset);
+                // Execução da consulta e obtenção do resultado
+                rs = ps.executeQuery();
+            } catch (SQLException e) {
+                System.out.println("Falha ao obter revisões.");
+                System.out.println("Exceção: " + e);
+            }
         }
         return rs;
     }
@@ -959,7 +1008,7 @@ public class Database {
     public static int getReviewersCount(String reviewID) {
         int count = 0;
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT UTILIZADORES.ID_UTILIZADORES, UTILIZADORES.NOME FROM UTILIZADORES LEFT JOIN REVISOES_UTILIZADORES ON UTILIZADORES.ID_UTILIZADORES = REVISOES_UTILIZADORES.ID_UTILIZADORES WHERE UTILIZADORES.TIPO = 'reviewer' AND UTILIZADORES.ESTADO = 'active' AND (REVISOES_UTILIZADORES.ID_REVISAO != ? OR REVISOES_UTILIZADORES.ID_REVISAO IS NULL)");
+        sqlQuery.append("SELECT UTILIZADORES.ID_UTILIZADORES, UTILIZADORES.NOME FROM UTILIZADORES LEFT JOIN REVISOES_UTILIZADORES ON UTILIZADORES.ID_UTILIZADORES = REVISOES_UTILIZADORES.ID_UTILIZADORES WHERE UTILIZADORES.TIPO = 'reviewer' AND UTILIZADORES.ESTADO = 'active' AND NOT EXISTS (SELECT 1 FROM REVISOES_UTILIZADORES WHERE REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES AND REVISOES_UTILIZADORES.ESTADO = 'rejected' AND REVISOES_UTILIZADORES.ID_REVISAO = ?)");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -978,7 +1027,7 @@ public class Database {
     public static ResultSet getReviewers(int page, int pageSize, String reviewID) {
         int offset = (page - 1) * pageSize;
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT UTILIZADORES.ID_UTILIZADORES, UTILIZADORES.NOME, UTILIZADORES.AREA_ESPECIALIZACAO, UTILIZADORES.FORMACAO_ACADEMICA FROM UTILIZADORES LEFT JOIN REVISOES_UTILIZADORES ON UTILIZADORES.ID_UTILIZADORES = REVISOES_UTILIZADORES.ID_UTILIZADORES WHERE UTILIZADORES.TIPO = 'reviewer' AND UTILIZADORES.ESTADO = 'active' AND (REVISOES_UTILIZADORES.ID_REVISAO != ? OR REVISOES_UTILIZADORES.ID_REVISAO IS NULL) LIMIT ? OFFSET ?");
+        sqlQuery.append("SELECT UTILIZADORES.ID_UTILIZADORES, UTILIZADORES.NOME, UTILIZADORES.AREA_ESPECIALIZACAO, UTILIZADORES.FORMACAO_ACADEMICA FROM UTILIZADORES LEFT JOIN REVISOES_UTILIZADORES ON UTILIZADORES.ID_UTILIZADORES = REVISOES_UTILIZADORES.ID_UTILIZADORES WHERE UTILIZADORES.TIPO = 'reviewer' AND UTILIZADORES.ESTADO = 'active' AND NOT EXISTS (SELECT 1 FROM REVISOES_UTILIZADORES WHERE REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES AND REVISOES_UTILIZADORES.ESTADO = 'rejected' AND REVISOES_UTILIZADORES.ID_REVISAO = ?) LIMIT ? OFFSET ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -1014,6 +1063,53 @@ public class Database {
             if (ps != null) {
                 try {
                     ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                    Main.pressEnterKey();
+                }
+            }
+        }
+    }
+
+    public static void updateReviewStatus(User user, String reviewID, String status) {
+        String sqlQuery = "UPDATE REVISOES_UTILIZADORES SET estado = ? WHERE id_revisao = ? AND id_utilizadores = ?";
+        String sqlQuery2 = "UPDATE REVISOES SET estado = 'in_progress' WHERE id_revisao = ?";
+        PreparedStatement ps = null;
+        PreparedStatement ps2 = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setString(1, status);
+            ps.setString(2, reviewID);
+            String userID = convertUsernameToID(User.getValue(user, "login"));
+            ps.setString(3, userID);
+            ps.executeUpdate();
+            if (status.equals("accepted")) {
+                ps2 = conn.prepareStatement(sqlQuery2);
+                ps2.setString(1, reviewID);
+                ps2.executeUpdate();
+            }
+            conn.commit();
+            Main.clearConsole();
+            System.out.println("Status updated successfully.");
+            Main.pressEnterKey();
+        } catch (SQLException e) {
+            System.out.println("Failed to update status. Rolling back transaction.");
+            System.out.println("Exception: " + e);
+            System.exit(1);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                    Main.pressEnterKey();
+                }
+            }
+            if (ps2 != null) {
+                try {
+                    ps2.close();
                 } catch (SQLException e) {
                     System.out.println("Failed to close prepared statement.");
                     System.out.println("Exception: " + e);

@@ -121,6 +121,7 @@ create table REVISOES_UTILIZADORES
 (
    ID_REVISAO            int not null,
    ID_UTILIZADORES         int not null,
+   ESTADO               ENUM('accepted', 'rejected'),
    primary key (ID_REVISAO, ID_UTILIZADORES),
    foreign key (ID_REVISAO) references REVISOES (ID_REVISAO),
    foreign key (ID_UTILIZADORES) references UTILIZADORES (ID_UTILIZADORES)

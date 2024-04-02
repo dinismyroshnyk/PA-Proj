@@ -25,9 +25,9 @@
 - [x] [R19] Quando a aplicação estiver a encerrar, deve apresentar a mensagem `Adeus [nome utilizador]`.
 
 ### Ações → Intervenientes e responsabilidades
-- [ ] [R20] Os revisores gerem (aprovam e finalizam) o processo de revisão.
-- [ ] [R21] Os autores submetem obras para revisão, que devem ser revistas por um ou mais revisores, e realizam o respetivo pagamento.
-- [ ] [R22] Os revisores são responsáveis rela realização da revisão.
+- [x] [R20] Os revisores gerem (aprovam e finalizam) o processo de revisão.
+- [x] [R21] Os autores submetem obras para revisão, que devem ser revistas por um ou mais revisores, e realizam o respetivo pagamento.
+- [x] [R22] Os revisores são responsáveis rela realização da revisão.
 - [x] [R23] Cada obra para revisão é caracterizada pelo autor, título, subtítulo (opcional), estilo literário (e.g. drama, ficção, thriller), tipo de publicação (e.g. capa dura, de bolso) número de páginas, número de palavras, código ISBN, número de edição, data de submissão e data de aprovação. O código ISBN deve possuir um valor único.
 - [x] [R24] Uma revisão está associada a uma obra, autor, gestor e revisor responsável.
 - [x] [R25] Uma revisão é caracterizada por um número de série, composto por um número sequencial (a cada pedido o número incrementa), seguido da data no formato `AAAAMMDDHHMMSS`. Por exemplo, se já ocorreram 95 pedidos até ao momento, e às 10h20m10s do dia 21 de fevereiro de 2023 surge um novo pedido, o mesmo terá o número 9620230221102010.
@@ -37,8 +37,8 @@
 ### Ações → Processo
 - [x] [R28] O processo inicia com o autor, que solicita uma revisão para uma das suas obras. Cada pedido recebe um número ISBN aleatório entre 1 e 1 000 000.
 - [x] [R29] O pedido de revisão tem de ser aprovado pelo gestor. O pedido pode ser aceite ou rejeitado. Se aceitar o pedido, o gestor deve atribuir um ou mais revisores. Deve sempre existir um revisor responsável. Se o pedido for rejeitado, o autor deve ser notificado e o processo arquivado.
-- [ ] [R30] Quando um processo de revisão é atribuído a um revisor este deve ser notificado. O revisor pode aceitar ou rejeitar o processo.
-- [ ] [R31] Caso um revisor rejeite um processo, o gestor responsável pelo processo deve ser notificado e selecionar outro revisor. Na nova listagem de possíveis revisores a atribuir, não deve surgir o(s) revisor(s) que rejeitou (rejeitaram) anteriormente o pedido.
+- [x] [R30] Quando um processo de revisão é atribuído a um revisor este deve ser notificado. O revisor pode aceitar ou rejeitar o processo.
+- [x] [R31] Caso um revisor rejeite um processo, o gestor responsável pelo processo deve ser notificado e selecionar outro revisor. Na nova listagem de possíveis revisores a atribuir, não deve surgir o(s) revisor(s) que rejeitou (rejeitaram) anteriormente o pedido.
 - [ ] [R32] Após aceitar o processo, o revisor inicia a revisão. Quando concluir a tarefa, encerra essa revisão. A revisão não tem de ter terminada numa única sessão da aplicação.
 - [ ] [R33] No final o autor realiza o pagamento do processo e o gestor será notificado.
 - [ ] [R34] Após a confirmação do autor, o gestor arquiva o processo.

@@ -33,7 +33,7 @@ public class Manager extends User {
             System.out.println("2. Manage existing users");
             System.out.println("3. Manage registration requests " + "\033[33m" + "[" + Database.getUsersCount("pending-activation") + "]" + "\033[0m");
             System.out.println("4. Manage deletion requests " + "\033[33m" + "[" + Database.getUsersCount("pending-deletion") + "]" + "\033[0m");
-            System.out.println("5. Manage review requests " + "\033[33m" + "[" + Database.getReviewsCount("initiated") + "]" + "\033[0m");
+            System.out.println("5. Manage review requests " + "\033[33m" + "[" + Database.getReviewsCount(null, "initiated") + "]" + "\033[0m");
             System.out.println("6. Insert license");
             System.out.println("0. Log out");
             System.out.print("\nOption: ");
@@ -52,7 +52,7 @@ public class Manager extends User {
                     manageUsersMenu(user, "pending-deletion");
                     break;
                 case "5":
-                    manageReviewMenu();
+                    manageReviewMenu(user);
                     break;
                 case "6":
                     License license = License.insertLicense();
@@ -333,7 +333,7 @@ public class Manager extends User {
         }
     }
 
-    private static void manageReviewMenu() {
+    private static void manageReviewMenu(Manager manager) {
         boolean running = true;
         while (running) {
             Main.clearConsole();
@@ -369,7 +369,7 @@ public class Manager extends User {
     private static void reviewPaginationMenu(String status) {
         int page = 1;
         int pageSize = 10;
-        int totalReviews = Database.getReviewsCount(status);
+        int totalReviews = Database.getReviewsCount(null, status);
         ArrayList<String> ids = new ArrayList<>();
         boolean orderCheck = false;
         while (true) {
@@ -391,7 +391,7 @@ public class Manager extends User {
                         orderCheck = true;
                     }
                 }
-                ResultSet rs = Database.getReviews(page, pageSize, status, order);
+                ResultSet rs = Database.getReviews(page, pageSize, status, order, null);
                 ids = displayReviews(rs, status);
                 String option = handlePagination(totalReviews, page, pageSize, ids);
                 try {
@@ -406,7 +406,7 @@ public class Manager extends User {
                             return;
                         default:
                             manageReviewRequests(option, status);
-                            totalReviews = Database.getReviewsCount(status);
+                            totalReviews = Database.getReviewsCount(null, status);
                             break;
                     }
                 } catch (NullPointerException e) {
