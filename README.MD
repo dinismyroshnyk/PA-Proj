@@ -81,7 +81,7 @@
 - [ ] [R61] Os autores podem pesquisar as suas obras por data de registo ou matrícula.
 - [ ] [R62] Os revisores podem listar os seus pedidos de revisão ordenando por data de criação ou por título.
 - [ ] [R63] Os revisores podem pesquisar os seus pedidos de revisão por data de criação, por título ou estado.
-- [ ] [R64] Devem ser implementados mecanismos de pesquisa avançada, ou seja, apresentar todos os registos que apresentem um termo de pesquisa, mesmo que parcialmente.
+- [x] [R64] Devem ser implementados mecanismos de pesquisa avançada, ou seja, apresentar todos os registos que apresentem um termo de pesquisa, mesmo que parcialmente.
 > [!NOTE]
 > (e.g., termo de pesquisa “Ana” deve apresentar como resultado “Ana Sousa”, “Ana Silva” e “Anabela”).
 
