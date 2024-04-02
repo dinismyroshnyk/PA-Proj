@@ -155,7 +155,7 @@ public class Manager extends User {
         System.out.println("Enter the value to search:");
         String searchValue = Input.readLine();
         while (true) {
-            ResultSet rs = Database.searchUser(searchCriteria, searchValue);
+            ResultSet rs = Database.searchUser(searchCriteria, searchValue, status);
             ArrayList<String> ids = displayUsers(rs);
             if (totalUsers > 0) {
                 String option = handlePagination(totalUsers, page, pageSize, ids);

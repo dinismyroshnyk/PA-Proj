@@ -50,7 +50,7 @@ create table LICENCAS
 create table OBRAS
 (
    ID_OBRA              int not null AUTO_INCREMENT,
-   ID_UTILIZADOR        int not null,
+   ID_UTILIZADORES        int not null,
    TITULO               varchar(100) not null,
    SUBTITULO            varchar(100),
    ESTILO_LITERARIO     varchar(20) not null,
@@ -96,7 +96,7 @@ create table REVISOES_LICENCAS
 /*==============================================================*/
 create table UTILIZADORES
 (
-   ID_UTILIZADOR        int not null AUTO_INCREMENT,
+   ID_UTILIZADORES        int not null AUTO_INCREMENT,
    NOME                 varchar(100) not null,
    USERNAME             varchar(20),
    PASSWORD             varchar(60),
@@ -111,7 +111,7 @@ create table UTILIZADORES
    DATA_INICIO          date,
    AREA_ESPECIALIZACAO  varchar(20),
    FORMACAO_ACADEMICA   varchar(100),
-   primary key (ID_UTILIZADOR)
+   primary key (ID_UTILIZADORES)
 );
 
 /*==============================================================*/
@@ -120,17 +120,17 @@ create table UTILIZADORES
 create table REVISOES_UTILIZADORES
 (
    ID_REVISAO            int not null,
-   ID_UTILIZADOR         int not null,
-   primary key (ID_REVISAO, ID_UTILIZADOR),
+   ID_UTILIZADORES         int not null,
+   primary key (ID_REVISAO, ID_UTILIZADORES),
    foreign key (ID_REVISAO) references REVISOES (ID_REVISAO),
-   foreign key (ID_UTILIZADOR) references UTILIZADORES (ID_UTILIZADOR)
+   foreign key (ID_UTILIZADORES) references UTILIZADORES (ID_UTILIZADORES)
 );
 
 alter table ANOTACOES add constraint FK_REVISOES_ANOTACOES foreign key (ID_REVISAO)
    references REVISOES (ID_REVISAO) on delete restrict on update restrict;
 
-alter table OBRAS add constraint FK_UTILIZADORES_OBRAS foreign key (ID_UTILIZADOR)
-   references UTILIZADORES (ID_UTILIZADOR) on delete restrict on update restrict;
+alter table OBRAS add constraint FK_UTILIZADORES_OBRAS foreign key (ID_UTILIZADORES)
+   references UTILIZADORES (ID_UTILIZADORES) on delete restrict on update restrict;
 
 alter table REVISOES add constraint FK_OBRAS_REVISOES foreign key (ID_OBRA)
    references OBRAS (ID_OBRA) on delete restrict on update restrict;

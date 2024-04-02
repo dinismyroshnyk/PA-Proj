@@ -251,13 +251,14 @@ public class Database {
         } else return count - 1;
     }
     // Search for a user in the database
-    public static ResultSet searchUser(String searchCriteria, String searchValue) {
+    public static ResultSet searchUser(String searchCriteria, String searchValue, String status) {
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT * FROM UTILIZADORES WHERE " + searchCriteria + " LIKE ?");
+        sqlQuery.append("SELECT * FROM UTILIZADORES WHERE estado = ? AND " + searchCriteria + " LIKE ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
-            ps.setString(1, searchValue + "%");
+            ps.setString(1, status); // Define o estado como o valor passado
+            ps.setString(2, "%" + searchValue + "%"); // Garante que a pesquisa seja parcial
             rs = ps.executeQuery();
         } catch (SQLException e) {
             System.out.println("Failed to execute query.");
@@ -279,7 +280,7 @@ public class Database {
         }
         String currUser = User.getValue(user, "login");
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT * FROM UTILIZADORES WHERE username != ? AND (estado = ? OR estado = ?) ORDER BY username "+ order +" LIMIT ? OFFSET ?");
+        sqlQuery.append("SELECT * FROM UTILIZADORES WHERE username != ? AND (estado = ? OR estado = ?) ORDER BY NOME "+ order +" LIMIT ? OFFSET ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -336,7 +337,7 @@ public class Database {
                 System.out.println("Selected user: " + userID);
             }
             sqlQuery = new StringBuffer();
-            sqlQuery.append("SELECT * FROM UTILIZADORES WHERE id_utilizador = ?");
+            sqlQuery.append("SELECT * FROM UTILIZADORES WHERE ID_UTILIZADORES = ?");
             PreparedStatement ps = null;
             try {
                 ps = conn.prepareStatement(sqlQuery.toString());
@@ -393,14 +394,14 @@ public class Database {
 
     public static String convertUsernameToID(String username) {
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT id_utilizador FROM UTILIZADORES WHERE username = ?");
+        sqlQuery.append("SELECT ID_UTILIZADORES FROM UTILIZADORES WHERE username = ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
             ps.setString(1, username);
             rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getString("id_utilizador");
+                return rs.getString("ID_UTILIZADORES");
             }
         } catch (SQLException e) {
             System.out.println("Failed to convert username to ID.");
@@ -459,7 +460,7 @@ public class Database {
 
     private static void updateValueForUserID(String value, String userID, ResultSet rs) {
         sqlQuery = new StringBuffer();
-        sqlQuery.append("UPDATE UTILIZADORES SET " + value + " = ? WHERE id_utilizador = ?");
+        sqlQuery.append("UPDATE UTILIZADORES SET " + value + " = ? WHERE ID_UTILIZADORES = ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -547,7 +548,7 @@ public class Database {
 
     public static void manageUserRequests(String userID, String decision) {
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT estado FROM UTILIZADORES WHERE id_utilizador = ?");
+        sqlQuery.append("SELECT estado FROM UTILIZADORES WHERE ID_UTILIZADORES = ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -607,12 +608,12 @@ public class Database {
 
     private static final Map<String, Map<String, String>> querryOptions = Map.of(
         "registration", Map.of(
-            "approve", "UPDATE UTILIZADORES SET estado = 'active' WHERE id_utilizador = ?",
-            "reject", "DELETE FROM UTILIZADORES WHERE id_utilizador = ?"
+            "approve", "UPDATE UTILIZADORES SET estado = 'active' WHERE ID_UTILIZADORES = ?",
+            "reject", "DELETE FROM UTILIZADORES WHERE ID_UTILIZADORES = ?"
         ),
         "deletion", Map.of(
-            "approve", "UPDATE UTILIZADORES SET estado = 'deleted' WHERE id_utilizador = ?",
-            "reject", "UPDATE UTILIZADORES SET estado = 'active' WHERE id_utilizador = ?"
+            "approve", "UPDATE UTILIZADORES SET estado = 'deleted' WHERE ID_UTILIZADORES = ?",
+            "reject", "UPDATE UTILIZADORES SET estado = 'active' WHERE ID_UTILIZADORES = ?"
         )
     );
 
@@ -665,7 +666,7 @@ public class Database {
             return;
         }
         sqlQuery = new StringBuffer();
-        sqlQuery.append("INSERT INTO OBRAS (id_utilizador, titulo, subtitulo, estilo_literario, tipo_publicacao, n_paginas, n_palavras, codigo_isbn, n_edicao, data_submissao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        sqlQuery.append("INSERT INTO OBRAS (ID_UTILIZADORES, titulo, subtitulo, estilo_literario, tipo_publicacao, n_paginas, n_palavras, codigo_isbn, n_edicao, data_submissao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -752,7 +753,7 @@ public class Database {
     public static int getBookCount(Author author) {
         int count = 0;
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT * FROM OBRAS WHERE OBRAS.id_utilizador = ? AND NOT EXISTS (SELECT 1 FROM REVISOES WHERE OBRAS.id_obra = REVISOES.id_obra AND (REVISOES.estado = 'initiated' OR REVISOES.estado = 'accepted' OR REVISOES.estado = 'in_progress'))");
+        sqlQuery.append("SELECT * FROM OBRAS WHERE OBRAS.ID_UTILIZADORES = ? AND NOT EXISTS (SELECT 1 FROM REVISOES WHERE OBRAS.id_obra = REVISOES.id_obra AND (REVISOES.estado = 'initiated' OR REVISOES.estado = 'accepted' OR REVISOES.estado = 'in_progress'))");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -772,7 +773,7 @@ public class Database {
     public static ResultSet getBooks(int page, int pageSize, Author author) {
         int offset = (page - 1) * pageSize;
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT * FROM OBRAS WHERE OBRAS.id_utilizador = ? AND NOT EXISTS (SELECT 1 FROM REVISOES WHERE OBRAS.id_obra = REVISOES.id_obra AND (REVISOES.estado = 'initiated' OR REVISOES.estado = 'accepted' OR REVISOES.estado = 'in_progress')) LIMIT ? OFFSET ?");
+        sqlQuery.append("SELECT * FROM OBRAS WHERE OBRAS.ID_UTILIZADORES = ? AND NOT EXISTS (SELECT 1 FROM REVISOES WHERE OBRAS.id_obra = REVISOES.id_obra AND (REVISOES.estado = 'initiated' OR REVISOES.estado = 'accepted' OR REVISOES.estado = 'in_progress')) LIMIT ? OFFSET ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -829,7 +830,7 @@ public class Database {
             return;
         }
         String sqlQueryReview = "INSERT INTO REVISOES (id_revisao, id_obra, data_submissao, tempo_decorrido, n_serie, custo, estado) VALUES (?, ?, CURRENT_TIMESTAMP, TIME('00:00:00'), ?, ?, ?)";
-        String sqlQuerryUser = "INSERT INTO REVISOES_UTILIZADORES (id_revisao, id_utilizador) VALUES (?, ?)";
+        String sqlQuerryUser = "INSERT INTO REVISOES_UTILIZADORES (id_revisao, ID_UTILIZADORES) VALUES (?, ?)";
         PreparedStatement psReview = null;
         PreparedStatement psUser = null;
         try {
@@ -880,7 +881,7 @@ public class Database {
 
     private static String getBookID(Book book) {
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT id_obra FROM OBRAS WHERE titulo = ? AND id_utilizador = ?");
+        sqlQuery.append("SELECT id_obra FROM OBRAS WHERE titulo = ? AND ID_UTILIZADORES = ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -902,7 +903,7 @@ public class Database {
     public static ResultSet getReviews(int page, int pageSize, String status) {
         int offset = (page - 1) * pageSize;
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADOR = UTILIZADORES.ID_UTILIZADOR JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO = ? AND UTILIZADORES.TIPO = 'author' LIMIT ? OFFSET ?");
+        sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO = ? AND UTILIZADORES.TIPO = 'author' LIMIT ? OFFSET ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
