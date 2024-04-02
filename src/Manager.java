@@ -340,7 +340,8 @@ public class Manager extends User {
             System.out.println("Manage review requests: ");
             System.out.println("1. List new reviews");
             System.out.println("2. List accepted reviews");
-            System.out.println("3. Search review");
+            System.out.println("3. list all review requests not yet finalized");
+            System.out.println("4. Search review");
             System.out.println("0. Go back");
             System.out.print("\nOption: ");
             String option = Input.readLine();
@@ -352,6 +353,8 @@ public class Manager extends User {
                     reviewPaginationMenu("accepted");
                     break;
                 case "3":
+                    
+                case "4":
                     searchReview();
                     break;
                 case "0":
@@ -370,19 +373,36 @@ public class Manager extends User {
         int page = 1;
         int pageSize = 10;
         int totalReviews = Database.getReviewsCount("all");
-        System.out.println("Enter search criteria (identifier, state or author):");
+        String searchValue= null;
+        String startDate = null;
+        String endDate = null;
+        System.out.println("Enter search criteria (identifier, state, author or within a time interval(time interval)):");
         String searchCriteria = Input.readLine();
         if (searchCriteria.equals("state")){
             searchCriteria = "r.estado";
+            System.out.println("Enter the value to search:");
+             searchValue = Input.readLine();
         }else if (searchCriteria.equals("author")){
             searchCriteria = "u.nome";
+            System.out.println("Enter the value to search:");
+            searchValue = Input.readLine();
         }else if (searchCriteria.equals("identifier")){
             searchCriteria = "r.id_revisao";
+            System.out.println("Enter the value to search:");
+            searchValue = Input.readLine();
+        } else if (searchCriteria.equals("time interval")){
+            searchCriteria = "r.data_submissao";
+            System.out.println("Enter the start date (YYYY-MM-DD):");
+            startDate = Input.readLine();
+            System.out.println("Enter the end date (YYYY-MM-DD):");
+            endDate = Input.readLine();
+        }else {
+            System.out.println("Invalid search criteria.");
+            Main.pressEnterKey();
+            return;
         }
-        System.out.println("Enter the value to search:");
-        String searchValue = Input.readLine();
         while (true) {
-            ResultSet rs = Database.searchReview(searchCriteria, searchValue);
+            ResultSet rs = Database.searchReview(searchCriteria, searchValue, startDate, endDate);
             if (totalReviews > 0) {
                 ArrayList<String> ids = displayReviews(rs, "all");
                 String option = handlePagination(totalReviews, page, pageSize, ids);
@@ -436,6 +456,10 @@ public class Manager extends User {
                     } else if (order.equals("author")) {
                         order = "autor";
                         orderCheck = true;
+                    } else {
+                        Main.clearConsole();
+                        System.out.println("Invalid option. Please try again.");
+                        Main.pressEnterKey();
                     }
                 }
                 ResultSet rs = Database.getReviews(page, pageSize, status, order);

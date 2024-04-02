@@ -251,10 +251,22 @@ public class Database {
         } else return count - 1;
     }
 
-    public static ResultSet searchReview(String searchCriteria, String searchValue) {
+    public static ResultSet searchReview(String searchCriteria, String searchValue, String startDate, String endDate) {
         sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT r.ID_REVISAO, u.NOME AS autor, o.TITULO AS titulo, r.DATA_SUBMISSAO AS data, r.N_SERIE AS n_serie, r.ESTADO AS estado FROM REVISOES r, UTILIZADORES u, OBRAS o WHERE r.ID_OBRA = o.ID_OBRA AND o.ID_OBRA = u.ID_UTILIZADORES  AND " + searchCriteria + " LIKE ?");
         PreparedStatement ps = null;
+        if(searchCriteria.equals("r.data_submissao")){
+            sqlQuery.append("SELECT r.ID_REVISAO, u.NOME AS autor, o.TITULO AS titulo, r.DATA_SUBMISSAO AS data, r.N_SERIE AS n_serie, r.ESTADO AS estado FROM REVISOES r, UTILIZADORES u, OBRAS o WHERE r.ID_OBRA = o.ID_OBRA AND o.ID_OBRA = u.ID_UTILIZADORES AND DATE(r.DATA_SUBMISSAO) BETWEEN ? AND ?");
+            try {
+                ps = conn.prepareStatement(sqlQuery.toString());
+                ps.setString(1, startDate);
+                ps.setString(2, endDate);
+                return ps.executeQuery();
+            } catch (SQLException e) {
+                System.out.println("Failed to execute query.");
+                System.out.println("Exception: " + e);
+            }
+        }else{
+        sqlQuery.append("SELECT r.ID_REVISAO, u.NOME AS autor, o.TITULO AS titulo, r.DATA_SUBMISSAO AS data, r.N_SERIE AS n_serie, r.ESTADO AS estado FROM REVISOES r, UTILIZADORES u, OBRAS o WHERE r.ID_OBRA = o.ID_OBRA AND o.ID_OBRA = u.ID_UTILIZADORES  AND " + searchCriteria + " LIKE ?");
         try {
             ps = conn.prepareStatement(sqlQuery.toString()); 
             ps.setString(1, searchValue + "%");
@@ -262,6 +274,7 @@ public class Database {
         } catch (SQLException e) {
             System.out.println("Failed to execute query.");
             System.out.println("Exception: " + e);
+        }
         }
         return rs;
     } 
@@ -273,8 +286,8 @@ public class Database {
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
-            ps.setString(1, status); // Define o estado como o valor passado
-            ps.setString(2, "%" + searchValue + "%"); // Garante que a pesquisa seja parcial
+            ps.setString(1, status); 
+            ps.setString(2, "%" + searchValue + "%"); 
             rs = ps.executeQuery();
         } catch (SQLException e) {
             System.out.println("Failed to execute query.");
@@ -917,12 +930,9 @@ public class Database {
     }
 
     public static ResultSet getReviews(int page, int pageSize, String status, String order) {
-        // Cálculo do offset
         int offset = (page - 1) * pageSize;
-        // Criação da string de consulta SQL
         StringBuffer sqlQuery = new StringBuffer();
         sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO = ? AND UTILIZADORES.TIPO = 'author' ORDER BY ? ASC LIMIT ? OFFSET ?");
-        // Preparação da consulta e definição dos parâmetros
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -930,7 +940,6 @@ public class Database {
             ps.setString(2, order);
             ps.setInt(3, pageSize);
             ps.setInt(4, offset);
-            // Execução da consulta e obtenção do resultado
             rs = ps.executeQuery();
         } catch (SQLException e) {
             System.out.println("Falha ao obter revisões.");
