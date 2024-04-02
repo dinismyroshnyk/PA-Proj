@@ -352,7 +352,7 @@ public class Manager extends User {
                     reviewPaginationMenu("accepted");
                     break;
                 case "3":
-                    //searchReview();
+                    searchReview();
                     break;
                 case "0":
                     running = false;
@@ -362,6 +362,53 @@ public class Manager extends User {
                     System.out.println("Invalid option. Please try again.");
                     Main.pressEnterKey();
                     break;
+            }
+        }
+    }
+
+    public static void searchReview() {
+        int page = 1;
+        int pageSize = 10;
+        int totalReviews = Database.getReviewsCount("all");
+        System.out.println("Enter search criteria (identifier, state or author):");
+        String searchCriteria = Input.readLine();
+        if (searchCriteria.equals("state")){
+            searchCriteria = "r.estado";
+        }else if (searchCriteria.equals("author")){
+            searchCriteria = "u.nome";
+        }else if (searchCriteria.equals("identifier")){
+            searchCriteria = "r.id_revisao";
+        }
+        System.out.println("Enter the value to search:");
+        String searchValue = Input.readLine();
+        while (true) {
+            ResultSet rs = Database.searchReview(searchCriteria, searchValue);
+            if (totalReviews > 0) {
+                ArrayList<String> ids = displayReviews(rs, "all");
+                String option = handlePagination(totalReviews, page, pageSize, ids);
+                try {
+                    switch (option) {
+                        case "next":
+                            page++;
+                            break;
+                        case "previous":
+                            page--;
+                            break;
+                        case "exit":
+                            return;
+                        default:
+                            manageReviewRequests(option, "all");
+                            totalReviews = Database.getReviewsCount("all");
+                            break;
+                    }
+                } catch (NullPointerException e) {
+                    continue;
+                }
+            } else {
+                Main.clearConsole();
+                System.out.println("No reviews to manage.");
+                Main.pressEnterKey();
+                return;
             }
         }
     }

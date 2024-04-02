@@ -250,6 +250,22 @@ public class Database {
             return count;
         } else return count - 1;
     }
+
+    public static ResultSet searchReview(String searchCriteria, String searchValue) {
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT r.ID_REVISAO, u.NOME AS autor, o.TITULO AS titulo, r.DATA_SUBMISSAO AS data, r.N_SERIE AS n_serie, r.ESTADO AS estado FROM REVISOES r, UTILIZADORES u, OBRAS o WHERE r.ID_OBRA = o.ID_OBRA AND o.ID_OBRA = u.ID_UTILIZADORES  AND " + searchCriteria + " LIKE ?");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString()); 
+            ps.setString(1, searchValue + "%");
+            return ps.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Failed to execute query.");
+            System.out.println("Exception: " + e);
+        }
+        return rs;
+    } 
+
     // Search for a user in the database
     public static ResultSet searchUser(String searchCriteria, String searchValue, String status) {
         sqlQuery = new StringBuffer();
