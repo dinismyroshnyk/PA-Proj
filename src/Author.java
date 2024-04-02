@@ -80,6 +80,7 @@ public class Author extends User{
             System.out.println("2. Edit profile");
             System.out.println("3. Insert new book");
             System.out.println("4. Ask for review");
+            System.out.println("5. List reviews");
             System.out.println("0. Log out");
             System.out.print("\nOption: ");
             String option = Input.readLine();
@@ -104,6 +105,9 @@ public class Author extends User{
                     break;
                 case "4":
                     initiateReviewProcess(user);
+                    break;
+                case "5":
+                    Review.listReviews(user);
                     break;
                 case "0":
                     running = false;

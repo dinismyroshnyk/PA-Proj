@@ -150,9 +150,6 @@ public class Main {
         System.out.println("Data de Início: " + startTime.format(date));
         System.out.println("Data de Fim: " + endTime.format(date));
         System.out.println("Tempo de Execução: " + tempoExecucaoFormatado);
-        System.out.println("Press Enter to exit...");
-        Input.readLine();
-        
     }
 
     // Register a new user

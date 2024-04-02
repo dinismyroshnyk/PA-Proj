@@ -642,11 +642,11 @@ public class Database {
     public static int getReviewsCount(String status) {
         int count = 0;
         sqlQuery = new StringBuffer();
-        if (status.equals("pending")) {
+        if (status.equals("initiated")) {
             sqlQuery.append("SELECT * FROM REVISOES WHERE estado = 'initiated'");
-        } else if (status.equals("all")) {
-            sqlQuery.append("SELECT * FROM REVISOES");
-        }
+        } else if (status.equals("accepted")) {
+            sqlQuery.append("SELECT * FROM REVISOES WHERE estado = 'accepted'");
+        } else sqlQuery.append("SELECT * FROM REVISOES");
         try {
             rs = st.executeQuery(sqlQuery.toString());
             while (rs.next()) {
@@ -666,7 +666,7 @@ public class Database {
             return;
         }
         sqlQuery = new StringBuffer();
-        sqlQuery.append("INSERT INTO OBRAS (ID_UTILIZADORES, titulo, subtitulo, estilo_literario, tipo_publicacao, n_paginas, n_palavras, codigo_isbn, n_edicao, data_submissao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        sqlQuery.append("INSERT INTO OBRAS (id_utilizadores, titulo, subtitulo, estilo_literario, tipo_publicacao, n_paginas, n_palavras, codigo_isbn, n_edicao, data_submissao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
@@ -830,7 +830,7 @@ public class Database {
             return;
         }
         String sqlQueryReview = "INSERT INTO REVISOES (id_revisao, id_obra, data_submissao, tempo_decorrido, n_serie, custo, estado) VALUES (?, ?, CURRENT_TIMESTAMP, TIME('00:00:00'), ?, ?, ?)";
-        String sqlQuerryUser = "INSERT INTO REVISOES_UTILIZADORES (id_revisao, ID_UTILIZADORES) VALUES (?, ?)";
+        String sqlQuerryUser = "INSERT INTO REVISOES_UTILIZADORES (id_revisao, id_utilizadores) VALUES (?, ?)";
         PreparedStatement psReview = null;
         PreparedStatement psUser = null;
         try {
@@ -903,11 +903,9 @@ public class Database {
     public static ResultSet getReviews(int page, int pageSize, String status, String order) {
         // Cálculo do offset
         int offset = (page - 1) * pageSize;
-        
         // Criação da string de consulta SQL
         StringBuffer sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO = ? ORDER BY ? AND UTILIZADORES.TIPO = 'autor' LIMIT ? OFFSET ?");
-        
+        sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO = ? AND UTILIZADORES.TIPO = 'author' ORDER BY ? ASC LIMIT ? OFFSET ?");
         // Preparação da consulta e definição dos parâmetros
         PreparedStatement ps = null;
         try {
@@ -916,7 +914,6 @@ public class Database {
             ps.setString(2, order);
             ps.setInt(3, pageSize);
             ps.setInt(4, offset);
-            
             // Execução da consulta e obtenção do resultado
             rs = ps.executeQuery();
         } catch (SQLException e) {
@@ -944,6 +941,73 @@ public class Database {
             Main.pressEnterKey();
         } catch (SQLException e) {
             System.out.println("Failed to " + decision + " review request. Rolling back transaction.");
+            System.out.println("Exception: " + e);
+            System.exit(1);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println("Failed to close prepared statement.");
+                    System.out.println("Exception: " + e);
+                    Main.pressEnterKey();
+                }
+            }
+        }
+    }
+
+    public static int getReviewersCount(String reviewID) {
+        int count = 0;
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT UTILIZADORES.ID_UTILIZADORES, UTILIZADORES.NOME FROM UTILIZADORES LEFT JOIN REVISOES_UTILIZADORES ON UTILIZADORES.ID_UTILIZADORES = REVISOES_UTILIZADORES.ID_UTILIZADORES WHERE UTILIZADORES.TIPO = 'reviewer' AND UTILIZADORES.ESTADO = 'active' AND (REVISOES_UTILIZADORES.ID_REVISAO != ? OR REVISOES_UTILIZADORES.ID_REVISAO IS NULL)");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, reviewID);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                count++;
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to get reviewers count.");
+            System.out.println("Exception: " + e);
+        }
+        return count;
+    }
+
+    public static ResultSet getReviewers(int page, int pageSize, String reviewID) {
+        int offset = (page - 1) * pageSize;
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT UTILIZADORES.ID_UTILIZADORES, UTILIZADORES.NOME, UTILIZADORES.AREA_ESPECIALIZACAO, UTILIZADORES.FORMACAO_ACADEMICA FROM UTILIZADORES LEFT JOIN REVISOES_UTILIZADORES ON UTILIZADORES.ID_UTILIZADORES = REVISOES_UTILIZADORES.ID_UTILIZADORES WHERE UTILIZADORES.TIPO = 'reviewer' AND UTILIZADORES.ESTADO = 'active' AND (REVISOES_UTILIZADORES.ID_REVISAO != ? OR REVISOES_UTILIZADORES.ID_REVISAO IS NULL) LIMIT ? OFFSET ?");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, reviewID);
+            ps.setInt(2, pageSize);
+            ps.setInt(3, offset);
+            rs = ps.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Failed to get reviewers.");
+            System.out.println("Exception: " + e);
+        }
+        return rs;
+    }
+
+    public static void assignReviewer(String reviewID, String reviewerID) {
+        sqlQuery = new StringBuffer();
+        sqlQuery.append("INSERT INTO REVISOES_UTILIZADORES (id_revisao, id_utilizadores) VALUES (?, ?)");
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString());
+            ps.setString(1, reviewID);
+            ps.setString(2, reviewerID);
+            ps.executeUpdate();
+            conn.commit();
+            Main.clearConsole();
+            System.out.println("Reviewer assigned successfully.");
+            Main.pressEnterKey();
+        } catch (SQLException e) {
+            System.out.println("Failed to assign reviewer. Rolling back transaction.");
             System.out.println("Exception: " + e);
             System.exit(1);
         } finally {

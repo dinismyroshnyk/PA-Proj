@@ -36,7 +36,7 @@
 
 ### Ações → Processo
 - [x] [R28] O processo inicia com o autor, que solicita uma revisão para uma das suas obras. Cada pedido recebe um número ISBN aleatório entre 1 e 1 000 000.
-- [ ] [R29] O pedido de revisão tem de ser aprovado pelo gestor. O pedido pode ser aceite ou rejeitado. Se aceitar o pedido, o gestor deve atribuir um ou mais revisores. Deve sempre existir um revisor responsável. Se o pedido for rejeitado, o autor deve ser notificado e o processo arquivado.
+- [x] [R29] O pedido de revisão tem de ser aprovado pelo gestor. O pedido pode ser aceite ou rejeitado. Se aceitar o pedido, o gestor deve atribuir um ou mais revisores. Deve sempre existir um revisor responsável. Se o pedido for rejeitado, o autor deve ser notificado e o processo arquivado.
 - [ ] [R30] Quando um processo de revisão é atribuído a um revisor este deve ser notificado. O revisor pode aceitar ou rejeitar o processo.
 - [ ] [R31] Caso um revisor rejeite um processo, o gestor responsável pelo processo deve ser notificado e selecionar outro revisor. Na nova listagem de possíveis revisores a atribuir, não deve surgir o(s) revisor(s) que rejeitou (rejeitaram) anteriormente o pedido.
 - [ ] [R32] Após aceitar o processo, o revisor inicia a revisão. Quando concluir a tarefa, encerra essa revisão. A revisão não tem de ter terminada numa única sessão da aplicação.

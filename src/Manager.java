@@ -1,3 +1,4 @@
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class Manager extends User {
             System.out.println("2. Manage existing users");
             System.out.println("3. Manage registration requests " + "\033[33m" + "[" + Database.getUsersCount("pending-activation") + "]" + "\033[0m");
             System.out.println("4. Manage deletion requests " + "\033[33m" + "[" + Database.getUsersCount("pending-deletion") + "]" + "\033[0m");
-            System.out.println("5. Manage review requests " + "\033[33m" + "[" + Database.getReviewsCount("pending") + "]" + "\033[0m");
+            System.out.println("5. Manage review requests " + "\033[33m" + "[" + Database.getReviewsCount("initiated") + "]" + "\033[0m");
             System.out.println("6. Insert license");
             System.out.println("0. Log out");
             System.out.print("\nOption: ");
@@ -337,16 +338,20 @@ public class Manager extends User {
         while (running) {
             Main.clearConsole();
             System.out.println("Manage review requests: ");
-            System.out.println("1. List reviews");
-            System.out.println("2. search review");
+            System.out.println("1. List new reviews");
+            System.out.println("2. List accepted reviews");
+            System.out.println("3. Search review");
             System.out.println("0. Go back");
             System.out.print("\nOption: ");
             String option = Input.readLine();
             switch (option) {
                 case "1":
-                    reviewPaginationMenu();
+                    reviewPaginationMenu("initiated");
                     break;
                 case "2":
+                    reviewPaginationMenu("accepted");
+                    break;
+                case "3":
                     //searchReview();
                     break;
                 case "0":
@@ -361,24 +366,33 @@ public class Manager extends User {
         }
     }
 
-    private static void reviewPaginationMenu() {
+    private static void reviewPaginationMenu(String status) {
         int page = 1;
         int pageSize = 10;
-        int totalReviews = Database.getReviewsCount("pending");
+        int totalReviews = Database.getReviewsCount(status);
         ArrayList<String> ids = new ArrayList<>();
-        System.out.println("You want to sort by creation date, title of work or by author?");
-        String order = Input.readLine();
-        if (order.equals("date")) {
-            order = "REVISOES.DATA_SUBMISSAO";
-        } else if (order.equals("title")) {
-            order = "OBRAS.TITULO";
-        } else if (order.equals("author")) {
-            order = "UTILIZADORES.autor";
-        }
+        boolean orderCheck = false;
         while (true) {
-            ResultSet rs = Database.getReviews(page, pageSize, "initiated", order);
             if (totalReviews > 0) {
-                ids = displayReviews(rs);
+                String order = "";
+                while (!orderCheck) {
+                    Main.clearConsole();
+                    System.out.println("You want to sort by date, title or author?");
+                    System.out.print("\nOption: ");
+                    order = Input.readLine();
+                    if (order.equals("date")) {
+                        order = "REVISOES.DATA_SUBMISSAO";
+                        orderCheck = true;
+                    } else if (order.equals("title")) {
+                        order = "OBRAS.TITULO";
+                        orderCheck = true;
+                    } else if (order.equals("author")) {
+                        order = "autor";
+                        orderCheck = true;
+                    }
+                }
+                ResultSet rs = Database.getReviews(page, pageSize, status, order);
+                ids = displayReviews(rs, status);
                 String option = handlePagination(totalReviews, page, pageSize, ids);
                 try {
                     switch (option) {
@@ -391,8 +405,8 @@ public class Manager extends User {
                         case "exit":
                             return;
                         default:
-                            manageReviewRequests(option);
-                            totalReviews = Database.getReviewsCount("pending");
+                            manageReviewRequests(option, status);
+                            totalReviews = Database.getReviewsCount(status);
                             break;
                     }
                 } catch (NullPointerException e) {
@@ -407,7 +421,7 @@ public class Manager extends User {
         }
     }
 
-    private static ArrayList<String> displayReviews(ResultSet rs) {
+    private static ArrayList<String> displayReviews(ResultSet rs, String status) {
         Main.clearConsole();
         ArrayList<String> ids = new ArrayList<>();
         System.out.println("Next page: n | Previous page: p | Go back: 0\n");
@@ -415,6 +429,33 @@ public class Manager extends User {
             while (rs.next()) {
                 System.out.println("ID: " + rs.getString("id_revisao"));
                 System.out.println("Author: " + rs.getString("autor"));
+                if (status.equals("accepted")) {
+                    Database.sqlQuery = new StringBuffer();
+                    Database.sqlQuery.append("SELECT REVISOES_UTILIZADORES.ID_UTILIZADORES FROM REVISOES_UTILIZADORES JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES WHERE REVISOES_UTILIZADORES.ID_REVISAO = ? AND UTILIZADORES.TIPO = 'reviewer'");
+                    PreparedStatement ps = null;
+                    try {
+                        ps = Database.conn.prepareStatement(Database.sqlQuery.toString());
+                        ps.setString(1, rs.getString("id_revisao"));
+                        Database.rs = ps.executeQuery();
+                        System.out.print("Reviewers: ");
+                        while (Database.rs.next()) {
+                            System.out.print(Database.rs.getString("id_utilizadores") + " ");
+                        }
+                        System.out.println();
+                    } catch (SQLException e) {
+                        System.out.println("Failed to display reviewer.");
+                        System.out.println("Exception: " + e);
+                    } finally {
+                        if (ps != null) {
+                            try {
+                                ps.close();
+                            } catch (SQLException e) {
+                                System.out.println("Failed to close prepared statement.");
+                                System.out.println("Exception: " + e);
+                            }
+                        }
+                    }
+                }
                 System.out.println("Book: " + rs.getString("titulo"));
                 System.out.println("Request date: " + rs.getDate("data"));
                 System.out.println("Serial number: " + rs.getString("n_serie"));
@@ -429,19 +470,27 @@ public class Manager extends User {
         }
     }
 
-    private static void manageReviewRequests(String reviewID) {
+    private static void manageReviewRequests(String reviewID, String status) {
         boolean running = true;
         while (running) {
             Main.clearConsole();
             System.out.println("Selected review: " + reviewID);
-            System.out.println("1. Approve request");
-            System.out.println("2. Reject request");
+            if (status.equals("initiated")) {
+                System.out.println("1. Approve request");
+                System.out.println("2. Reject request");
+            } else if (status.equals("accepted")) {
+                System.out.println("1. Assign reviewers");
+            }
             System.out.println("0. Go back");
             System.out.print("\nOption: ");
             String option = Input.readLine();
             switch (option) {
                 case "1":
-                    Database.manageReviewRequests(reviewID, "approve");
+                    if (status.equals("initiated")) {
+                        Database.manageReviewRequests(reviewID, "approve");
+                    } else if (status.equals("accepted")) {
+                        reviewerPaginationMenu(reviewID);
+                    }
                     running = false;
                     break;
                 case "2":
@@ -457,6 +506,64 @@ public class Manager extends User {
                     Main.pressEnterKey();
                     break;
             }
+        }
+    }
+
+    private static void reviewerPaginationMenu(String reviewID) {
+        int page = 1;
+        int pageSize = 10;
+        int totalReviewers = Database.getReviewersCount(reviewID);
+        ArrayList<String> ids = new ArrayList<>();
+        while (true) {
+            ResultSet rs = Database.getReviewers(page, pageSize, reviewID);
+            if (totalReviewers > 0) {
+                ids = displayReviewers(rs);
+                String option = handlePagination(totalReviewers, page, pageSize, ids);
+                try {
+                    switch (option) {
+                        case "next":
+                            page++;
+                            break;
+                        case "previous":
+                            page--;
+                            break;
+                        case "exit":
+                            return;
+                        default:
+                            Database.assignReviewer(reviewID, option);
+                            totalReviewers = Database.getReviewersCount(reviewID);
+                            break;
+                    }
+                } catch (NullPointerException e) {
+                    continue;
+                }
+            } else {
+                Main.clearConsole();
+                System.out.println("No reviewers to manage.");
+                Main.pressEnterKey();
+                return;
+            }
+        }
+    }
+
+    private static ArrayList<String> displayReviewers(ResultSet rs) {
+        Main.clearConsole();
+        ArrayList<String> ids = new ArrayList<>();
+        System.out.println("Next page: n | Previous page: p | Go back: 0\n");
+        try {
+            while (rs.next()) {
+                System.out.println("ID: " + rs.getString("id_utilizadores"));
+                System.out.println("Name: " + rs.getString("nome"));
+                System.out.println("Specialization: " + rs.getString("area_especializacao"));
+                System.out.println("Academic background: " + rs.getString("formacao_academica"));
+                System.out.println();
+                ids.add(rs.getString("id_utilizadores"));
+            }
+            return ids;
+        } catch (SQLException e) {
+            System.out.println("Failed to display reviewers.");
+            System.out.println("Exception: " + e);
+            return null;
         }
     }
 }

@@ -117,7 +117,7 @@ public class Review {
     }
 
     private static String generateUniqueSerialNumber() {
-        int currReviewID = Database.getReviewsCount("all") + 1;
+        int currReviewID = Database.getReviewsCount("") + 1;
         String serialNumber = "";
         boolean isUnique = false;
         do {
@@ -187,5 +187,36 @@ public class Review {
         return id;
     }
 
-    
+    public static void listReviews(User user) {
+        boolean running = true;
+        while (running) {
+            Main.clearConsole();
+            System.out.println("List reviews:");
+            System.out.println("1. List all reviews");
+            System.out.println("2. List ongoing reviews");
+            System.out.println("3. List archived reviews");
+            System.out.println("0. Go back");
+            System.out.print("\nOption: ");
+            String option = Input.readLine();
+            switch (option) {
+                case "1":
+                    //listAllReviews(user);
+                    break;
+                case "2":
+                    //listOngoingReviews(user);
+                    break;
+                case "3":
+                    //listArchivedReviews(user);
+                    break;
+                case "0":
+                    running = false;
+                    break;
+                default:
+                    Main.clearConsole();
+                    System.out.println("Invalid option. Please try again.");
+                    Main.pressEnterKey();
+                    break;
+            }
+        }
+    }
 }
