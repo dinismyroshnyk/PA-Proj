@@ -3,7 +3,10 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.lang.reflect.Field;
+import java.time.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -102,6 +105,7 @@ public class Main {
     // Main loop of the application
     private static void mainLoop() {
         boolean running = true;
+        LocalDateTime startTime = LocalDateTime.now();
         while (running) {
             clearConsole();
             System.out.println("Menu:");
@@ -125,6 +129,7 @@ public class Main {
                     break;
                 case "0":
                     clearConsole();
+                    presentation(startTime);
                     running = false;
                     break;
                 default:
@@ -134,6 +139,20 @@ public class Main {
                     break;
             }
         }
+    }
+
+    private static void presentation(LocalDateTime startTime) {
+        LocalDateTime endTime = LocalDateTime.now();
+        DateTimeFormatter date = DateTimeFormatter.ofPattern("EEEE; yyyy-MM-dd HH:mm:ss");
+        long executionTimeMillis = Duration.between(startTime, endTime).toMillis();
+        Duration duration = Duration.ofMillis(executionTimeMillis);
+        String tempoExecucaoFormatado = String.format("%d Milissegundos (%d Segundos; %d Minutos; %d Horas)", executionTimeMillis, duration.toSecondsPart(), duration.toMinutesPart(), duration.toHours());
+        System.out.println("Data de Início: " + startTime.format(date));
+        System.out.println("Data de Fim: " + endTime.format(date));
+        System.out.println("Tempo de Execução: " + tempoExecucaoFormatado);
+        System.out.println("Press Enter to exit...");
+        Input.readLine();
+        
     }
 
     // Register a new user
