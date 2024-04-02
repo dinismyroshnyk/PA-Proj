@@ -340,7 +340,9 @@ public class Manager extends User {
             System.out.println("Manage review requests: ");
             System.out.println("1. List new reviews");
             System.out.println("2. List accepted reviews");
-            System.out.println("3. Search review");
+            System.out.println("3. List the review of any work from the title.");
+            System.out.println("4. list all review requests not yet finalized.");
+            System.out.println("5. Search review");
             System.out.println("0. Go back");
             System.out.print("\nOption: ");
             String option = Input.readLine();
@@ -352,7 +354,13 @@ public class Manager extends User {
                     reviewPaginationMenu("accepted");
                     break;
                 case "3":
-                    //searchReview();
+                    searchReview(true);
+                    break;
+                case "4":
+                    reviewPaginationMenu("completed");
+                    break;
+                case "5":
+                    searchReview(false);
                     break;
                 case "0":
                     running = false;
@@ -362,6 +370,83 @@ public class Manager extends User {
                     System.out.println("Invalid option. Please try again.");
                     Main.pressEnterKey();
                     break;
+            }
+        }
+    }
+
+    public static void searchReview(boolean titlesearch) {
+        int page = 1;
+        int pageSize = 10;
+        int totalReviews = Database.getReviewsCount("all");
+        String searchValue= null;
+        String startDate = null;
+        String endDate = null;
+        String searchCriteria = null;
+        if (titlesearch) {
+            System.out.println("Enter the title of the work:");
+            searchValue = Input.readLine();
+            searchCriteria = "o.titulo";
+        } else {
+            System.out.println("Enter search criteria (identifier, state, author or within a time interval(time interval)):");
+            searchCriteria = Input.readLine();
+            switch (searchCriteria) {
+                case "state":
+                  searchCriteria = "r.estado";
+                  System.out.println("Enter the value to search:");
+                  searchValue = Input.readLine();
+                  break;
+                case "author":
+                  searchCriteria = "u.nome";
+                  System.out.println("Enter the value to search:");
+                  searchValue = Input.readLine();
+                  break;
+                case "identifier":
+                  searchCriteria = "r.id_revisao";
+                  System.out.println("Enter the value to search:");
+                  searchValue = Input.readLine();
+                  break;
+                case "time interval":
+                  searchCriteria = "r.data_submissao";
+                  System.out.println("Enter the start date (YYYY-MM-DD):");
+                  startDate = Input.readLine();
+                  System.out.println("Enter the end date (YYYY-MM-DD):");
+                  endDate = Input.readLine();
+                  break;
+                default:
+                  System.out.println("Invalid search criteria.");
+                  Main.pressEnterKey();
+                  return;
+              }
+              
+            } 
+        while (true) {
+            ResultSet rs = Database.searchReview(searchCriteria, searchValue, startDate, endDate);
+            if (totalReviews > 0) {
+                ArrayList<String> ids = displayReviews(rs, "all");
+                String option = handlePagination(totalReviews, page, pageSize, ids);
+                try {
+                    switch (option) {
+                        case "next":
+                            page++;
+                            break;
+                        case "previous":
+                            page--;
+                            break;
+                        case "exit":
+                            return;
+                        default:
+                            manageReviewRequests(option, "all");
+                            totalReviews = Database.getReviewsCount("all");
+                            break;
+                    }
+                } catch (NullPointerException e) {
+                    continue;
+                }
+            } else {
+                Main.clearConsole();
+                System.out.println("No reviews to manage.");
+                Main.pressEnterKey();
+                return;
             }
         }
     }
@@ -377,9 +462,13 @@ public class Manager extends User {
                 String order = "";
                 while (!orderCheck) {
                     Main.clearConsole();
-                    System.out.println("You want to sort by date, title or author?");
-                    System.out.print("\nOption: ");
-                    order = Input.readLine();
+                    if(status.equals("completed")){
+                        order = "date";
+                    } else{
+                        System.out.println("You want to sort by date, title or author?");
+                        System.out.print("\nOption: ");
+                        order = Input.readLine();
+                    }
                     if (order.equals("date")) {
                         order = "REVISOES.DATA_SUBMISSAO";
                         orderCheck = true;
@@ -389,6 +478,10 @@ public class Manager extends User {
                     } else if (order.equals("author")) {
                         order = "autor";
                         orderCheck = true;
+                    } else {
+                        Main.clearConsole();
+                        System.out.println("Invalid option. Please try again.");
+                        Main.pressEnterKey();
                     }
                 }
                 ResultSet rs = Database.getReviews(page, pageSize, status, order, null);

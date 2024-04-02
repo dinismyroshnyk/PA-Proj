@@ -250,6 +250,35 @@ public class Database {
             return count;
         } else return count - 1;
     }
+
+    public static ResultSet searchReview(String searchCriteria, String searchValue, String startDate, String endDate) {
+        sqlQuery = new StringBuffer();
+        PreparedStatement ps = null;
+        if(searchCriteria.equals("r.data_submissao")){
+            sqlQuery.append("SELECT r.ID_REVISAO, u.NOME AS autor, o.TITULO AS titulo, r.DATA_SUBMISSAO AS data, r.N_SERIE AS n_serie, r.ESTADO AS estado FROM REVISOES r, UTILIZADORES u, OBRAS o WHERE r.ID_OBRA = o.ID_OBRA AND o.ID_OBRA = u.ID_UTILIZADORES AND DATE(r.DATA_SUBMISSAO) BETWEEN ? AND ?");
+            try {
+                ps = conn.prepareStatement(sqlQuery.toString());
+                ps.setString(1, startDate);
+                ps.setString(2, endDate);
+                return ps.executeQuery();
+            } catch (SQLException e) {
+                System.out.println("Failed to execute query.");
+                System.out.println("Exception: " + e);
+            }
+        }else{
+        sqlQuery.append("SELECT r.ID_REVISAO, u.NOME AS autor, o.TITULO AS titulo, r.DATA_SUBMISSAO AS data, r.N_SERIE AS n_serie, r.ESTADO AS estado FROM REVISOES r, UTILIZADORES u, OBRAS o WHERE r.ID_OBRA = o.ID_OBRA AND o.ID_OBRA = u.ID_UTILIZADORES  AND " + searchCriteria + " LIKE ?");
+        try {
+            ps = conn.prepareStatement(sqlQuery.toString()); 
+            ps.setString(1, searchValue + "%");
+            return ps.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Failed to execute query.");
+            System.out.println("Exception: " + e);
+        }
+        }
+        return rs;
+    } 
+
     // Search for a user in the database
     public static ResultSet searchUser(String searchCriteria, String searchValue, String status) {
         sqlQuery = new StringBuffer();
@@ -257,8 +286,8 @@ public class Database {
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
-            ps.setString(1, status); // Define o estado como o valor passado
-            ps.setString(2, "%" + searchValue + "%"); // Garante que a pesquisa seja parcial
+            ps.setString(1, status); 
+            ps.setString(2, "%" + searchValue + "%"); 
             rs = ps.executeQuery();
         } catch (SQLException e) {
             System.out.println("Failed to execute query.");
@@ -653,7 +682,7 @@ public class Database {
             } else if (status.equals("archived")) {
                 new_sqlQuery.append("SELECT * FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO WHERE REVISOES.ESTADO = 'archived' AND REVISOES_UTILIZADORES.ESTADO != 'rejected' AND REVISOES_UTILIZADORES.ID_UTILIZADORES = " + userID);
             } else new_sqlQuery.append("SELECT * FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO WHERE REVISOES_UTILIZADORES.ESTADO != 'rejected' AND REVISOES_UTILIZADORES.ID_UTILIZADORES = " + userID);
-        } else {
+        }else {
             if (status.equals("initiated")) {
                 new_sqlQuery.append("SELECT * FROM REVISOES WHERE REVISOES.ESTADO = 'initiated'");
             } else if (status.equals("accepted")) {
@@ -662,6 +691,8 @@ public class Database {
                 new_sqlQuery.append("SELECT * FROM REVISOES WHERE REVISOES.ESTADO IN ('accepted', 'in_progress')");
             } else if (status.equals("archived")) {
                 new_sqlQuery.append("SELECT * FROM REVISOES WHERE REVISOES.ESTADO = 'archived'");
+            } else if (status.equals("completed")) {
+                sqlQuery.append("SELECT * FROM REVISOES WHERE estado != 'completed'");
             } else new_sqlQuery.append("SELECT * FROM REVISOES");
         }
         try {
@@ -920,7 +951,6 @@ public class Database {
     public static ResultSet getReviews(int page, int pageSize, String status, String order, User user) {
         // Cálculo do offset
         int offset = (page - 1) * pageSize;
-        // Criação da string de consulta SQL
         StringBuffer sqlQuery = new StringBuffer();
         String sqlStatus = "";
         if (user != null) {
@@ -932,7 +962,7 @@ public class Database {
             } else {
                 sqlStatus = "REVISOES.ESTADO = '" + status + "' AND REVISOES_UTILIZADORES.ID_UTILIZADORES = " + userID;
             }
-            sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie, REVISOES.ESTADO FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE " + sqlStatus + " AND REVISOES_UTILIZADORES.ESTADO != 'rejected' ORDER BY ? LIMIT ? OFFSET ?");
+            sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie, REVISOES.ESTADO FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE " + sqlStatus + " AND REVISOES_UTILIZADORES.ESTADO != 'rejected' ORDER BY ? ASC LIMIT ? OFFSET ?");
             // Preparação da consulta e definição dos parâmetros
             PreparedStatement ps = null;
             try {
@@ -954,7 +984,7 @@ public class Database {
             } else {
                 sqlStatus = "REVISOES.ESTADO = '" + status + "'";
             }
-            sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie, REVISOES.ESTADO FROM REVISOES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA JOIN UTILIZADORES ON OBRAS.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES WHERE " + sqlStatus + " ORDER BY ? LIMIT ? OFFSET ?");
+            sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie, REVISOES.ESTADO FROM REVISOES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA JOIN UTILIZADORES ON OBRAS.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES WHERE " + sqlStatus + " ORDER BY ? ASC LIMIT ? OFFSET ?");
             // Preparação da consulta e definição dos parâmetros
             PreparedStatement ps = null;
             try {
