@@ -900,20 +900,28 @@ public class Database {
         return null;
     }
 
-    public static ResultSet getReviews(int page, int pageSize, String status) {
+    public static ResultSet getReviews(int page, int pageSize, String status, String order) {
+        // Cálculo do offset
         int offset = (page - 1) * pageSize;
-        sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO = ? AND UTILIZADORES.TIPO = 'author' LIMIT ? OFFSET ?");
+        
+        // Criação da string de consulta SQL
+        StringBuffer sqlQuery = new StringBuffer();
+        sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO = ? ORDER BY ? AND UTILIZADORES.TIPO = 'autor' LIMIT ? OFFSET ?");
+        
+        // Preparação da consulta e definição dos parâmetros
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());
             ps.setString(1, status);
-            ps.setInt(2, pageSize);
-            ps.setInt(3, offset);
+            ps.setString(2, order);
+            ps.setInt(3, pageSize);
+            ps.setInt(4, offset);
+            
+            // Execução da consulta e obtenção do resultado
             rs = ps.executeQuery();
         } catch (SQLException e) {
-            System.out.println("Failed to get reviews.");
-            System.out.println("Exception: " + e);
+            System.out.println("Falha ao obter revisões.");
+            System.out.println("Exceção: " + e);
         }
         return rs;
     }

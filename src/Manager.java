@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import javax.print.DocFlavor.STRING;
+
 public class Manager extends User {
     // constructor
     public Manager(String login, String password, String name, String email) {
@@ -336,12 +338,16 @@ public class Manager extends User {
             Main.clearConsole();
             System.out.println("Manage review requests: ");
             System.out.println("1. List reviews");
+            System.out.println("2. search review");
             System.out.println("0. Go back");
             System.out.print("\nOption: ");
             String option = Input.readLine();
             switch (option) {
                 case "1":
                     reviewPaginationMenu();
+                    break;
+                case "2":
+                    //searchReview();
                     break;
                 case "0":
                     running = false;
@@ -360,8 +366,17 @@ public class Manager extends User {
         int pageSize = 10;
         int totalReviews = Database.getReviewsCount("pending");
         ArrayList<String> ids = new ArrayList<>();
+        System.out.println("You want to sort by creation date, title of work or by author?");
+        String order = Input.readLine();
+        if (order.equals("date")) {
+            order = "REVISOES.DATA_SUBMISSAO";
+        } else if (order.equals("title")) {
+            order = "OBRAS.TITULO";
+        } else if (order.equals("author")) {
+            order = "UTILIZADORES.autor";
+        }
         while (true) {
-            ResultSet rs = Database.getReviews(page, pageSize, "initiated");
+            ResultSet rs = Database.getReviews(page, pageSize, "initiated", order);
             if (totalReviews > 0) {
                 ids = displayReviews(rs);
                 String option = handlePagination(totalReviews, page, pageSize, ids);
