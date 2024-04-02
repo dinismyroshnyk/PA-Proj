@@ -377,7 +377,7 @@ public class Manager extends User {
     public static void searchReview(boolean titlesearch) {
         int page = 1;
         int pageSize = 10;
-        int totalReviews = Database.getReviewsCount("all");
+        int totalReviews = Database.getReviewsCount(null, "");
         String searchValue= null;
         String startDate = null;
         String endDate = null;
@@ -417,8 +417,7 @@ public class Manager extends User {
                   Main.pressEnterKey();
                   return;
               }
-              
-            } 
+            }
         while (true) {
             ResultSet rs = Database.searchReview(searchCriteria, searchValue, startDate, endDate);
             if (totalReviews > 0) {
@@ -436,7 +435,7 @@ public class Manager extends User {
                             return;
                         default:
                             manageReviewRequests(option, "all");
-                            totalReviews = Database.getReviewsCount("all");
+                            totalReviews = Database.getReviewsCount(null, "");
                             break;
                     }
                 } catch (NullPointerException e) {
