@@ -71,10 +71,10 @@
 - [x] [R51] Os gestores podem listar todos os utilizadores, ordenando por nome.
 - [x] [R52] Os gestores podem pesquisar utilizadores por nome, login ou tipo.
 - [x] [R53] Os gestores podem listar todas os pedidos de revisão ordenados por data de criação, título de obra ou por autor.
-- [ ] [R54] Os gestores podem listar todas os pedidos de revisão ainda não finalizados, ordenados por data.
+- [x] [R54] Os gestores podem listar todas os pedidos de revisão ainda não finalizados, ordenados por data.
 - [x] [R55] Os gestores podem pesquisar pedidos de revisão por identificador, estado ou autor.
 - [x] [R56] Os gestores podem pesquisar pedidos de revisão submetidos num intervalo temporal (período entre duas datas a indicar pelo utilizador).
-- [ ] [R57] Os gestores podem listar os processos de revisão de qualquer obra a partir do título.
+- [x] [R57] Os gestores podem listar os processos de revisão de qualquer obra a partir do título.
 - [ ] [R58] Os autores podem listar os seus pedidos de revisão ordenando por data de criação ou por número de série.
 - [ ] [R59] Os autores podem pesquisar os seus pedidos de revisão por data de criação, por título ou estado.
 - [ ] [R60] Os autores podem listar as suas obras ordenadas por data de submissão ou por título.

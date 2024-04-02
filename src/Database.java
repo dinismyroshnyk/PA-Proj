@@ -675,7 +675,9 @@ public class Database {
             sqlQuery.append("SELECT * FROM REVISOES WHERE estado = 'initiated'");
         } else if (status.equals("accepted")) {
             sqlQuery.append("SELECT * FROM REVISOES WHERE estado = 'accepted'");
-        } else sqlQuery.append("SELECT * FROM REVISOES");
+        } else if (status.equals("completed")) {
+            sqlQuery.append("SELECT * FROM REVISOES WHERE estado != 'completed'");
+        }else sqlQuery.append("SELECT * FROM REVISOES");
         try {
             rs = st.executeQuery(sqlQuery.toString());
             while (rs.next()) {
@@ -932,7 +934,9 @@ public class Database {
     public static ResultSet getReviews(int page, int pageSize, String status, String order) {
         int offset = (page - 1) * pageSize;
         StringBuffer sqlQuery = new StringBuffer();
-        sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO = ? AND UTILIZADORES.TIPO = 'author' ORDER BY ? ASC LIMIT ? OFFSET ?");
+        if(status.equals("completed")){
+            sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO != ? ORDER BY ? ASC LIMIT ? OFFSET ?");
+        }else sqlQuery.append("SELECT REVISOES.ID_REVISAO, UTILIZADORES.NOME AS autor, OBRAS.TITULO AS titulo, REVISOES.DATA_SUBMISSAO AS data, REVISOES.N_SERIE AS n_serie FROM REVISOES JOIN REVISOES_UTILIZADORES ON REVISOES.ID_REVISAO = REVISOES_UTILIZADORES.ID_REVISAO JOIN UTILIZADORES ON REVISOES_UTILIZADORES.ID_UTILIZADORES = UTILIZADORES.ID_UTILIZADORES JOIN OBRAS ON REVISOES.ID_OBRA = OBRAS.ID_OBRA WHERE REVISOES.ESTADO = ? AND UTILIZADORES.TIPO = 'author' ORDER BY ? ASC LIMIT ? OFFSET ?");
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sqlQuery.toString());

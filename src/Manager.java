@@ -341,7 +341,8 @@ public class Manager extends User {
             System.out.println("1. List new reviews");
             System.out.println("2. List accepted reviews");
             System.out.println("3. List the review of any work from the title.");
-            System.out.println("4. Search review");
+            System.out.println("4. list all review requests not yet finalized.");
+            System.out.println("5. Search review");
             System.out.println("0. Go back");
             System.out.print("\nOption: ");
             String option = Input.readLine();
@@ -356,6 +357,9 @@ public class Manager extends User {
                     searchReview(true);
                     break;
                 case "4":
+                    reviewPaginationMenu("completed");
+                    break;
+                case "5":
                     searchReview(false);
                     break;
                 case "0":
@@ -458,9 +462,13 @@ public class Manager extends User {
                 String order = "";
                 while (!orderCheck) {
                     Main.clearConsole();
-                    System.out.println("You want to sort by date, title or author?");
-                    System.out.print("\nOption: ");
-                    order = Input.readLine();
+                    if(status.equals("completed")){
+                        order = "date";
+                    } else{
+                        System.out.println("You want to sort by date, title or author?");
+                        System.out.print("\nOption: ");
+                        order = Input.readLine();
+                    }
                     if (order.equals("date")) {
                         order = "REVISOES.DATA_SUBMISSAO";
                         orderCheck = true;
