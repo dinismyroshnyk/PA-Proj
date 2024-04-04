@@ -1,44 +1,44 @@
 # Descrição global da aplicação
 ### Gestão de acesso e utilizadores
-- [x] [R1] Permitir aos utilizadores registarem-se e autenticarem-se na aplicação.
-- [x] [R2] Permitir o acesso à aplicação por 3 tipos de utilizadores: gestores da plataforma (ou administradores), autores e revisores.
-- [x] [R3] Os utilizadores são caracterizados pelos atributos nome, login, password, estado (ativo/inativo), email e tipo (gestor, autor ou revisor).
-- [x] [R4] Tanto o atributo login como o email devem ser únicos.
-- [x] [R5] O email deve apresentar um formato válido.
+- [ ] [R1] Permitir aos utilizadores registarem-se e autenticarem-se na aplicação.
+- [ ] [R2] Permitir o acesso à aplicação por 3 tipos de utilizadores: gestores da plataforma (ou administradores), autores e revisores.
+- [ ] [R3] Os utilizadores são caracterizados pelos atributos nome, login, password, estado (ativo/inativo), email e tipo (gestor, autor ou revisor).
+- [ ] [R4] Tanto o atributo login como o email devem ser únicos.
+- [ ] [R5] O email deve apresentar um formato válido.
 > [!NOTE]
 > [designação] @ [entidade] . [domínio]
-- [x] [R6] Cada utilizador apenas pode alterar a sua própria informação, não podendo alterar ou visualizar dados de outros utilizadores, ou criar utilizadores.
-- [x] [R7] A exceção ao requisito anterior são os gestores, que podem visualizar e alterar dados de todos os utilizadores e criar utilizadores, nomeadamente outros gestores.
-- [x] [R8] Tanto os autores como os revisores têm adicionalmente os parâmetros número de contribuinte, contacto telefónico e morada. Os autores possuem ainda estilo literário (e.g. drama, ficção, thriller) e data de início de atividade. Os revisores possuem, adicionalmente, área de especialização e formação académica.
+- [ ] [R6] Cada utilizador apenas pode alterar a sua própria informação, não podendo alterar ou visualizar dados de outros utilizadores, ou criar utilizadores.
+- [ ] [R7] A exceção ao requisito anterior são os gestores, que podem visualizar e alterar dados de todos os utilizadores e criar utilizadores, nomeadamente outros gestores.
+- [ ] [R8] Tanto os autores como os revisores têm adicionalmente os parâmetros número de contribuinte, contacto telefónico e morada. Os autores possuem ainda estilo literário (e.g. drama, ficção, thriller) e data de início de atividade. Os revisores possuem, adicionalmente, área de especialização e formação académica.
 > [!NOTE]
 > (e.g. ciências, literatura, artes)
-- [x] [R9] O atributo número de contribuinte deve ser único e possuir 9 dígitos.
-- [x] [R10] O atributo contacto telefónico deve possuir 9 dígitos e iniciar pelos dígitos 9, 2 ou 3.
-- [x] [R11] Os autores e revisores devem registar-se na plataforma. Os gestores são criados por outros gestores.
-- [x] [R12] Todos os pedidos de registo de novos utilizadores devem ser notificados aos gestores através da aplicação.
-- [x] [R13] Os gestores aprovam ou rejeitam os pedidos de registo dos utilizadores. Todos os pedidos devem ser aprovados antes de poderem ser usados para autenticação.
-- [x] [R14] Caso uma conta seja reprovada pelo gestor ou ainda não tenha sido analisada, quando o utilizador tentar usar essas credenciais deve surgir uma mensagem informativa.
-- [x] [R15] Em qualquer momento um gestor pode inativar ou ativar uma conta de um utilizador.
-- [x] [R16] Um utilizador pode solicitar que a sua conta seja removida do sistema. Neste caso deve surgir uma notificação aos gestores que podem aceitar ou recusar o pedido. Se o pedido for aceite, a informação pessoal do utilizador deve ser omitida do sistema, embora os registos associados ao utilizador devem ser mantidos.
-- [x] [R17] Caso não existiam utilizadores criados na primeira execução, a aplicação deve solicitar credenciais para criar uma conta gestor.
-- [x] [R18] Após a autenticação, a aplicação deve apresentar a mensagem `Bem-vindo [nome utilizador]`.
-- [x] [R19] Quando a aplicação estiver a encerrar, deve apresentar a mensagem `Adeus [nome utilizador]`.
+- [ ] [R9] O atributo número de contribuinte deve ser único e possuir 9 dígitos.
+- [ ] [R10] O atributo contacto telefónico deve possuir 9 dígitos e iniciar pelos dígitos 9, 2 ou 3.
+- [ ] [R11] Os autores e revisores devem registar-se na plataforma. Os gestores são criados por outros gestores.
+- [ ] [R12] Todos os pedidos de registo de novos utilizadores devem ser notificados aos gestores através da aplicação.
+- [ ] [R13] Os gestores aprovam ou rejeitam os pedidos de registo dos utilizadores. Todos os pedidos devem ser aprovados antes de poderem ser usados para autenticação.
+- [ ] [R14] Caso uma conta seja reprovada pelo gestor ou ainda não tenha sido analisada, quando o utilizador tentar usar essas credenciais deve surgir uma mensagem informativa.
+- [ ] [R15] Em qualquer momento um gestor pode inativar ou ativar uma conta de um utilizador.
+- [ ] [R16] Um utilizador pode solicitar que a sua conta seja removida do sistema. Neste caso deve surgir uma notificação aos gestores que podem aceitar ou recusar o pedido. Se o pedido for aceite, a informação pessoal do utilizador deve ser omitida do sistema, embora os registos associados ao utilizador devem ser mantidos.
+- [ ] [R17] Caso não existiam utilizadores criados na primeira execução, a aplicação deve solicitar credenciais para criar uma conta gestor.
+- [ ] [R18] Após a autenticação, a aplicação deve apresentar a mensagem `Bem-vindo [nome utilizador]`.
+- [ ] [R19] Quando a aplicação estiver a encerrar, deve apresentar a mensagem `Adeus [nome utilizador]`.
 
 ### Ações → Intervenientes e responsabilidades
-- [x] [R20] Os revisores gerem (aprovam e finalizam) o processo de revisão.
-- [x] [R21] Os autores submetem obras para revisão, que devem ser revistas por um ou mais revisores, e realizam o respetivo pagamento.
-- [x] [R22] Os revisores são responsáveis rela realização da revisão.
-- [x] [R23] Cada obra para revisão é caracterizada pelo autor, título, subtítulo (opcional), estilo literário (e.g. drama, ficção, thriller), tipo de publicação (e.g. capa dura, de bolso) número de páginas, número de palavras, código ISBN, número de edição, data de submissão e data de aprovação. O código ISBN deve possuir um valor único.
-- [x] [R24] Uma revisão está associada a uma obra, autor, gestor e revisor responsável.
-- [x] [R25] Uma revisão é caracterizada por um número de série, composto por um número sequencial (a cada pedido o número incrementa), seguido da data no formato `AAAAMMDDHHMMSS`. Por exemplo, se já ocorreram 95 pedidos até ao momento, e às 10h20m10s do dia 21 de fevereiro de 2023 surge um novo pedido, o mesmo terá o número 9620230221102010.
-- [x] [R26] Adicionalmente, uma revisão inclui a data da realização, o tempo decorrido (calculado automaticamente desde o início até ao fim da revisão) uma listagem de anotações realizadas, observações genéricas inseridas pelo revisor, um custo do processo e o seu estado.
-- [x] [R27] As anotações são caracterizadas por uma descrição, a página e o parágrafo onde ocorrem e a data em que foram realizadas.
+- [ ] [R20] Os revisores gerem (aprovam e finalizam) o processo de revisão.
+- [ ] [R21] Os autores submetem obras para revisão, que devem ser revistas por um ou mais revisores, e realizam o respetivo pagamento.
+- [ ] [R22] Os revisores são responsáveis rela realização da revisão.
+- [ ] [R23] Cada obra para revisão é caracterizada pelo autor, título, subtítulo (opcional), estilo literário (e.g. drama, ficção, thriller), tipo de publicação (e.g. capa dura, de bolso) número de páginas, número de palavras, código ISBN, número de edição, data de submissão e data de aprovação. O código ISBN deve possuir um valor único.
+- [ ] [R24] Uma revisão está associada a uma obra, autor, gestor e revisor responsável.
+- [ ] [R25] Uma revisão é caracterizada por um número de série, composto por um número sequencial (a cada pedido o número incrementa), seguido da data no formato `AAAAMMDDHHMMSS`. Por exemplo, se já ocorreram 95 pedidos até ao momento, e às 10h20m10s do dia 21 de fevereiro de 2023 surge um novo pedido, o mesmo terá o número 9620230221102010.
+- [ ] [R26] Adicionalmente, uma revisão inclui a data da realização, o tempo decorrido (calculado automaticamente desde o início até ao fim da revisão) uma listagem de anotações realizadas, observações genéricas inseridas pelo revisor, um custo do processo e o seu estado.
+- [ ] [R27] As anotações são caracterizadas por uma descrição, a página e o parágrafo onde ocorrem e a data em que foram realizadas.
 
 ### Ações → Processo
-- [x] [R28] O processo inicia com o autor, que solicita uma revisão para uma das suas obras. Cada pedido recebe um número ISBN aleatório entre 1 e 1 000 000.
-- [x] [R29] O pedido de revisão tem de ser aprovado pelo gestor. O pedido pode ser aceite ou rejeitado. Se aceitar o pedido, o gestor deve atribuir um ou mais revisores. Deve sempre existir um revisor responsável. Se o pedido for rejeitado, o autor deve ser notificado e o processo arquivado.
-- [x] [R30] Quando um processo de revisão é atribuído a um revisor este deve ser notificado. O revisor pode aceitar ou rejeitar o processo.
-- [x] [R31] Caso um revisor rejeite um processo, o gestor responsável pelo processo deve ser notificado e selecionar outro revisor. Na nova listagem de possíveis revisores a atribuir, não deve surgir o(s) revisor(s) que rejeitou (rejeitaram) anteriormente o pedido.
+- [ ] [R28] O processo inicia com o autor, que solicita uma revisão para uma das suas obras. Cada pedido recebe um número ISBN aleatório entre 1 e 1 000 000.
+- [ ] [R29] O pedido de revisão tem de ser aprovado pelo gestor. O pedido pode ser aceite ou rejeitado. Se aceitar o pedido, o gestor deve atribuir um ou mais revisores. Deve sempre existir um revisor responsável. Se o pedido for rejeitado, o autor deve ser notificado e o processo arquivado.
+- [ ] [R30] Quando um processo de revisão é atribuído a um revisor este deve ser notificado. O revisor pode aceitar ou rejeitar o processo.
+- [ ] [R31] Caso um revisor rejeite um processo, o gestor responsável pelo processo deve ser notificado e selecionar outro revisor. Na nova listagem de possíveis revisores a atribuir, não deve surgir o(s) revisor(s) que rejeitou (rejeitaram) anteriormente o pedido.
 - [ ] [R32] Após aceitar o processo, o revisor inicia a revisão. Quando concluir a tarefa, encerra essa revisão. A revisão não tem de ter terminada numa única sessão da aplicação.
 - [ ] [R33] No final o autor realiza o pagamento do processo e o gestor será notificado.
 - [ ] [R34] Após a confirmação do autor, o gestor arquiva o processo.
@@ -49,14 +49,14 @@
 > c) decorrer (revisor iniciou a revisão)\
 > d) finalizada (revisor terminou a revisão)\
 > e) arquivado (o gestor encerra o processo após o autor pagar o processo)
-- [x] [R36] Cada autor pode possuir diversas obras e cada obra só está associada a um autor.
-- [x] [R37] Sempre que uma nova obra é inserida no sistema deve-se verificar se o título já existe, bloqueando a sua inserção em caso de duplicação.
-- [x] [R38] Uma obra pode possuir várias revisões.
+- [ ] [R36] Cada autor pode possuir diversas obras e cada obra só está associada a um autor.
+- [ ] [R37] Sempre que uma nova obra é inserida no sistema deve-se verificar se o título já existe, bloqueando a sua inserção em caso de duplicação.
+- [ ] [R38] Uma obra pode possuir várias revisões.
 - [ ] [R39] Para garantir que as obras não contêm plágio, são utilizadas aplicações específicas. Estas aplicações possuem um número limitado de licenças, com prazo de utilização (usualmente um ano). Cada revisão pode usar uma ou mais licenças.
-- [x] [R40] O gestor é responsável pela inserção de licenças no sistema e atualização do seu número.
+- [ ] [R40] O gestor é responsável pela inserção de licenças no sistema e atualização do seu número.
 
 ### Notificações
-- [x] [R41] Quando um novo utilizador se registou na plataforma o gestor deve ser notificado.
+- [ ] [R41] Quando um novo utilizador se registou na plataforma o gestor deve ser notificado.
 - [ ] [R42] Sempre que existe um pedido de revisão o gestor deve ser notificado.
 - [ ] [R43] Se um pedido de revisão for rejeitado, o autor deve ser notificado.
 - [ ] [R44] Quando um pedido de revisão é atribuído a um revisor, este deve ser notificado.
@@ -65,23 +65,23 @@
 - [ ] [R47] Sempre que um processo de revisão passou 10 dias sem ser finalizado, o gestor deve ser notificado.
 
 ### Listagens e pesquisas
-- [x] [R48] Todas as listagens devem permitir visualizar os resultados por páginas de 10 registos cada.
-- [x] [R49] Todas as listagens devem permitir ordenar os resultados, no sentido ascendente ou descendente.
-- [x] [R50] Todas as listagens devem permitir realizar pesquisas para filtrar os resultados.
-- [x] [R51] Os gestores podem listar todos os utilizadores, ordenando por nome.
-- [x] [R52] Os gestores podem pesquisar utilizadores por nome, login ou tipo.
-- [x] [R53] Os gestores podem listar todas os pedidos de revisão ordenados por data de criação, título de obra ou por autor.
-- [x] [R54] Os gestores podem listar todas os pedidos de revisão ainda não finalizados, ordenados por data.
-- [x] [R55] Os gestores podem pesquisar pedidos de revisão por identificador, estado ou autor.
-- [x] [R56] Os gestores podem pesquisar pedidos de revisão submetidos num intervalo temporal (período entre duas datas a indicar pelo utilizador).
-- [x] [R57] Os gestores podem listar os processos de revisão de qualquer obra a partir do título.
+- [ ] [R48] Todas as listagens devem permitir visualizar os resultados por páginas de 10 registos cada.
+- [ ] [R49] Todas as listagens devem permitir ordenar os resultados, no sentido ascendente ou descendente.
+- [ ] [R50] Todas as listagens devem permitir realizar pesquisas para filtrar os resultados.
+- [ ] [R51] Os gestores podem listar todos os utilizadores, ordenando por nome.
+- [ ] [R52] Os gestores podem pesquisar utilizadores por nome, login ou tipo.
+- [ ] [R53] Os gestores podem listar todas os pedidos de revisão ordenados por data de criação, título de obra ou por autor.
+- [ ] [R54] Os gestores podem listar todas os pedidos de revisão ainda não finalizados, ordenados por data.
+- [ ] [R55] Os gestores podem pesquisar pedidos de revisão por identificador, estado ou autor.
+- [ ] [R56] Os gestores podem pesquisar pedidos de revisão submetidos num intervalo temporal (período entre duas datas a indicar pelo utilizador).
+- [ ] [R57] Os gestores podem listar os processos de revisão de qualquer obra a partir do título.
 - [ ] [R58] Os autores podem listar os seus pedidos de revisão ordenando por data de criação ou por número de série.
 - [ ] [R59] Os autores podem pesquisar os seus pedidos de revisão por data de criação, por título ou estado.
 - [ ] [R60] Os autores podem listar as suas obras ordenadas por data de submissão ou por título.
 - [ ] [R61] Os autores podem pesquisar as suas obras por data de registo ou matrícula.
 - [ ] [R62] Os revisores podem listar os seus pedidos de revisão ordenando por data de criação ou por título.
 - [ ] [R63] Os revisores podem pesquisar os seus pedidos de revisão por data de criação, por título ou estado.
-- [x] [R64] Devem ser implementados mecanismos de pesquisa avançada, ou seja, apresentar todos os registos que apresentem um termo de pesquisa, mesmo que parcialmente.
+- [ ] [R64] Devem ser implementados mecanismos de pesquisa avançada, ou seja, apresentar todos os registos que apresentem um termo de pesquisa, mesmo que parcialmente.
 > [!NOTE]
 > (e.g., termo de pesquisa “Ana” deve apresentar como resultado “Ana Sousa”, “Ana Silva” e “Anabela”).
 
@@ -92,7 +92,7 @@
 
 ### Interação com o utilizador
 - [ ] [R68] Disponibilizar uma interface em modo texto onde o utilizador possa interagir e controlar a aplicação. A organização da interface e escolha de componentes fica ao critério do aluno. Soluções eficientes de menus, respeitando as regras de interação com o utilizador serão bonificadas.
-- [x] [R69] Calcular o tempo que a aplicação demora a executar a aplicação, desde o arranque até ao utilizador selecionar a opção de saída, apresentando, no final do processo, a seguinte informação:
+- [ ] [R69] Calcular o tempo que a aplicação demora a executar a aplicação, desde o arranque até ao utilizador selecionar a opção de saída, apresentando, no final do processo, a seguinte informação:
 ```
 Início do processo: Terça-Feira; 2023-03-01 11:21:11
 Fim do processo:    Terça-Feira; 2023-03-01 11:21:56

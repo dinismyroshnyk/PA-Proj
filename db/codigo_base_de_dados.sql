@@ -2,144 +2,142 @@
 /* DBMS name:      MySQL 5.0                                    */
 /* Created on:     06/03/2024 17:45:02                          */
 /*==============================================================*/
-drop database if exists projeto;
-CREATE DATABASE projeto;
-USE projeto;
+DROP DATABASE IF EXISTS PA-PROJ-MAIN;
+CREATE DATABASE PA-PROJ-MAIN;
+USE PA-PROJ-MAIN;
 
-drop table if exists ANOTACOES;
-
-drop table if exists LICENCAS;
-
-drop table if exists OBRAS;
-
-drop table if exists REVISOES;
-
-drop table if exists UTILIZADORES;
+DROP TABLE IF EXISTS NOTES;
+DROP TABLE IF EXISTS LICENSES;
+DROP TABLE IF EXISTS BOOKS;
+DROP TABLE IF EXISTS REVIEWS;
+DROP TABLE IF EXISTS USERS;
+DROP TABLE IF EXISTS REVIEWS_LICENSES;
+DROP TABLE IF EXISTS REVIEWS_USERS;
 
 /*==============================================================*/
-/* Table: ANOTACOES                                             */
+/* Table: NOTES                                                 */
 /*==============================================================*/
-create table ANOTACOES
+CREATE TABLE NOTES
 (
-   ID_ANOTACAO          int not null AUTO_INCREMENT,
-   ID_REVISAO           int,
-   DESCRICAO            text not null,
-   PAGINA               int not null,
-   PARAGRAFO            int not null,
-   DATA                 date not null,
-   primary key (ID_ANOTACAO)
+   NOTE_ID               INT NOT NULL AUTO_INCREMENT,
+   REVIEW_ID             INT NOT NULL,
+   CONTENT               TEXT NOT NULL,
+   PAGE                  INT NOT NULL,
+   PARAGRAPH             INT NOT NULL,
+   DATE                  DATE NOT NULL,
+   PRIMARY KEY (NOTE_ID)
 );
 
 /*==============================================================*/
-/* Table: LICENCAS                                              */
+/* Table: LICENSES                                              */
 /*==============================================================*/
-create table LICENCAS
+CREATE TABLE LICENSES
 (
-   ID_LICENCA           int not null AUTO_INCREMENT,
-   NUMERO               varchar(20) not null,
-   DATA_INICIO          date not null,
-   DATA_FIM             date not null,
-   N_DISPONIVEL         int not null,
-   COMENTARIOS          varchar(100),
-   primary key (ID_LICENCA)
+   LICENSE_ID            INT NOT NULL AUTO_INCREMENT,
+   NUMBER                VARCHAR(20) NOT NULL,
+   VALID_FROM            DATE NOT NULL,
+   VALID_TO              DATE NOT NULL,
+   USAGE_LIMIT           INT NOT NULL,
+   COMMENTS              VARCHAR(100),
+   PRIMARY KEY (LICENSE_ID)
 );
 
 /*==============================================================*/
-/* Table: OBRAS                                                 */
+/* Table: BOOKS                                                 */
 /*==============================================================*/
-create table OBRAS
+CREATE TABLE BOOKS
 (
-   ID_OBRA              int not null AUTO_INCREMENT,
-   ID_UTILIZADORES        int not null,
-   TITULO               varchar(100) not null,
-   SUBTITULO            varchar(100),
-   ESTILO_LITERARIO     varchar(20) not null,
-   TIPO_PUBLICACAO      varchar(20) not null,
-   N_PAGINAS            int not null,
-   N_PALAVRAS           int not null,
-   CODIGO_ISBN          varchar(13) not null,
-   N_EDICAO             int not null,
-   DATA_SUBMISSAO       date not null,
-   DATA_APROVACAO       date,
-   primary key (ID_OBRA)
+   BOOK_ID               INT NOT NULL AUTO_INCREMENT,
+   USER_ID               INT NOT NULL,
+   TITLE                 VARCHAR(100) NOT NULL,
+   SUBTITLE              VARCHAR(100),
+   LITERARY_STYLE        VARCHAR(20) NOT NULL,
+   PUBLICATION_TYPE      VARCHAR(20) NOT NULL,
+   PAGE_NUMBER           INT NOT NULL,
+   WORD_NUMBER           INT NOT NULL,
+   ISDN                  VARCHAR(13) NOT NULL,
+   EDITION               INT NOT NULL,
+   SUBMISSION_DATE       DATE NOT NULL,
+   APPROVAL_DATE         DATE,
+   PRIMARY KEY (BOOK_ID)
 );
 
 /*==============================================================*/
-/* Table: REVISOES                                              */
+/* Table: REVIEWS                                               */
 /*==============================================================*/
-create table REVISOES
+CREATE TABLE REVIEWS
 (
-   ID_REVISAO           int not null,
-   ID_OBRA              int not null,
-   DATA_SUBMISSAO       datetime not null,
-   TEMPO_DECORRIDO      time not null,
-   N_SERIE              varchar(20) not null,
-   CUSTO                decimal(2,2),
-   ESTADO               ENUM('initiated', 'accepted', 'in_progress', 'completed', 'archived') not null,
-   primary key (ID_REVISAO)
+   REVIEW_ID             INT NOT NULL,
+   BOOK_ID               INT NOT NULL,
+   SUBMISSION_DATE       DATETIME NOT NULL,
+   ELAPSED_TIME          TIME NOT NULL,
+   SERIAL_NUMBER         VARCHAR(20) NOT NULL,
+   COST                  DECIMAL(2,2),
+   STATUS                ENUM('initiated', 'accepted', 'in_progress', 'completed', 'archived') NOT NULL,
+   PRIMARY KEY (REVIEW_ID)
 );
 
 /*==============================================================*/
-/* Table: REVISOES_LICENCAS                                     */
+/* Table: REVIEWS LICENSES                                      */
 /*==============================================================*/
-create table REVISOES_LICENCAS
+CREATE TABLE REVIEWS_LICENSES
 (
-   ID_REVISAO            int not null,
-   ID_LICENCA            int not null,
-   primary key (ID_REVISAO, ID_LICENCA),
-   foreign key (ID_REVISAO) references REVISOES (ID_REVISAO),
-   foreign key (ID_LICENCA) references LICENCAS (ID_LICENCA)
+   REVIEW_ID             INT NOT NULL,
+   LICENSE_ID            INT NOT NULL,
+   PRIMARY KEY (REVIEW_ID, LICENSE_ID),
+   FOREIGN KEY (REVIEW_ID) REFERENCES REVIEWS (REVIEW_ID),
+   FOREIGN KEY (LICENSE_ID) REFERENCES LICENSES (LICENSE_ID)
 );
 
 /*==============================================================*/
-/* Table: UTILIZADORES                                          */
+/* Table: USERS                                                 */
 /*==============================================================*/
-create table UTILIZADORES
+CREATE TABLE USERS
 (
-   ID_UTILIZADORES        int not null AUTO_INCREMENT,
-   NOME                 varchar(100) not null,
-   USERNAME             varchar(20),
-   PASSWORD             varchar(60),
-   SALT                 varbinary(16),
-   ESTADO               ENUM('active', 'inactive', 'pending-activation', 'pending-deletion', 'deleted') not null,
-   EMAIL                varchar(100),
-   TIPO                 ENUM('manager', 'author', 'reviewer'),
-   CONTRIBUINTE         varchar(9),
-   TELEFONE             varchar(9),
-   MORADA               varchar(100),
-   ESTILO_LITERARIO     varchar(20),
-   DATA_INICIO          date,
-   AREA_ESPECIALIZACAO  varchar(20),
-   FORMACAO_ACADEMICA   varchar(100),
-   primary key (ID_UTILIZADORES)
+   USER_ID               INT NOT NULL AUTO_INCREMENT,
+   NAME                  VARCHAR(100) NOT NULL,
+   USERNAME              VARCHAR(20),
+   PASSWORD              VARCHAR(60),
+   SALT                  VARBINARY(16),
+   STATUS                ENUM('active', 'inactive', 'pending-activatiON', 'pending-deletiON', 'DELETEd') NOT NULL,
+   EMAIL                 VARCHAR(100),
+   USER_TYPE             ENUM('manager', 'author', 'reviewer'),
+   NIF                   VARCHAR(9),
+   PHONE                 VARCHAR(9),
+   ADDRESS               VARCHAR(100),
+   LITERARY_STYLE        VARCHAR(20),
+   START_DATE            DATE,
+   SPECIALIZATION        VARCHAR(20),
+   ACADEMIC_BACKGROUND   VARCHAR(100),
+   PRIMARY KEY (USER_ID)
 );
 
 /*==============================================================*/
-/* Table: REVISOES_UTILIZADORES                                 */
+/* Table: REVIEWS_USERS                                         */
 /*==============================================================*/
-create table REVISOES_UTILIZADORES
+CREATE TABLE REVIEWS_USERS
 (
-   ID_REVISAO            int not null,
-   ID_UTILIZADORES         int not null,
-   ESTADO               ENUM('accepted', 'rejected'),
-   primary key (ID_REVISAO, ID_UTILIZADORES),
-   foreign key (ID_REVISAO) references REVISOES (ID_REVISAO),
-   foreign key (ID_UTILIZADORES) references UTILIZADORES (ID_UTILIZADORES)
+   REVIEW_ID             INT NOT NULL,
+   USER_ID               INT NOT NULL,
+   STATUS                ENUM('accepted', 'rejected'),
+   PRIMARY KEY (REVIEW_ID, USER_ID),
+   FOREIGN KEY (REVIEW_ID) REFERENCES REVIEWS (REVIEW_ID),
+   FOREIGN KEY (USER_ID) REFERENCES USERS (USER_ID)
 );
 
-alter table ANOTACOES add constraint FK_REVISOES_ANOTACOES foreign key (ID_REVISAO)
-   references REVISOES (ID_REVISAO) on delete restrict on update restrict;
+ALTER TABLE NOTES ADD CONSTRAINT FK_REVIEWS_NOTES FOREIGN KEY (REVIEW_ID)
+   REFERENCES REVIEWS (REVIEW_ID) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-alter table OBRAS add constraint FK_UTILIZADORES_OBRAS foreign key (ID_UTILIZADORES)
-   references UTILIZADORES (ID_UTILIZADORES) on delete restrict on update restrict;
+ALTER TABLE BOOKS ADD CONSTRAINT FK_USERS_BOOKS FOREIGN KEY (USER_ID)
+   REFERENCES USERS (USER_ID) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-alter table REVISOES add constraint FK_OBRAS_REVISOES foreign key (ID_OBRA)
-   references OBRAS (ID_OBRA) on delete restrict on update restrict;
+ALTER TABLE REVIEWS ADD CONSTRAINT FK_BOOKS_REVIEWS FOREIGN KEY (BOOK_ID)
+   REFERENCES BOOKS (BOOK_ID) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 /*==============================================================*/
 /* Enable event scheduler                                       */
 /*==============================================================*/
-SET GLOBAL event_scheduler = ON;
+SET GLOBAL EVENT_SCHEDULER = ON;
 
 /*==============================================================*/
 /* Event: FREE_USER_CREDENTIALS                                 */
@@ -148,7 +146,7 @@ CREATE EVENT FREE_USER_CREDENTIALS
 ON SCHEDULE EVERY 2 MINUTE
 STARTS CURRENT_DATE
 DO
-   UPDATE UTILIZADORES
+   UPDATE USERS
    SET USERNAME = NULL, PASSWORD = NULL, SALT = NULL,
          EMAIL = NULL, TIPO = NULL, CONTRIBUINTE = NULL,
          TELEFONE = NULL, MORADA = NULL, ESTILO_LITERARIO = NULL,
@@ -163,7 +161,7 @@ CREATE EVENT REMOVE_EXPIRED_LICENSES
 ON SCHEDULE EVERY 2 MINUTE
 STARTS CURRENT_DATE
 DO
-   DELETE FROM LICENCAS
+   DELETE FROM LICENSES
    WHERE DATA_FIM < CURRENT_DATE;
 
 /*==============================================================*/
@@ -172,15 +170,15 @@ DO
 CREATE EVENT UPDATE_ELAPSED_TIME_EVENT
 ON SCHEDULE EVERY 1 MINUTE
 DO
-   UPDATE REVISOES
+   UPDATE REVIEWS
    SET TEMPO_DECORRIDO = SEC_TO_TIME(TIMESTAMPDIFF(SECOND, DATA_SUBMISSAO, NOW()))
-   WHERE ESTADO IN ('initiated', 'accepted', 'in_progress');
+   WHERE ESTADO in ('initiated', 'accepted', 'in_progress');
 
 /*==============================================================*/
 /* Trigger: UPDATE_ELAPSED_TIME_TRIGGER                         */
 /*==============================================================*/
 CREATE TRIGGER UPDATE_ELAPSED_TIME_TRIGGER
-BEFORE UPDATE ON REVISOES
+BEFORE UPDATE ON REVIEWS
 FOR EACH ROW
 BEGIN
    IF NEW.ESTADO IN ('initiated', 'accepted', 'in_progress', 'completed', 'archived')
