@@ -27,17 +27,21 @@ public class Database {
         try {
             task.run();
         } catch (SQLException e) {
+            OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
             System.out.println("Database operation failed.");
             System.out.println("Exception: " + e);
             try {
                 conn.rollback();
+                System.exit(1);
             } catch (SQLException e2) {
                 System.out.println("Failed to rollback transaction.");
                 System.out.println("Exception: " + e2);
+                System.exit(1);
             }
         } catch (ClassNotFoundException e) {
             System.out.println("Failed to load JDBC driver.");
             System.out.println("Exception: " + e);
+            System.exit(1);
         } finally {
             if (closeResources) {
                 try {
@@ -50,6 +54,7 @@ public class Database {
                 } catch (SQLException e) {
                     System.out.println("Failed to close database resources.");
                     System.out.println("Exception: " + e);
+                    System.exit(1);
                 }
             }
         }
@@ -70,6 +75,7 @@ public class Database {
                 password = Security.encryptDecryptString(password, "-d");
                 connectToDatabase(user, password);
             } catch (IOException e) {
+                OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
                 System.out.println("Error reading credentials file: " + e.getMessage());
                 System.exit(1);
             }

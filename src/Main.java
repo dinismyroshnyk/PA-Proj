@@ -23,46 +23,58 @@ public class Main {
     private static void mainLoop() {
         boolean running = true;
         LocalDateTime startTime = LocalDateTime.now();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String title = "Menu";
+        String[] menuItems = {
+            "1. Login",
+            "2. Register",
+            "0. Exit"
+        };
         while (running) {
             clearConsole();
             OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "raw");
-            String title = "Menu";
-            String[] menuItems = {
-                "1. Login",
-                "2. Register",
-                "0. Exit"
-            };
-            OS.drawMenuBox(title, menuItems);
-            OS.insertBoxItems(title, menuItems);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            OS.runTaskInSaneMode(() -> {
+                OS.drawMenuBox(title, menuItems);
+                OS.insertBoxItems(title, menuItems);
+            });
             try {
                 char c = (char)reader.read();
                 switch (c) {
                     case '1':
                         clearConsole();
-                        System.out.println("Login");
+                        OS.runTaskInSaneMode(() -> {
+                            System.out.println("Login");
+                        });
                         pressEnterKey();
                         break;
                     case '2':
                         clearConsole();
-                        System.out.println("Register");
+                        OS.runTaskInSaneMode(() -> {
+                            System.out.println("Register");
+                        });
                         pressEnterKey();
                         break;
                     case '0':
                         clearConsole();
-                        showExecutionTime(startTime);
+                        OS.runTaskInSaneMode(() -> {
+                            showExecutionTime(startTime);
+                        });
                         OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
                         running = false;
                         break;
                     default:
                         clearConsole();
-                        System.out.println("Invalid option. Please try again.");
+                        OS.runTaskInSaneMode(() -> {
+                            System.out.println("Invalid option. Please try again.");
+                        });
                         pressEnterKey();
                         break;
                 }
             } catch (IOException e) {
+                OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
                 System.out.println("Error reading input.");
                 System.out.println("Exception: " + e);
+                System.exit(1);
             }
         }
     }
@@ -106,8 +118,10 @@ public class Main {
                 }
             }
         } catch (IOException e) {
+            OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
             System.out.println("Error reading input.");
             System.out.println("Exception: " + e);
+            System.exit(1);
         }
     }
 

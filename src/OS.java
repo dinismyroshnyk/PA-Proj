@@ -25,6 +25,12 @@ public class OS {
         return prepareOS().getValue();
     }
 
+    public static void runTaskInSaneMode(Runnable task) {
+        toggleConsoleMode(getHandle(), getMode(), "sane");
+        task.run();
+        toggleConsoleMode(getHandle(), getMode(), "raw");
+    }
+
     public static void toggleConsoleMode(WinNT.HANDLE handle, WinDef.DWORDByReference mode, String toggle) {
         switch (toggle) {
             case "raw":
