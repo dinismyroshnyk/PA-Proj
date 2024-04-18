@@ -10,8 +10,6 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import com.sun.jna.platform.win32.WinDef;
-import com.sun.jna.platform.win32.WinNT;
 
 public class Security {
     // Encryption key
@@ -69,15 +67,12 @@ public class Security {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         try {
             System.out.print(type + ": ");
-            Pair<WinNT.HANDLE, WinDef.DWORDByReference> osInfo = OS.prepareOS();
-            WinNT.HANDLE handle = osInfo.getKey();
-            WinDef.DWORDByReference mode = osInfo.getValue();
-            OS.consoleRaw(handle, mode);
+            OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "raw");
             int c;
             while ((c = reader.read()) != -1) {
                 switch (c) {
                     case 10: case 13:
-                        OS.consoleReset(handle, mode);
+                        OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
                         return password;
                     case 8: case 127:
                         if (password.length() > 0) {
@@ -90,7 +85,7 @@ public class Security {
                         password += (char) c;
                 }
             }
-            OS.consoleReset(handle, mode);
+            OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
         } catch (IOException e) {
             System.out.println("Error reading password.");
             System.out.println("Exception: " + e);

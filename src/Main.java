@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Date;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -22,27 +25,44 @@ public class Main {
         LocalDateTime startTime = LocalDateTime.now();
         while (running) {
             clearConsole();
-            System.out.println("Menu:");
-            System.out.println("1. Login");
-            System.out.println("2. Register");
-            System.out.println("0. Exit");
-            System.out.print("\nOption: ");
-            String option = Input.readLine();
-            switch (option) {
-                case "1":
-                    break;
-                case "2":
-                    break;
-                case "0":
-                    clearConsole();
-                    showExecutionTime(startTime);
-                    running = false;
-                    break;
-                default:
-                    clearConsole();
-                    System.out.println("Invalid option. Please try again.");
-                    pressEnterKey();
-                    break;
+            OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "raw");
+            String title = "Menu";
+            String[] menuItems = {
+                "1. Login",
+                "2. Register",
+                "0. Exit"
+            };
+            OS.drawMenuBox(title, menuItems);
+            OS.insertBoxItems(title, menuItems);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            try {
+                char c = (char)reader.read();
+                switch (c) {
+                    case '1':
+                        clearConsole();
+                        System.out.println("Login");
+                        pressEnterKey();
+                        break;
+                    case '2':
+                        clearConsole();
+                        System.out.println("Register");
+                        pressEnterKey();
+                        break;
+                    case '0':
+                        clearConsole();
+                        showExecutionTime(startTime);
+                        OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
+                        running = false;
+                        break;
+                    default:
+                        clearConsole();
+                        System.out.println("Invalid option. Please try again.");
+                        pressEnterKey();
+                        break;
+                }
+            } catch (IOException e) {
+                System.out.println("Error reading input.");
+                System.out.println("Exception: " + e);
             }
         }
     }
@@ -53,12 +73,14 @@ public class Main {
         long executionTimeMillis = Duration.between(startTime, endTime).toMillis();
         Duration duration = Duration.ofMillis(executionTimeMillis);
         String formattedExecutionTime = String.format("%d milliseconds (%d seconds; %d minutes; %d hours)", executionTimeMillis, duration.toSecondsPart(), duration.toMinutesPart(), duration.toHours());
-        System.out.println("[Execution time]");
-        System.out.println();
-        System.out.println("Process start: " + startTime.format(date));
-        System.out.println("Process end: " + endTime.format(date));
-        System.out.println("Total time: " + formattedExecutionTime);
-        System.out.println();
+        String title = "Execution Time";
+        String[] menuItems = {
+            "Process start: " + startTime.format(date),
+            "Process end: " + endTime.format(date),
+            "Total time: " + formattedExecutionTime
+        };
+        OS.drawMenuBox(title, menuItems);
+        OS.insertBoxItems(title, menuItems);
     }
 
     // Clear the console
@@ -67,10 +89,26 @@ public class Main {
         System.out.flush();
     }
 
-    // Press any key to continue
+    // Press E nter key to continue
     public static void pressEnterKey() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.print("Press Enter to continue...");
-        Input.readLine();
+        try {
+            boolean pressed = false;
+            while (!pressed) {
+                switch ((int)reader.read()) {
+                    case 10: case 13:
+                        pressed = true;
+                        break;
+                    default:
+                        // Do nothing
+                        break;
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading input.");
+            System.out.println("Exception: " + e);
+        }
     }
 
     // Get current date
