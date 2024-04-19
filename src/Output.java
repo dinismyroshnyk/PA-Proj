@@ -25,6 +25,20 @@ public class Output {
             insertBoxItems(title, menuItems, boxSize, selectedId);
         }
 
+        // Draw the menu controls
+        public static void drawControls() {
+            OS.runTaskInSaneMode(() -> {
+                String title = "Controls";
+                String[] menuItems = {
+                    "Up: k or ↑",
+                    "Down: j or ↓",
+                    "Select: Enter"
+                };
+                int[] outOfBoundsId = {-1};
+                Output.drawBox(title, menuItems, outOfBoundsId);
+            });
+        }
+
     // Helper methods
         // Drawing mode enum
             private enum DrawingMode {

@@ -1,6 +1,9 @@
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class Main {
     public static void main(String[] args) {
@@ -8,7 +11,10 @@ public class Main {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.SANE);
             Input.closeInput();
+            Utils.clearConsole();
         }));
+        // Start the timer
+        Utils.getStartTime();
         // Prepare and connect to the database
         Database.setUpDatabase();
         // Application and SQL handling
@@ -21,8 +27,6 @@ public class Main {
 
     // Main loop of the application
     private static void mainLoop() {
-        boolean running = true;
-        LocalDateTime startTime = LocalDateTime.now();
         String title = "Menu";
         String[] menuItems = {
             "Login",
@@ -33,81 +37,43 @@ public class Main {
         final int[] selectedId = {0};
         int maxId = menuItems.length - 1;
         OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.RAW);
-        OS.runTaskInSaneMode(() -> {
-            Output.drawBox(title, menuItems, selectedId);
-        });
-        while (running) {
-            int input = Input.readBufferedInt();
-            if (input == 27) {
-                input = Input.readBufferedInt();
-                if (Input.readBufferedInt() == 91) {
-                    input = Input.readBufferedInt();
-                    if (input == 65) {
-                        input = 106;
-                    } else if (input == 66) {
-                        input = 107;
-                    }
-                }
-            }
+        Map<String, Consumer<Integer>> actions = new HashMap<>();
+        actions.put("Login", id -> loginAction());
+        actions.put("Register", id -> registerAction());
+        actions.put("DB params", id -> dbParamsAction());
+        actions.put("Exit", id -> exitAction());
+        Utils.clearConsole();
+        drawMenu(title, menuItems, selectedId);
+        while (true) {
+            int input = checkArrowKeys();
             switch (input) {
                 case 106:
                     Utils.clearConsole();
-                    if (selectedId[0] < maxId) {
-                        selectedId[0] += 1;
-                    } else {
-                        selectedId[0] = 0;
-                    }
-                    OS.runTaskInSaneMode(() -> {
-                        Output.drawBox(title, menuItems, selectedId);
-                    });
+                    selectedId[0] = (selectedId[0] + 1) % (maxId + 1);
+                    drawMenu(title, menuItems, selectedId);
                     break;
                 case 107:
                     Utils.clearConsole();
-                    if (selectedId[0] > 0) {
-                        selectedId[0] -= 1;
-                    } else {
-                        selectedId[0] = maxId;
-                    }
-                    OS.runTaskInSaneMode(() -> {
-                        Output.drawBox(title, menuItems, selectedId);
-                    });
+                    selectedId[0] = (selectedId[0] - 1 + (maxId + 1)) % (maxId + 1);
+                    drawMenu(title, menuItems, selectedId);
+                    break;
+                case 99:
+                    Utils.clearConsole();
+                    Output.drawControls();
+                    Utils.pressEnterKey();
+                    Utils.clearConsole();
+                    drawMenu(title, menuItems, selectedId);
                     break;
                 case 10: case 13:
                     Utils.clearConsole();
-                    switch (selectedId[0]) {
-                        case 0:
-                            OS.runTaskInSaneMode(() -> {
-                                System.out.println("Login");
-                            });
-                            Utils.pressEnterKey();
-                            break;
-                        case 1:
-                            OS.runTaskInSaneMode(() -> {
-                                System.out.println("Register");
-                            });
-                            Utils.pressEnterKey();
-                            break;
-                        case 2:
-                            OS.runTaskInSaneMode(() -> {
-                                System.out.println("DB params");
-                            });
-                            Utils.pressEnterKey();
-                            break;
-                        case 3:
-                            Utils.clearConsole();
-                            OS.runTaskInSaneMode(() -> {
-                                showExecutionTime(startTime);
-                            });
-                            running = false;
-                            return;
-                        default:
-                            // Do nothing
-                            break;
+                    actions.get(menuItems[selectedId[0]]).accept(selectedId[0]);
+                    Utils.pressEnterKey();
+                    if (menuItems[selectedId[0]].equals("Exit")) {
+                        return;
+                    } else {
+                        Utils.clearConsole();
+                        drawMenu(title, menuItems, selectedId);
                     }
-                    Utils.clearConsole();
-                    OS.runTaskInSaneMode(() -> {
-                        Output.drawBox(title, menuItems, selectedId);
-                    });
                     break;
                 default:
                     // Do nothing
@@ -131,5 +97,65 @@ public class Main {
         };
         int[] outOfBoundsId = {-1};
         Output.drawBox(title, menuItems, outOfBoundsId);
+    }
+
+    // Check the arrow keys
+    private static int checkArrowKeys() {
+        int input = Input.readBufferedInt();
+        if (input == 27) {
+            input = Input.readBufferedInt();
+            if (input == 91) {
+                input = Input.readBufferedInt();
+                switch (input) {
+                    case 65:
+                        input = 107;
+                        break;
+                    case 66:
+                        input = 106;
+                        break;
+                    default:
+                        // Do nothing
+                        break;
+                }
+            }
+        }
+        return input;
+    }
+
+    // Draw the menu
+    private static void drawMenu(String title, String[] menuItems, int[] selectedId) {
+        OS.runTaskInSaneMode(() -> {
+            Output.drawBox(title, menuItems, selectedId);
+            System.out.println("Controls: c");
+        });
+    }
+
+    // Login action
+    private static void loginAction() {
+        OS.runTaskInSaneMode(() -> {
+            System.out.println("Login");
+        });
+    }
+
+    // Register action
+    private static void registerAction() {
+        OS.runTaskInSaneMode(() -> {
+            System.out.println("Register");
+        });
+    }
+
+    // DB params action
+    private static void dbParamsAction() {
+        OS.runTaskInSaneMode(() -> {
+            System.out.println("DB params");
+        });
+    }
+
+    // Exit action
+    private static boolean exitAction() {
+        OS.runTaskInSaneMode(() -> {
+            showExecutionTime(Utils.getStartTime());
+        });
+        return false;
     }
 }

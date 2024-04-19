@@ -1,3 +1,4 @@
+import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Date;
 import java.util.Map;
@@ -35,4 +36,16 @@ public class Utils {
         public static <K, V> Map.Entry<K, V> pair(K key, V value) {
             return new AbstractMap.SimpleEntry<>(key, value);
         }
+
+        // Application start time
+        public static LocalDateTime getStartTime() {
+            if (startTime == null) {
+                startTime = LocalDateTime.now();
+            }
+            return startTime;
+        }
+
+    // Helper methods
+        // Class level variables
+        private static LocalDateTime startTime;
 }
