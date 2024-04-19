@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.util.Map;
-
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
@@ -77,7 +76,7 @@ public class OS {
             if (handle != null && mode != null) {
                 WinDef.DWORD newMode = null;
                 if (conMode == ConsoleMode.RAW) {
-                    newMode = new WinDef.DWORD(mode.getValue().intValue() & ~0x0002 & ~0x0001);
+                    newMode = new WinDef.DWORD(mode.getValue().intValue() & ~0x0002 & ~0x0001 | 0x0200);
                 } else {
                     newMode = mode.getValue();
                 }

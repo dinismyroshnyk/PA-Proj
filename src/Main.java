@@ -152,10 +152,9 @@ public class Main {
     }
 
     // Exit action
-    private static boolean exitAction() {
+    private static void exitAction() {
         OS.runTaskInSaneMode(() -> {
             showExecutionTime(Utils.getStartTime());
         });
-        return false;
     }
 }
