@@ -1,21 +1,21 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.Date;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Main {
     public static void main(String[] args) {
+        // Add a shutdown hook to close the input stream and restore the console mode
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.SANE);
+            Input.closeInput();
+        }));
         // Prepare and connect to the database
         Database.setUpDatabase();
         // Application and SQL handling
         Database.databaseTaskWithErrorHandling(() -> {
             mainLoop();
         }, true);
-        // Close the scanner and exit the application
-        Input.closeScanner();
+        // Exit the application
         System.exit(0);
     }
 
@@ -23,62 +23,60 @@ public class Main {
     private static void mainLoop() {
         boolean running = true;
         LocalDateTime startTime = LocalDateTime.now();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String title = "Menu";
         String[] menuItems = {
             "1. Login",
             "2. Register",
+            "3. DB params",
             "0. Exit"
         };
+        OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.RAW);
         while (running) {
-            clearConsole();
-            OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "raw");
+            Utils.clearConsole();
             OS.runTaskInSaneMode(() -> {
-                OS.drawMenuBox(title, menuItems);
-                OS.insertBoxItems(title, menuItems);
+                Output.drawBox(title, menuItems);
             });
-            try {
-                char c = (char)reader.read();
-                switch (c) {
-                    case '1':
-                        clearConsole();
-                        OS.runTaskInSaneMode(() -> {
-                            System.out.println("Login");
-                        });
-                        pressEnterKey();
-                        break;
-                    case '2':
-                        clearConsole();
-                        OS.runTaskInSaneMode(() -> {
-                            System.out.println("Register");
-                        });
-                        pressEnterKey();
-                        break;
-                    case '0':
-                        clearConsole();
-                        OS.runTaskInSaneMode(() -> {
-                            showExecutionTime(startTime);
-                        });
-                        OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
-                        running = false;
-                        break;
-                    default:
-                        clearConsole();
-                        OS.runTaskInSaneMode(() -> {
-                            System.out.println("Invalid option. Please try again.");
-                        });
-                        pressEnterKey();
-                        break;
-                }
-            } catch (IOException e) {
-                OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
-                System.out.println("Error reading input.");
-                System.out.println("Exception: " + e);
-                System.exit(1);
+            switch (Input.readBufferedInt()) {
+                case 49:
+                    Utils.clearConsole();
+                    OS.runTaskInSaneMode(() -> {
+                        System.out.println("Login");
+                    });
+                    Utils.pressEnterKey();
+                    break;
+                case 50:
+                    Utils.clearConsole();
+                    OS.runTaskInSaneMode(() -> {
+                        System.out.println("Register");
+                    });
+                    Utils.pressEnterKey();
+                    break;
+                case 51:
+                    Utils.clearConsole();
+                    OS.runTaskInSaneMode(() -> {
+                        System.out.println("DB params");
+                    });
+                    Utils.pressEnterKey();
+                    break;
+                case 48:
+                    Utils.clearConsole();
+                    OS.runTaskInSaneMode(() -> {
+                        showExecutionTime(startTime);
+                    });
+                    running = false;
+                    break;
+                default:
+                    Utils.clearConsole();
+                    OS.runTaskInSaneMode(() -> {
+                        System.out.println("Invalid option. Please try again.");
+                    });
+                    Utils.pressEnterKey();
+                    break;
             }
         }
     }
 
+    // Show the execution time
     private static void showExecutionTime(LocalDateTime startTime) {
         LocalDateTime endTime = LocalDateTime.now();
         DateTimeFormatter date = DateTimeFormatter.ofPattern("EEEE; yyyy-MM-dd HH:mm:ss");
@@ -91,42 +89,6 @@ public class Main {
             "Process end: " + endTime.format(date),
             "Total time: " + formattedExecutionTime
         };
-        OS.drawMenuBox(title, menuItems);
-        OS.insertBoxItems(title, menuItems);
-    }
-
-    // Clear the console
-    public static void clearConsole() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
-
-    // Press E nter key to continue
-    public static void pressEnterKey() {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        System.out.print("Press Enter to continue...");
-        try {
-            boolean pressed = false;
-            while (!pressed) {
-                switch ((int)reader.read()) {
-                    case 10: case 13:
-                        pressed = true;
-                        break;
-                    default:
-                        // Do nothing
-                        break;
-                }
-            }
-        } catch (IOException e) {
-            OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
-            System.out.println("Error reading input.");
-            System.out.println("Exception: " + e);
-            System.exit(1);
-        }
-    }
-
-    // Get current date
-    public static Date getCurrentDate() {
-        return new Date(System.currentTimeMillis());
+        Output.drawBox(title, menuItems);
     }
 }

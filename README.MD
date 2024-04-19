@@ -4,8 +4,8 @@
 
 ### User interface
 
-- [ ] [R68] The system should have a text-based user interface.
-- [ ] [R69] The system should keep track of the time spent from the moment the application is started until the user decides to exit the application. When exiting the application, the system should display the total time spent in the application in the following format:
+- [x] [R68] The system should have a text-based user interface.
+- [x] [R69] The system should keep track of the time spent from the moment the application is started until the user decides to exit the application. When exiting the application, the system should display the total time spent in the application in the following format:
 ```
 Process start:  Tuesday; 2023-03-01 11:21:11
 Process end:    Tuesday; 2023-03-01 11:21:56
@@ -21,13 +21,13 @@ Total time:     45132 milliseconds (45 seconds; 0 minutes; 0 hours)
 
 ### Object oriented programming
 
-- [ ] [R74] The application has to be implemented using object-oriented programming, using tha Java programming language.
-- [ ] [R75] Implement the necessary storage structures trying to optimize the resource usage and the performance of the application.
+- [x] [R74] The application has to be implemented using object-oriented programming, using tha Java programming language.
+- [x] [R75] Implement the necessary storage structures trying to optimize the resource usage and the performance of the application.
 
 ### Data validation and user notification
 
 - [ ] [R76] The system should validate all data entered by the user.
-- [ ] [R77] The system should display informative messages when necessary.
+- [x] [R77] The system should display informative messages when necessary.
 > [!TIP]
 > Informative messages includes user actions, errors, warnings, etc.
 

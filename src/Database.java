@@ -1,129 +1,149 @@
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Database {
-    // Class level variables
-    static Statement st = null;
-    static ResultSet rs = null;
-    static Connection conn = null;
-    static StringBuffer sqlQuery = null;
+    // Public methods
+        // Runnable tasks with exception throwing
+        public interface DatabaseTask {
+            void run() throws SQLException, ClassNotFoundException;
+        }
 
-    // Runnable tasks with exception throwing
-    public interface DatabaseTask {
-        void run() throws SQLException, ClassNotFoundException;
-    }
-
-    // Database error handling
-    public static void databaseTaskWithErrorHandling(DatabaseTask task, boolean closeResources) {
-        try {
-            task.run();
-        } catch (SQLException e) {
-            OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
-            System.out.println("Database operation failed.");
-            System.out.println("Exception: " + e);
+        // Database error handling
+        public static void databaseTaskWithErrorHandling(DatabaseTask task, boolean closeResources) {
             try {
-                conn.rollback();
-                System.exit(1);
-            } catch (SQLException e2) {
-                System.out.println("Failed to rollback transaction.");
-                System.out.println("Exception: " + e2);
-                System.exit(1);
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("Failed to load JDBC driver.");
-            System.out.println("Exception: " + e);
-            System.exit(1);
-        } finally {
-            if (closeResources) {
+                task.run();
+            } catch (SQLException e) {
+                Utils.clearConsole();
+                System.out.println("Database operation failed.");
+                System.out.println("Exception: " + e);
                 try {
-                    if (st != null) {
-                        st.close();
-                    }
-                    if (conn != null) {
-                        conn.close();
-                    }
-                } catch (SQLException e) {
-                    System.out.println("Failed to close database resources.");
-                    System.out.println("Exception: " + e);
+                    conn.rollback();
                     System.exit(1);
+                } catch (SQLException e2) {
+                    Utils.clearConsole();
+                    System.out.println("Failed to rollback transaction.");
+                    System.out.println("Exception: " + e2);
+                    System.exit(1);
+                }
+            } catch (ClassNotFoundException e) {
+                Utils.clearConsole();
+                System.out.println("Failed to load JDBC driver.");
+                System.out.println("Exception: " + e);
+                System.exit(1);
+            } finally {
+                if (closeResources) {
+                    try {
+                        if (st != null) {
+                            st.close();
+                        }
+                        if (conn != null) {
+                            conn.close();
+                        }
+                    } catch (SQLException e) {
+                        Utils.clearConsole();
+                        System.out.println("Failed to close database resources.");
+                        System.out.println("Exception: " + e);
+                        System.exit(1);
+                    }
                 }
             }
         }
-    }
 
-    // Set up the database connection
-    public static void setUpDatabase() {
-        // Path to the credentials file
-        String credentialsPath = ".credentials";
-        File credentialsFile = new File(credentialsPath);
-        // Check if the credentials file exists
-        if (credentialsFile.exists()) {
-            // Read the credentials from the file
-            try (BufferedReader reader = new BufferedReader(new FileReader(credentialsFile))) {
-                String user = reader.readLine();
-                user = Security.encryptDecryptString(user, "-d");
-                String password = reader.readLine();
-                password = Security.encryptDecryptString(password, "-d");
-                connectToDatabase(user, password);
-            } catch (IOException e) {
-                OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), "sane");
-                System.out.println("Error reading credentials file: " + e.getMessage());
-                System.exit(1);
-            }
-        } else {
-            // Prompt the user for credentials
-            System.out.println("[Database Setup]");
-            System.out.print("User: ");
-            String user = Input.readLine();
-            String password = Security.maskPassword("Password");
-            // Attempt to connect with the provided credentials
-            if (connectToDatabase(user, password)) {
-                // If successful, encrypt and save the credentials
-                user = Security.encryptDecryptString(user, "-e");
-                password = Security.encryptDecryptString(password, "-e");
-                if (password == null) {
-                    System.out.println("Failed to encrypt password. Exiting application.");
-                    System.exit(1);
-                }
-                try (PrintWriter writer = new PrintWriter(new FileWriter(credentialsPath))) {
-                    writer.println(user);
-                    writer.println(password);
-                } catch (IOException e) {
-                    System.out.println("Error saving credentials: " + e.getMessage());
-                    System.exit(1);
-                }
+        // Set up the database connection
+        public static void setUpDatabase() {
+            // Path to the credentials file
+            String credentialsPath = "Properties";
+            File credentialsFile = new File(credentialsPath);
+            String[] params = new String[5];
+            // Check if the credentials file exists
+            if (credentialsFile.exists()) {
+                // Read the credentials from the file
+                params = readCredentialsFromFile(credentialsFile, params);
             } else {
-                System.out.println("Invalid credentials. Exiting application.");
+                // Prompt the user for credentials
+                params = readCredentialsFromUser(params);
+            }
+            // Attempt to connect with the provided credentials
+            if (connectToDatabase(params)) {
+                if (!credentialsFile.exists()) {
+                    saveCredentialsToFile(credentialsPath, params);
+                }
+            }
+        }
+
+    // Helper methods
+        // Class level variables
+        private static Statement st = null;
+        private static Connection conn = null;
+
+        // Read the credentials from the file
+        private static String[] readCredentialsFromFile(File file, String[] params) {
+            for (int i = 0; i < params.length; i++) {
+                params[i] = Input.readBufferedString(Input.BufferedInputReader.FILE_READER, file);
+                if (i == 4) {
+                    params[i] = Security.encryptDecryptString(params[i], Security.EncryptionParam.DECRYPT);
+                }
+            }
+            return params;
+        }
+
+        // Read the credentials from the user
+        private static String[] readCredentialsFromUser(String[] params) {
+            System.out.println("[Database Setup]");
+            System.out.print("ip: ");
+            params[0] = Input.readLine();
+            System.out.print("Port: ");
+            params[1] = Input.readLine();
+            System.out.print("Database: ");
+            params[2] = Input.readLine();
+            System.out.print("User: ");
+            params[3] = Input.readLine();
+            params[4] = Security.maskPassword("Password");
+            return params;
+        }
+
+        // Save the credentials to the file
+        private static void saveCredentialsToFile(String path, String[] params) {
+            params[4] = Security.encryptDecryptString(params[4], Security.EncryptionParam.ENCRYPT);
+            if (params[4] == null) {
+                Utils.clearConsole();
+                System.out.println("Failed to encrypt password. Exiting application.");
+                System.exit(1);
+            }
+            try (PrintWriter writer = new PrintWriter(new FileWriter(path))) {
+                for (String param : params) {
+                    writer.println(param);
+                }
+            } catch (IOException e) {
+                Utils.clearConsole();
+                System.out.println("Error saving credentials");
+                System.out.println("Exception: " + e);
                 System.exit(1);
             }
         }
-    }
 
-    // Connect to the database
-    private static boolean connectToDatabase(String user, String password) {
-        databaseTaskWithErrorHandling(() -> {
-            String ip = "localhost";
-            String port = "3306";
-            String database = "projeto";
-            String parameters = "?useTimezone=true&serverTimezone=UTC&verifyServerCertificate=false&useSSL=true";
-            String url = "jdbc:mysql://" + ip + ":" + port + "/" + database + parameters;
-            // Load the JDBC driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            // Connect to the database
-            conn = DriverManager.getConnection(url, user, password);
-            st = conn.createStatement();
-            // Transaction control
-            conn.setAutoCommit(false);
-        }, false);
-        return conn != null;
-    }
+        // Connect to the database
+        private static boolean connectToDatabase(String[] params) {
+            databaseTaskWithErrorHandling(() -> {
+                String ip = params[0];
+                String port = params[1];
+                String database = params[2];
+                String parameters = "?useTimezone=true&serverTimezone=UTC&verifyServerCertificate=false&useSSL=true";
+                String url = "jdbc:mysql://" + ip + ":" + port + "/" + database + parameters;
+                // Load the JDBC driver
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                // Connect to the database
+                conn = DriverManager.getConnection(url, params[3], params[4]);
+                st = conn.createStatement();
+                // Transaction control
+                conn.setAutoCommit(false);
+            }, false);
+            return conn != null;
+        }
 }
