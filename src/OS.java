@@ -36,10 +36,10 @@ public class OS {
             switch (toggle) {
                 case RAW:
                     System.out.print("\33[?25l");
-                    setConsoleMode(handle, mode, new WinDef.DWORD(mode.getValue().intValue() & ~0x0002 & ~0x0001), ConsoleMode.RAW);
+                    setConsoleMode(handle, mode, ConsoleMode.RAW);
                     break;
                 case SANE:
-                    setConsoleMode(handle, mode, mode.getValue(), ConsoleMode.SANE);
+                    setConsoleMode(handle, mode, ConsoleMode.SANE);
                     break;
                 default:
                     System.out.println("Invalid toggle.");
@@ -73,11 +73,17 @@ public class OS {
         }
 
         // Set the console mode
-        private static void setConsoleMode(WinNT.HANDLE handle, WinDef.DWORDByReference mode, WinDef.DWORD newMode, ConsoleMode conMode) {
+        private static void setConsoleMode(WinNT.HANDLE handle, WinDef.DWORDByReference mode, ConsoleMode conMode) {
             if (handle != null && mode != null) {
+                WinDef.DWORD newMode = null;
+                if (conMode == ConsoleMode.RAW) {
+                    newMode = new WinDef.DWORD(mode.getValue().intValue() & ~0x0002 & ~0x0001);
+                } else {
+                    newMode = mode.getValue();
+                }
                 Kernel32.INSTANCE.SetConsoleMode(handle, newMode);
             } else {
-                executeBash("/bin/sh", "-c", "stty " + conMode + " -echo </dev/tty", "Error setting terminal to " + conMode + " mode.");
+                executeBash("/bin/sh", "-c", "stty " + conMode.toString().toLowerCase() + " -echo </dev/tty", "Error setting terminal to " + conMode + " mode.");
             }
         }
 
