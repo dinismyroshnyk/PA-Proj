@@ -25,52 +25,92 @@ public class Main {
         LocalDateTime startTime = LocalDateTime.now();
         String title = "Menu";
         String[] menuItems = {
-            "1. Login",
-            "2. Register",
-            "3. DB params",
-            "0. Exit"
+            "Login",
+            "Register",
+            "DB params",
+            "Exit"
         };
+        final int[] selectedId = {0};
+        int maxId = menuItems.length - 1;
         OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.RAW);
+        OS.runTaskInSaneMode(() -> {
+            Output.drawBox(title, menuItems, selectedId);
+        });
         while (running) {
-            Utils.clearConsole();
-            OS.runTaskInSaneMode(() -> {
-                Output.drawBox(title, menuItems);
-            });
-            switch (Input.readBufferedInt()) {
-                case 49:
+            int input = Input.readBufferedInt();
+            if (input == 27) {
+                input = Input.readBufferedInt();
+                if (Input.readBufferedInt() == 91) {
+                    input = Input.readBufferedInt();
+                    if (input == 65) {
+                        input = 106;
+                    } else if (input == 66) {
+                        input = 107;
+                    }
+                }
+            }
+            switch (input) {
+                case 106:
                     Utils.clearConsole();
+                    if (selectedId[0] < maxId) {
+                        selectedId[0] += 1;
+                    } else {
+                        selectedId[0] = 0;
+                    }
                     OS.runTaskInSaneMode(() -> {
-                        System.out.println("Login");
+                        Output.drawBox(title, menuItems, selectedId);
                     });
-                    Utils.pressEnterKey();
                     break;
-                case 50:
+                case 107:
                     Utils.clearConsole();
+                    if (selectedId[0] > 0) {
+                        selectedId[0] -= 1;
+                    } else {
+                        selectedId[0] = maxId;
+                    }
                     OS.runTaskInSaneMode(() -> {
-                        System.out.println("Register");
+                        Output.drawBox(title, menuItems, selectedId);
                     });
-                    Utils.pressEnterKey();
                     break;
-                case 51:
+                case 10: case 13:
+                    Utils.clearConsole();
+                    switch (selectedId[0]) {
+                        case 0:
+                            OS.runTaskInSaneMode(() -> {
+                                System.out.println("Login");
+                            });
+                            Utils.pressEnterKey();
+                            break;
+                        case 1:
+                            OS.runTaskInSaneMode(() -> {
+                                System.out.println("Register");
+                            });
+                            Utils.pressEnterKey();
+                            break;
+                        case 2:
+                            OS.runTaskInSaneMode(() -> {
+                                System.out.println("DB params");
+                            });
+                            Utils.pressEnterKey();
+                            break;
+                        case 3:
+                            Utils.clearConsole();
+                            OS.runTaskInSaneMode(() -> {
+                                showExecutionTime(startTime);
+                            });
+                            running = false;
+                            return;
+                        default:
+                            // Do nothing
+                            break;
+                    }
                     Utils.clearConsole();
                     OS.runTaskInSaneMode(() -> {
-                        System.out.println("DB params");
+                        Output.drawBox(title, menuItems, selectedId);
                     });
-                    Utils.pressEnterKey();
-                    break;
-                case 48:
-                    Utils.clearConsole();
-                    OS.runTaskInSaneMode(() -> {
-                        showExecutionTime(startTime);
-                    });
-                    running = false;
                     break;
                 default:
-                    Utils.clearConsole();
-                    OS.runTaskInSaneMode(() -> {
-                        System.out.println("Invalid option. Please try again.");
-                    });
-                    Utils.pressEnterKey();
+                    // Do nothing
                     break;
             }
         }
@@ -89,6 +129,7 @@ public class Main {
             "Process end: " + endTime.format(date),
             "Total time: " + formattedExecutionTime
         };
-        Output.drawBox(title, menuItems);
+        int[] outOfBoundsId = {-1};
+        Output.drawBox(title, menuItems, outOfBoundsId);
     }
 }

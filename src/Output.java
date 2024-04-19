@@ -1,7 +1,7 @@
 public class Output {
     // Public methods
         // Draw a dynamic border and insert text
-        public static void drawBox(String title, String[] menuItems) {
+        public static void drawBox(String title, String[] menuItems, int[] selectedId) {
             int boxSize = getBoxSize(title, menuItems);
             toggleDrawingMode(DrawingMode.ON);
             System.out.print("lq");
@@ -22,7 +22,7 @@ public class Output {
             }
             System.out.print("qj");
             toggleDrawingMode(DrawingMode.OFF);
-            insertBoxItems(title, menuItems, boxSize);
+            insertBoxItems(title, menuItems, boxSize, selectedId);
         }
 
     // Helper methods
@@ -59,15 +59,29 @@ public class Output {
         }
 
         // Insert the box items
-        private static void insertBoxItems(String title, String[] menuItems, int boxSize) {
+        private static void insertBoxItems(String title, String[] menuItems, int boxSize, int[] selectedId) {
             System.out.print("\33[" + (boxSize + 2) + "D");
             System.out.print("\33[" + (menuItems.length + 1) + "A");
             System.out.print(title);
             System.out.print("\33[" + (title.length()) + "D");
             for (String item : menuItems) {
-                System.out.print("\33[1B");
-                System.out.print(item);
-                System.out.print("\33[" + (item.length()) + "D");
+                if (selectedId[0] >= 0 && selectedId[0] < menuItems.length) {
+                    if (menuItems[selectedId[0]].equals(item)) {
+                        System.out.print("\33[1B");
+                        int spaces = boxSize - item.length();
+                        item = item + " ".repeat(spaces);
+                        System.out.print("\33[7m" + item + "\33[0m");
+                        System.out.print("\33[" + (item.length()) + "D");
+                    } else {
+                        System.out.print("\33[1B");
+                        System.out.print(item);
+                        System.out.print("\33[" + (item.length()) + "D");
+                    }
+                } else {
+                    System.out.print("\33[1B");
+                    System.out.print(item);
+                    System.out.print("\33[" + (item.length()) + "D");
+                }
             }
             System.out.print("\33[2B\33[2D");
         }
