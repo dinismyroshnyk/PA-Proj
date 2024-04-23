@@ -1,3 +1,4 @@
+import java.io.File;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +35,7 @@ public class Main {
             "DB params",
             "Exit"
         };
+        String footer = "Controls: c";
         final int[] selectedId = {0};
         int maxId = menuItems.length - 1;
         OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.RAW);
@@ -43,26 +45,26 @@ public class Main {
         actions.put("DB params", id -> dbParamsAction());
         actions.put("Exit", id -> exitAction());
         Utils.clearConsole();
-        drawMenu(title, menuItems, selectedId);
+        drawMenu(title, menuItems, selectedId, footer);
         while (true) {
             int input = checkArrowKeys();
             switch (input) {
                 case 106:
                     Utils.clearConsole();
                     selectedId[0] = (selectedId[0] + 1) % (maxId + 1);
-                    drawMenu(title, menuItems, selectedId);
+                    drawMenu(title, menuItems, selectedId, footer);
                     break;
                 case 107:
                     Utils.clearConsole();
                     selectedId[0] = (selectedId[0] - 1 + (maxId + 1)) % (maxId + 1);
-                    drawMenu(title, menuItems, selectedId);
+                    drawMenu(title, menuItems, selectedId, footer);
                     break;
                 case 99:
                     Utils.clearConsole();
                     Output.drawControls();
                     Utils.pressEnterKey();
                     Utils.clearConsole();
-                    drawMenu(title, menuItems, selectedId);
+                    drawMenu(title, menuItems, selectedId, footer);
                     break;
                 case 10: case 13:
                     Utils.clearConsole();
@@ -72,7 +74,7 @@ public class Main {
                         return;
                     } else {
                         Utils.clearConsole();
-                        drawMenu(title, menuItems, selectedId);
+                        drawMenu(title, menuItems, selectedId, footer);
                     }
                     break;
                 default:
@@ -123,10 +125,10 @@ public class Main {
     }
 
     // Draw the menu
-    private static void drawMenu(String title, String[] menuItems, int[] selectedId) {
+    private static void drawMenu(String title, String[] menuItems, int[] selectedId, String footer) {
         OS.runTaskInSaneMode(() -> {
+            System.out.println(" " + footer + "\n");
             Output.drawBox(title, menuItems, selectedId);
-            System.out.println("Controls: c");
         });
     }
 
@@ -146,9 +148,43 @@ public class Main {
 
     // DB params action
     private static void dbParamsAction() {
+        String[] params = new String[5];
+        params = Utils.readParamsFromFile(new File("Properties"), params);
+        String title = "DB Params";
+        String[] menuItems = {
+            "ip:       " + params[0],
+            "port:     " + params[1],
+            "database: " + params[2],
+            "user:     " + params[3],
+            "password: " + "*".repeat(params[4].length())
+        };
+        String footer = "Confirm: c";
+        final int[] selectedId = {0};
+        int maxId = menuItems.length - 1;
         OS.runTaskInSaneMode(() -> {
-            System.out.println("DB params");
+            drawMenu(title, menuItems, selectedId, footer);
         });
+        while (true) {
+            int input = checkArrowKeys();
+            switch (input) {
+                case 106:
+                    Utils.clearConsole();
+                    selectedId[0] = (selectedId[0] + 1) % (maxId + 1);
+                    drawMenu(title, menuItems, selectedId, footer);
+                    break;
+                case 107:
+                    Utils.clearConsole();
+                    selectedId[0] = (selectedId[0] - 1 + (maxId + 1)) % (maxId + 1);
+                    drawMenu(title, menuItems, selectedId, footer);
+                    break;
+                case 99:
+                    Utils.clearConsole();
+                    return;
+                default:
+                    // Do nothing
+                    break;
+            }
+        }
     }
 
     // Exit action

@@ -64,7 +64,7 @@ public class Database {
             // Check if the credentials file exists
             if (credentialsFile.exists()) {
                 // Read the credentials from the file
-                params = readCredentialsFromFile(credentialsFile, params);
+                params = Utils.readParamsFromFile(credentialsFile, params);
             } else {
                 // Prompt the user for credentials
                 params = readCredentialsFromUser(params);
@@ -81,17 +81,6 @@ public class Database {
         // Class level variables
         private static Statement st = null;
         private static Connection conn = null;
-
-        // Read the credentials from the file
-        private static String[] readCredentialsFromFile(File file, String[] params) {
-            for (int i = 0; i < params.length; i++) {
-                params[i] = Input.readBufferedString(Input.BufferedInputReader.FILE_READER, file);
-                if (i == 4) {
-                    params[i] = Security.encryptDecryptString(params[i], Security.EncryptionParam.DECRYPT);
-                }
-            }
-            return params;
-        }
 
         // Read the credentials from the user
         private static String[] readCredentialsFromUser(String[] params) {

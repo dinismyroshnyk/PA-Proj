@@ -1,3 +1,4 @@
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Date;
@@ -43,6 +44,17 @@ public class Utils {
                 startTime = LocalDateTime.now();
             }
             return startTime;
+        }
+
+        // Read the credentials from the file
+        public static String[] readParamsFromFile(File file, String[] params) {
+            for (int i = 0; i < params.length; i++) {
+                params[i] = Input.readBufferedString(Input.BufferedInputReader.FILE_READER, file);
+                if (i == 4) {
+                    params[i] = Security.encryptDecryptString(params[i], Security.EncryptionParam.DECRYPT);
+                }
+            }
+            return params;
         }
 
     // Helper methods

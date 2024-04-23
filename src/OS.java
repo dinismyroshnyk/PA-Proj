@@ -38,6 +38,7 @@ public class OS {
                     setConsoleMode(handle, mode, ConsoleMode.RAW);
                     break;
                 case SANE:
+                    System.out.print("\33[?25h");
                     setConsoleMode(handle, mode, ConsoleMode.SANE);
                     break;
                 default:
