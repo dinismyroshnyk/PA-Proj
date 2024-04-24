@@ -98,7 +98,7 @@ public class Database {
         }
 
         // Save the credentials to the file
-        private static void saveCredentialsToFile(String path, String[] params) {
+        public static void saveCredentialsToFile(String path, String[] params) {
             params[4] = Security.encryptDecryptString(params[4], Security.EncryptionParam.ENCRYPT);
             if (params[4] == null) {
                 Utils.clearConsole();

@@ -8,11 +8,11 @@ import java.util.function.Consumer;
 
 public class Main {
     public static void main(String[] args) {
+        
         // Add a shutdown hook to close the input stream and restore the console mode
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.SANE);
             Input.closeInput();
-            Utils.clearConsole();
         }));
         // Start the timer
         Utils.getStartTime();
@@ -23,6 +23,7 @@ public class Main {
             mainLoop();
         }, true);
         // Exit the application
+        Utils.clearConsole();
         System.exit(0);
     }
 
@@ -220,6 +221,7 @@ public class Main {
                         menuItems[2] = "database: " + params[2];
                         menuItems[3] = "user:     " + params[3];
                         menuItems[4] = "password: " + "*".repeat(params[4].length());
+                        Database.saveCredentialsToFile("Properties", params);
                         Utils.clearConsole();
                         drawMenu(title, menuItems, selectedId, footer);
                     } else {
