@@ -146,10 +146,31 @@ public class Main {
         });
     }
 
+    private static void allParams(String[] paramWrapper, final int[] selectedId) {
+        OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.SANE);
+        Map <Integer, String> paramText = new HashMap<>( Map.of(
+                0, "Enter new ip: ",
+                1, "Enter new port: ",
+                2, "Enter new database: ",
+                3, "Enter new user: "
+        ));
+        if (selectedId[0] == 4){
+            paramWrapper[0] = Security.maskPassword("Enter new password");
+            return;
+
+        } else {
+            System.out.print(paramText.get(selectedId [0]));
+            paramWrapper[0] = Input.readLine();  
+        }
+        OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.RAW);
+        
+    }
+
     // DB params action
     private static void dbParamsAction() {
         String[] params = new String[5];
         params = Utils.readParamsFromFile(new File("Properties"), params);
+        String[] ipWrapper = new String[]{params[0]};
         String title = "DB Params";
         String[] menuItems = {
             "ip:       " + params[0],
@@ -161,9 +182,14 @@ public class Main {
         String footer = "Confirm: c";
         final int[] selectedId = {0};
         int maxId = menuItems.length - 1;
-        OS.runTaskInSaneMode(() -> {
-            drawMenu(title, menuItems, selectedId, footer);
-        });
+        Map<String, Consumer<Integer>> actions = new HashMap<>();
+        actions.put("ip", id -> allParams(ipWrapper, selectedId));
+        actions.put("port", id -> allParams(ipWrapper, selectedId));   
+        actions.put("database", id -> allParams(ipWrapper, selectedId));
+        actions.put("user", id -> allParams(ipWrapper, selectedId));
+        actions.put("password", id -> allParams(ipWrapper, selectedId));
+        Utils.clearConsole();
+        drawMenu(title, menuItems, selectedId, footer);
         while (true) {
             int input = checkArrowKeys();
             switch (input) {
@@ -180,6 +206,28 @@ public class Main {
                 case 99:
                     Utils.clearConsole();
                     return;
+                case 10: case 13:
+                    String selectedItem = menuItems[selectedId[0]]; // Obtém o item selecionado
+                    // Extrai apenas a parte da chave que corresponde ao identificador da ação
+                    String actionKey = selectedItem.split(":")[0].trim();
+                    Consumer<Integer> action = actions.get(actionKey); // Busca a ação correspondente ao item selecionado
+                    if (action != null) { // Se a ação existir
+                        action.accept(selectedId[0]); // Executa a ação
+                        params[selectedId[0]] = ipWrapper[0];
+                        //Atualizar os itens do menu para refletir os novos valores de params
+                        menuItems[0] = "ip:       " + params[0];
+                        menuItems[1] = "port:     " + params[1];
+                        menuItems[2] = "database: " + params[2];
+                        menuItems[3] = "user:     " + params[3];
+                        menuItems[4] = "password: " + "*".repeat(params[4].length());
+                        Utils.clearConsole();
+                        drawMenu(title, menuItems, selectedId, footer);
+                    } else {
+                        System.out.println("Ação " + actionKey + " não encontrada"); // Adicionar uma mensagem de depuração
+                        Utils.pressEnterKey(); 
+                        Utils.clearConsole(); 
+                        drawMenu(title, menuItems, selectedId, footer);} // Redesenha o menu
+                    break;
                 default:
                     // Do nothing
                     break;
