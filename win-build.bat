@@ -8,6 +8,11 @@ echo Removing current out folder...
 rmdir /S /Q out
 echo Folder removed.
 
+:: Create the tmp directory.
+echo Creating tmp folder...
+mkdir tmp
+echo Folder created.
+
 :: Create the out directory while compiling the Java files.
 echo Compiling Java files...
 javac -cp ".;lib/*" -d out/ src/main/*.java -Xlint
