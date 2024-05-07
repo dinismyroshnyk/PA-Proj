@@ -41,7 +41,7 @@ public class Security {
             System.out.print(type + ": ");
             OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.RAW);
             int c;
-            while ((c = Input.readBufferedInt()) != -1) {
+            while ((c = IO.readBufferedInt()) != -1) {
                 switch (c) {
                     case 10: case 13:
                         OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.SANE);

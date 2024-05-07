@@ -2,10 +2,35 @@ import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class Input {
+public class IO {
     // Public methods
+        // Runnable tasks with exception throwing
+        public interface IOTask {
+            void run() throws IOException, InterruptedException;
+        }
+
+        // IO error handling
+        public static void ioTaskWithErrorHandling(IOTask task, String error) {
+            try {
+                task.run();
+            } catch (IOException e) {
+                Utils.clearConsole();
+                if (error != null) {
+                    System.out.println(error);
+                } else {
+                    System.out.println("IO operation failed.");
+                }
+                System.out.println("Exception: " + e);
+            } catch (InterruptedException e) {
+                Utils.clearConsole();
+                System.out.println("Thread interrupted.");
+                System.out.println("Exception: " + e);
+            }
+        }
+
         // Buffered input reader enum
         public static enum BufferedInputReader {
             SYSTEM_IN,

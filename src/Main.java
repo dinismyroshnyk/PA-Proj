@@ -8,11 +8,10 @@ import java.util.function.Consumer;
 
 public class Main {
     public static void main(String[] args) {
-        
         // Add a shutdown hook to close the input stream and restore the console mode
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.SANE);
-            Input.closeInput();
+            IO.closeInput();
         }));
         // Start the timer
         Utils.getStartTime();
@@ -104,11 +103,11 @@ public class Main {
 
     // Check the arrow keys
     private static int checkArrowKeys() {
-        int input = Input.readBufferedInt();
+        int input = IO.readBufferedInt();
         if (input == 27) {
-            input = Input.readBufferedInt();
+            input = IO.readBufferedInt();
             if (input == 91) {
-                input = Input.readBufferedInt();
+                input = IO.readBufferedInt();
                 switch (input) {
                     case 65:
                         input = 107;
@@ -161,10 +160,9 @@ public class Main {
 
         } else {
             System.out.print(paramText.get(selectedId [0]));
-            paramWrapper[0] = Input.readLine();  
+            paramWrapper[0] = IO.readLine();
         }
         OS.toggleConsoleMode(OS.getHandle(), OS.getMode(), OS.ConsoleMode.RAW);
-        
     }
 
     // DB params action
@@ -185,7 +183,7 @@ public class Main {
         int maxId = menuItems.length - 1;
         Map<String, Consumer<Integer>> actions = new HashMap<>();
         actions.put("ip", id -> allParams(ipWrapper, selectedId));
-        actions.put("port", id -> allParams(ipWrapper, selectedId));   
+        actions.put("port", id -> allParams(ipWrapper, selectedId));
         actions.put("database", id -> allParams(ipWrapper, selectedId));
         actions.put("user", id -> allParams(ipWrapper, selectedId));
         actions.put("password", id -> allParams(ipWrapper, selectedId));
@@ -226,8 +224,8 @@ public class Main {
                         drawMenu(title, menuItems, selectedId, footer);
                     } else {
                         System.out.println("Ação " + actionKey + " não encontrada"); // Adicionar uma mensagem de depuração
-                        Utils.pressEnterKey(); 
-                        Utils.clearConsole(); 
+                        Utils.pressEnterKey();
+                        Utils.clearConsole();
                         drawMenu(title, menuItems, selectedId, footer);} // Redesenha o menu
                     break;
                 default:

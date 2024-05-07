@@ -86,13 +86,13 @@ public class Database {
         private static String[] readCredentialsFromUser(String[] params) {
             System.out.println("[Database Setup]");
             System.out.print("ip: ");
-            params[0] = Input.readLine();
+            params[0] = IO.readLine();
             System.out.print("Port: ");
-            params[1] = Input.readLine();
+            params[1] = IO.readLine();
             System.out.print("Database: ");
-            params[2] = Input.readLine();
+            params[2] = IO.readLine();
             System.out.print("User: ");
-            params[3] = Input.readLine();
+            params[3] = IO.readLine();
             params[4] = Security.maskPassword("Password");
             return params;
         }
