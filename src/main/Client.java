@@ -29,6 +29,7 @@ public class Client {
                     String input = IO.readLine();
                     IO.writeBufferedString(input, socket);
                     if (input.equalsIgnoreCase("exit")) {
+                        IO.writeBufferedString("<bye>;", socket);
                         closeSocket();
                         System.exit(0);
                     }

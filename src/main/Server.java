@@ -94,7 +94,7 @@ public class Server {
                                 clientSocket.close();
                             }
                         }
-                        System.out.println("Client disconnected: " + clientAddress);
+                        System.out.println("<" + clientAddress + ">" + " <bye>;");
                     } catch (Exception e) {
                         Utils.clearConsole();
                         System.out.println("Error handling client: " + e.getMessage());
