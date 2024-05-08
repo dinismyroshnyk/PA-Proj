@@ -78,8 +78,17 @@ public class Server {
                     try {
                         String clientAddress = clientSocket.getInetAddress().getHostAddress();
                         System.out.println("New client connected: " + clientAddress);
+                        // Espera a mensagem de hello do cliente
+                        String input = IO.readBufferedString(IO.BufferedInputReader.SOCKET, null, clientSocket);
+                        if (input.equals("<hello>;")) {
+                            // Envia a resposta de confirmação para o cliente
+                            IO.writeBufferedString("<login> <ack>;", clientSocket);
+                            System.out.println("<" + clientAddress + "> " + input);
+                        } else {
+                            System.out.println("Client did not send the correct initial message.");
+                        }
                         while (!clientSocket.isClosed()) {
-                            String input = IO.readBufferedString(IO.BufferedInputReader.SOCKET, null, clientSocket);
+                            input = IO.readBufferedString(IO.BufferedInputReader.SOCKET, null, clientSocket);
                             System.out.println(clientAddress + ": " + input);
                             if (input.equalsIgnoreCase("exit")) {
                                 clientSocket.close();

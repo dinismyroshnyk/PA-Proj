@@ -23,6 +23,8 @@ public class Client {
                 socket = new Socket(SERVER_ADDRESS, PORT);
                 System.out.println("Connected to server at " + SERVER_ADDRESS + ":" + PORT);
                 System.out.println("Client running...");
+                //enviar a mensagem para o servidor
+                IO.writeBufferedString("<hello>;", socket);
                 while (!socket.isClosed()) {
                     String input = IO.readLine();
                     IO.writeBufferedString(input, socket);

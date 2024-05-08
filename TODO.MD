@@ -39,7 +39,7 @@ Espera-se o desenvolvimento e aplicação de conhecimentos e competências relac
 
 ### Sequência de comunicação:
 
-- [ ] [R13] A primeira mensagem logo após o estabelecimento de comunicação deverá ser iniciada pelo servidor com a sintaxe `<login> <hello>;`. O cliente responderá da mesma forma. Se o servidor não receber como resposta uma mensagem do tipo `<hello>`, deve remeter novamente a sua mensagem `<hello>` até receber a resposta correcta. Se o servidor receber a resposta correcta do cliente deve enviar o comando `<login> <ack>;`.
+- [x] [R13] A primeira mensagem logo após o estabelecimento de comunicação deverá ser iniciada pelo servidor com a sintaxe `<login> <hello>;`. O cliente responderá da mesma forma. Se o servidor não receber como resposta uma mensagem do tipo `<hello>`, deve remeter novamente a sua mensagem `<hello>` até receber a resposta correcta. Se o servidor receber a resposta correcta do cliente deve enviar o comando `<login> <ack>;`.
 - [ ] [R14] A comunicação termina quando o nó cliente envia a mensagem `<login> <bye>;`.
 - [ ] [R15] O nó cliente envia pedidos ao nó servidor com a seguinte estrutura: `<login> <acção> [<argumentos>];` descritos nos pontos seguintes. O nó servidor responde com um comando semelhante, disponibilizando a informação solicitada.
 - [ ] [R16] Para autenticar, o nó cliente envia o comando `<login> <autenticar> <username,password>;`. Caso a autenticação seja realizada com sucesso, o nó servidor responde com `<login> <autenticar> <success>;`. Caso contrário, o nó servidor responde com `<login> <autenticar> <fail>;`.
