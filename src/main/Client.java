@@ -20,16 +20,16 @@ public class Client {
             }));
 
             IO.ioTaskWithErrorHandling(() -> {
-                socket = new Socket(SERVER_ADDRESS, PORT);
+                serverSocket = new Socket(SERVER_ADDRESS, PORT);
+                String clientAddress = serverSocket.getLocalAddress().getHostAddress();
                 System.out.println("Connected to server at " + SERVER_ADDRESS + ":" + PORT);
                 System.out.println("Client running...");
-                //enviar a mensagem para o servidor
-                IO.writeBufferedString("<hello>;", socket);
-                while (!socket.isClosed()) {
+                IO.writeBufferedString("<" + clientAddress + "> <hello>;", serverSocket);
+                while (!serverSocket.isClosed()) {
                     String input = IO.readLine();
-                    IO.writeBufferedString(input, socket);
+                    IO.writeBufferedString(input, serverSocket);
                     if (input.equalsIgnoreCase("exit")) {
-                        IO.writeBufferedString("<bye>;", socket);
+                        IO.writeBufferedString("<" + clientAddress + "> <bye>;", serverSocket);
                         closeSocket();
                         System.exit(0);
                     }
@@ -43,14 +43,14 @@ public class Client {
          */
         private static final String SERVER_ADDRESS = "127.0.0.1";
         private static final int PORT = 8080;
-        private static Socket socket;
+        private static Socket serverSocket;
 
         /**
          * Closes the client socket.
          */
         private static void closeSocket() {
             IO.ioTaskWithErrorHandling(() -> {
-                socket.close();
+                serverSocket.close();
             }, "Error closing client socket.");
         }
 }

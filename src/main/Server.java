@@ -1,6 +1,7 @@
 package main;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 /**
  * Contains the methods to start and close the server.
@@ -31,11 +32,17 @@ public class Server {
             }).start();
 
             IO.ioTaskWithErrorHandling(() -> {
-                serverSocket = new ServerSocket(PORT);
-                System.out.println("Server started on port " + PORT);
+                int port = getPort();
+                System.out.println("Port set to " + port);
+                serverSocket = new ServerSocket(port);
+                System.out.println("Server started on port " + port);
                 while (!serverSocket.isClosed()) {
-                    Socket clientSocket = serverSocket.accept();
-                    new Thread(new ClientHandler(clientSocket)).start();
+                    try {
+                        Socket clientSocket = serverSocket.accept();
+                        new Thread(new ClientHandler(clientSocket)).start();
+                    } catch (SocketException e) {
+                        System.out.println("Server closed.");
+                    }
                 }
             }, "Error starting server.");
         }
@@ -44,8 +51,27 @@ public class Server {
         /**
          * Class level variables
          */
-        private static final int PORT = 8080;
         private static ServerSocket serverSocket;
+
+        /**
+         * Asks the server administrator to enter the server port.
+         *
+         * @return The server port.
+         */
+        private static int getPort() {
+            int port;
+            while (true) {
+                System.out.print("Enter the exposed server port: ");
+                String input = IO.readLine().trim();
+                port = Utils.tryParseInt(input);
+                if (port < 1 || port > 65535) {
+                    System.out.println("Invalid port.");
+                } else {
+                    break;
+                }
+            }
+            return port;
+        }
 
         /**
          * Closes the server socket.
@@ -78,20 +104,13 @@ public class Server {
                     try {
                         String clientAddress = clientSocket.getInetAddress().getHostAddress();
                         System.out.println("New client connected: " + clientAddress);
-                        // Espera a mensagem de hello do cliente
-                        String input = IO.readBufferedString(IO.BufferedInputReader.SOCKET, null, clientSocket);
-                        if (input.equals("<hello>;")) {
-                            // Envia a resposta de confirmação para o cliente
-                            IO.writeBufferedString("<login> <ack>;", clientSocket);
-                            System.out.println("<" + clientAddress + "> " + input);
-                        } else {
-                            System.out.println("Client did not send the correct initial message.");
-                        }
+                        validateConnection(clientAddress, clientSocket);
                         while (!clientSocket.isClosed()) {
-                            input = IO.readBufferedString(IO.BufferedInputReader.SOCKET, null, clientSocket);
-                            System.out.println(clientAddress + ": " + input);
+                            String input = IO.readBufferedString(IO.BufferedInputReader.SOCKET, null, clientSocket);
                             if (input.equalsIgnoreCase("exit")) {
                                 clientSocket.close();
+                            } else {
+                                System.out.println(input);
                             }
                         }
                         System.out.println("<" + clientAddress + ">" + " <bye>;");
@@ -110,5 +129,21 @@ public class Server {
                  * Class level variables
                  */
                 private final Socket clientSocket;
+
+                /**
+                 * Validates the client connection.
+                 *
+                 * @param clientAddress The client address.
+                 * @param clientSocket The client socket.
+                 */
+                private void validateConnection(String clientAddress, Socket clientSocket) {
+                    String receivedMsg = IO.readBufferedString(IO.BufferedInputReader.SOCKET, null, clientSocket);
+                    if (receivedMsg.equals("<" + clientAddress + "> <hello>;")) {
+                        IO.writeBufferedString("<server> <ack>;", clientSocket);
+                        System.out.println("<" + clientAddress + "> " + receivedMsg);
+                    } else {
+                        System.out.println("Client did not send the correct initial message.");
+                    }
+                }
         }
 }

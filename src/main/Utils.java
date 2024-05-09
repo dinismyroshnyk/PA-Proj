@@ -93,6 +93,20 @@ public class Utils {
             return params;
         }
 
+        /**
+         * Tries to parse an integer from a string.
+         *
+         * @param input The string to parse.
+         * @return The integer if successful, or -1 if not.
+         */
+        public static int tryParseInt(String input) {
+            try {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                return -1;
+            }
+        }
+
     // Helper methods
         /**
          * Class level variables
