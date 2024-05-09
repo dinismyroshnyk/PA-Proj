@@ -25,8 +25,10 @@ public class Client {
                 System.out.println("Connected to server at " + SERVER_ADDRESS + ":" + PORT);
                 System.out.println("Client running...");
                 IO.writeBufferedString("<" + clientAddress + "> <hello>;", serverSocket);
+                String input = IO.readBufferedString(IO.BufferedInputReader.SOCKET, null, serverSocket);
+                System.out.println(input);
                 while (!serverSocket.isClosed()) {
-                    String input = IO.readLine();
+                    input = IO.readLine();
                     IO.writeBufferedString(input, serverSocket);
                     if (input.equalsIgnoreCase("exit")) {
                         IO.writeBufferedString("<" + clientAddress + "> <bye>;", serverSocket);
